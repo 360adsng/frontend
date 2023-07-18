@@ -1,0 +1,87 @@
+import Link from 'next/link'
+import React from 'react'
+import search from "@public/icons/search.svg"
+import Image from 'next/image'
+
+const Table = () => {
+    
+  return (
+    <>
+
+        <div className="flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10">
+          <button>
+            <Image
+              width={0}
+              height={0}
+              src={search}
+              alt="searchicon"
+            />
+            </button>
+            <input className="rounded-10 w-full bg-transparent focus:outline-none h-full" placeholder="search..."/>
+        </div>
+        <div className="w-full overflow-x-auto my-5">
+          <table className="min-w-full bg-white">
+            <thead className='bg-[#D0B301]/40'>
+              <tr>
+                <th className="py-2 px-2 md:px-3 border-b">ID</th>
+                <th className="py-2 px-2 md:px-3 border-b">COST</th>
+                <th className="py-2 px-2 md:px-3 border-b">DATE CREATED</th>
+                <th className="py-2 px-2 md:px-3 border-b">STATUS</th>
+                <th className="py-2 px-2 md:px-3 border-b">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody className='text-center'>
+              <tr>
+                <td className="py-2 px-2 md:px-3 border-br">#1</td>
+                <td className="py-2 px-2 md:px-3 border-b">₦200000</td>
+                <td className="py-2 px-2 md:px-3 border-b">2023-05-20</td>
+                <td className="py-2 px-2 md:px-3 border-b">Completed</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                    <Link href={`/users/campaign/${1}`}>view</Link>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 px-2 md:px-3 border-br">#2</td>
+                <td className="py-2 px-2 md:px-3 border-b">₦60000</td>
+                <td className="py-2 px-2 md:px-3 border-b">2023-05-4</td>
+                <td className="py-2 px-2 md:px-3 border-b">negotiating</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                    <Link href={`/users/campaign/${2}`}>view</Link>
+                </td>
+              </tr>
+              <tr>
+                <td className="py-2 px-2 md:px-3 border-br">#3</td>
+                <td className="py-2 px-2 md:px-3 border-b">₦500000</td>
+                <td className="py-2 px-2 md:px-3 border-b">2023-05-2</td>
+                <td className="py-2 px-2 md:px-3 border-b">ongonging</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                    <Link href={`/users/campaign/${3}`}>view</Link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className='flex w-full justify-between'>
+
+            <div className='flex space-x-2'>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>{'<'}</button>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>1</button>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>2</button>
+                <button>...</button>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>7</button>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>8</button>
+                <button className='border rounded-10 border-ads360yellow-100 py-1 px-2'>{'>'}</button>
+            </div>
+
+            <div>
+                1 of 8
+            </div>
+
+        </div>
+        
+    </>
+  )
+}
+
+export default Table
