@@ -10,24 +10,26 @@ const Why360 = () => {
      //this array is for why 360 ads section
      const why360ads = [
         {
-            yellowWriteUp : "Customer Loyalty Management",
-            whiteWripeUp : "We provide well optimized system that allows you access to all you need to grow your business thereby giving you your money’s worth of service.",
+            yellowWriteUp : "Automated Advertising Platform",
+            whiteWripeUp : "Our platform eliminates the need for intermediaries and streamlines the advertising process, saving you time, effort, and resources. You have full control over your ad placements, allowing you to make data-driven decisions and optimise your campaigns for maximum effectiveness.",
+            image : why2
+
+        },
+        {
+            yellowWriteUp : "User-Friendly Interface",
+            whiteWripeUp : "Our platform is designed with user-friendliness in mind, making it easy for you to navigate and manage your advertising campaigns. You don't need prior advertising experience to utilise our platform effectively.",
             image : why1
         },
         {
-            yellowWriteUp : "Increase Leads & Customers",
-            whiteWripeUp : "We allow you to focus on the people who are searching for what your business offers. Watch your number increase with our transparent process.",
-            image : why2
-        },
-        {
-            yellowWriteUp : "Target Demography",
-            whiteWripeUp : "We target on the basis of age, gender, location to communicate with relevance and precision.",
-            image : why3
-        },
-        {
-            yellowWriteUp : "Building Customers Trust and give them Consultation",
-            whiteWripeUp : "We allow you to focus on the people who are searching for what your business offers. Watch your number increase with our transparent process.",
+            yellowWriteUp : "Exceptional Support",
+            whiteWripeUp : "Our dedicated support team is here to assist you every step of the way. If you have any questions or encounter any issues, we are ready to provide prompt and helpful assistance.",
             image : why4
+
+        },
+        {
+            yellowWriteUp : "Targeted Reach",
+            whiteWripeUp : "With our precise targeting capabilities, we ensure that your ads reach the right audience, maximizing your chances of success and generating tangible results.",
+            image : why3
         },
     ]
 

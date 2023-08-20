@@ -46,13 +46,13 @@ function UserSideNav() {
             on:onwallet
 
         },
-        {
-            link:'/users/analysis',
-            name:'Analysis',
-            off:analysis,
-            on:onanalysis
+        // {
+        //     link:'/users/analysis',
+        //     name:'Analysis',
+        //     off:analysis,
+        //     on:onanalysis
 
-        },
+        // },
     ]
 
     const navItem2 = [

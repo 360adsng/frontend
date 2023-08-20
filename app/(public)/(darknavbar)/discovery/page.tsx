@@ -69,8 +69,7 @@ const Service = () => {
                     <div className="mb-16">
                     <h5 className="text-ads360yellow-100  mb-10">Our Services</h5>
                     <h3 className="text-2xl lg:text-4xl lg:mb-4 mb-2">
-                        Get your audience’s attention with our 
-                        services
+                        Discover Our Automated Advertising Solutions
                     </h3>
                     </div>
                     <div className="hidden md:block">
@@ -79,14 +78,14 @@ const Service = () => {
                             <div className="basis-1/2 -rotate-12">
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
-                                </span>Influencer Marketing</div>
+                                </span> Influencer Marketing</div>
                                 <Image width={0} height={0} src={influencer} alt='...'/>
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
-                                360 ads offers the ideal platform for 
-                                advertisers to engage influencers to 
-                                promote their products and services on 
-                                their social media platforms at a cost.
+                                Leverage the power of influencers to amplify your brand's reach. Our platform connects 
+                                you with a diverse network of influencers, allowing you to tap into their engaged
+                                 audiences and drive brand awareness.
+
                             </div>
                         </div>
 
@@ -94,14 +93,12 @@ const Service = () => {
                             <div className="basis-1/2 rotate-6">
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
-                                </span>Digital Ads</div>
+                                </span>Twitter Spaces</div>
                                 <Image width={0} height={0} src={digital} alt='...'/>
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center">
-                                We utilize display ads to reach our target 
-                                audience when consuming relevant content 
-                                on the network. With this data, we combine 
-                                the best appraoch to reach them
+                            Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads.ng connects you with influential voices on Twitter, empowering you to host interactive audio sessions that foster engagement and build brand loyalty. Amplify your reach and create valuable connections with your target audience through our network of influential partners. Discover the power of hosting impactful Twitter Spaces with 360ads.ng
+
                             </div>
                         </div>
 
@@ -110,15 +107,12 @@ const Service = () => {
                             <div className="basis-1/2 -rotate-12">
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
-                                </span>SMS Makerting</div>
+                                </span>SMS Campaigns</div>
                                 <Image width={0} height={0} src={happy} alt='...'/>
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
-                                Our SMS Marketing service mostly delivers 
-                                messages on latest updates, time-sensitive 
-                                offers, product launches, alerts, notifications 
-                                and any other form of 
-                                promotional information.
+                            Engage customers directly through personalised SMS campaigns. Our platform enables you 
+                            to create and send targeted messages, keeping your audience informed, and driving conversions.
                             </div>
                         </div>
 
@@ -127,14 +121,13 @@ const Service = () => {
                             <div className="basis-1/2 rotate-6">
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
-                                </span>BillBoard Makerting</div>
+                                </span>Billboard Advertisements</div>
                                 <Image width={0} height={0} src={billboard} alt='...'/>
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center">
-                                With Billboards displayed in strategic 
-                                locations across the country, you can 
-                                reach your customers with promotional 
-                                information, product offers and alerts.
+                            Capture attention and make a lasting impact with our billboard advertising module.
+                             We connect you to billboards strategically placed 
+                            in high-traffic areas, ensuring maximum visibility for your brand.
                             </div>
                         </div>
 
@@ -143,14 +136,28 @@ const Service = () => {
                             <div className="basis-1/2 -rotate-12">
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
-                                </span>WhatsApp Cluster</div>
+                                </span>WhatsApp Status Ads</div>
                                 <Image width={0} height={0} src={whatsapp} alt='...'/>
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
-                                Our SMS Marketing service mostly delivers 
-                                messages on latest updates, time-sensitive 
-                                offers, product launches, alerts, notifications 
-                                and any other form of promotional information.
+                             Showcase your brand in the WhatsApp ecosystem.
+                             With our platform, you can seamlessly place ads in WhatsApp status,
+                             reaching a vast user base and generating buzz around your products or services.
+                            </div>
+                        </div>
+
+
+
+                        <div id='billboard' className="flex flex-row-reverse my-10">
+                            <div className="basis-1/2 rotate-6">
+                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                                    <Image width={0} height={0} src={Yellowdot} alt='...'/>
+                                </span>Blog Advertisements</div>
+                                <Image width={0} height={0} src={billboard} alt='...'/>
+                            </div>
+                            <div className="basis-1/2 grid grid-cols-1 content-center">
+                             Expand your online presence by placing ads on popular blogs. Our platform allows you to negotiate and secure ad placements on relevant blogs, effectively reaching your target audience.
+
                             </div>
                         </div>
                        

@@ -9,6 +9,7 @@ import facebook from '@public/icons/Facebook2.svg'
 import twitter from '@public/icons/twitter2.svg'
 import google from '@public/icons/Google2.svg'
 import Image from "next/image";
+import Link from "next/link";
 
 
 
@@ -24,13 +25,13 @@ const Contact = () => {
                     <div className="text-4xl md:text-6xl font-sgb">
                         <h3>ready when</h3>
                         <h3>you are—Let’s kickstart</h3>
-                        <h3>your digital campaign.</h3>
+                        <h3>your campaign.</h3>
                     </div>
                     <div className="md:flex flex-row-reverse justify-between my-10">
                         <div className="mb-10">
                             <BlackButtons text="Get in touch"/>
                         </div>
-                        <h5>you can also send us a plain email if you want too ;{')'} info@360ads.ng</h5>
+                        <h5>you can also send us a plain email if you want too ;{')'} hello@360ads.ng</h5>
                     </div>
                 </div>
             </section>
@@ -42,8 +43,7 @@ const Contact = () => {
                             <h5 className="text-ads360yellow-100">Our Office</h5>
                         </div>
                         <div className="basis-4/12 text-right">
-                            <h6>3 Adedoyin Ogungbe Crecent,</h6>
-                            <h6>Lekki Phase 1,</h6>
+                            <h6>King Court estate,</h6>              
                             <h6>Lagos, Nigeria.</h6>
                         </div>
 
@@ -57,10 +57,10 @@ const Contact = () => {
                         </div>
                         <div className="basis-4/12">
                             <div>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={phone} alt='phone number'/>+2348122089773</h5>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={email} alt='email'/>info@360ads.ng</h5>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={time} alt='time'/>09:34pm</h5>
-                                <div className="flex justify-end my-2"><Image width={0} height={0} src={React360Logo} alt='logo'/></div>
+                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={phone} alt='phone number'/> +2347082436214</h5>
+                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={email} alt='email'/> hello@360ads.ng</h5>
+                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={time} alt='time'/> 24/7</h5>
+                                <div className="flex justify-end my-2"><Image width={0} height={0} src={React360Logo} className="hover:-rotate-90 transistion duration-300" alt='logo'/></div>
                             </div>
                             <div></div>
                         </div>
@@ -77,11 +77,10 @@ const Contact = () => {
                         </h3>
                         <div className="flex justify-end basis-2/12">
                             <div className="border-l border-[#3C3C3B] pl-7">
-                                <Image width={0} height={0} src={whatsapp} className="my-3" alt="whatsapp"/>
-                                <Image width={0} height={0} src={facebook} className="my-3" alt="facebook"/>
-                                <Image width={0} height={0} src={instagram} className="my-3" alt="instagram"/>
-                                <Image width={0} height={0} src={twitter} className="my-3" alt="twitter"/>
-                                <Image width={0} height={0} src={google} className="my-3" alt="google"/>
+                                <Link href=' https://wa.me/+2347082436214?text=urlencodedtext'><Image width={0} height={0} src={whatsapp} className="my-3" alt="whatsapp"/></Link>
+                                {/* <Image width={0} height={0} src={facebook} className="my-3" alt="facebook"/> */}
+                                <Link href='https://www.instagram.com/360ads.ng/' ><Image width={0} height={0} src={instagram} className="my-3" alt="instagram"/></Link>
+                                <Link href='https://twitter.com/360adsNg'><Image width={0} height={0} src={twitter} className="my-3" alt="twitter"/></Link>
                             </div>
                         </div>
                     </div>

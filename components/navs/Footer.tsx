@@ -35,10 +35,10 @@ const Footer = () =>{
                     <div className="basis-1/4 my-10 md:text-right">
                         <h4 className='text-ads360yellow-100 my-4'>CONTACT INFO</h4>
                         <h6>King Court estate,</h6>
-                        {/* <h6>Lekki Phase 1,</h6> */}
+                        
                         <h6>Lagos, Nigeria</h6>
-                        <h6>+234 8160985407</h6>
-                        {/* <h6>info@360ads.com.ng</h6> */}
+                        <h6>+234 7082436214</h6>
+                     
                     </div>
                 </div>
 
