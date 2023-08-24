@@ -19,18 +19,19 @@ const Footer = () =>{
                     </div>
                     <div className="basis-1/4 my-10 md:text-center">
                         <h4 className='text-ads360yellow-100 my-4'>QUICK LINKS</h4>
-                        <h6><Link href='/about'>About Us</Link></h6>
-                        <h6><Link href='/contact'>Contact</Link></h6>
-                        <h6><Link href='/discovery'>Services</Link></h6>
-                        <h6><Link href='/faqs'>FAQs</Link></h6>
+                        <h6><Link href='/about' className='transition duration-300 hover:text-ads360yellowBtn-100'>About Us</Link></h6>
+                        <h6><Link href='/contact' className='transition duration-300 hover:text-ads360yellowBtn-100'>Contact</Link></h6>
+                        <h6><Link href='/discovery' className='transition duration-300 hover:text-ads360yellowBtn-100'>Services</Link></h6>
+                        <h6><Link href='/faqs' className='transition duration-300 hover:text-ads360yellowBtn-100'>FAQs</Link></h6>
                     </div>
                     <div className="basis-1/4 my-10 md:text-center">
                         <h4 className='text-ads360yellow-100 my-4'>OUR SERVICES</h4>
-                        <h6><Link href='/discovery/#billboard'>Billboard Marketing </Link></h6>
-                        <h6><Link href='/discovery/#digital'>Digital Ads</Link></h6>
-                        <h6><Link href='/discovery/#smartsms'>Smart SMS</Link></h6>
-                        <h6><Link href='/discovery/#whatsapp'>WhatsApp Cluster</Link></h6>
-                        <h6><Link href='/discovery/#influencer'>Influencer Marketing</Link></h6>
+                        <h6><Link href='/discovery/#billboard' className='transition duration-300 hover:text-ads360yellowBtn-100'>Billboard Advertisements</Link></h6>
+                        <h6><Link href='/discovery/#blog' className='transition duration-300 hover:text-ads360yellowBtn-100'>Blog Advertisements</Link></h6>
+                        <h6><Link href='/discovery/#sms' className='transition duration-300 hover:text-ads360yellowBtn-100'>SMS Campaigns</Link></h6>
+                        <h6><Link href='/discovery/#whatsapp' className='transition duration-300 hover:text-ads360yellowBtn-100'>WhatsApp Status Ads</Link></h6>
+                        <h6><Link href='/discovery/#influencer' className='transition duration-300 hover:text-ads360yellowBtn-100'>Influencer Marketing</Link></h6>
+                        <h6><Link href='/discovery/#twitter' className='transition duration-300 hover:text-ads360yellowBtn-100'>Twitter Spaces</Link></h6>
                     </div>
                     <div className="basis-1/4 my-10 md:text-right">
                         <h4 className='text-ads360yellow-100 my-4'>CONTACT INFO</h4>

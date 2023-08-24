@@ -9,7 +9,7 @@ const About = () =>{
     return(
         <>
             <section className='bg-ads360light-100 pt-24'>
-                <div className="text-4xl md:text-6xl px-5 font-sgb md:text-center">
+                <div className="text-4xl md:text-6xl px-5 font-[600] md:text-center">
                     <h3>building concurrent</h3>
                     <h3>——— projects together</h3> 
                 </div>

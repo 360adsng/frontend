@@ -1,10 +1,9 @@
-
 import UserSideNav from '@components/navs/UserSideNav'
 import UsersNav from '@components/navs/UsersNav'
 
 
 
-function layout({children}:{children:React.ReactNode}) {
+function Layout({children}:{children:React.ReactNode}) {
   return (
     <>
       <main className='md:flex'>
@@ -24,4 +23,4 @@ function layout({children}:{children:React.ReactNode}) {
   )
 }
 
-export default layout
+export default Layout

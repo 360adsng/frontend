@@ -11,6 +11,8 @@ import SmallBtnYello from '@components/buttons/SmallBtnYellow';
 import manads2 from '@public/images/manads2.png';
 import Image from 'next/image';
 import CountUp from '@components/CountUp'
+import SectionX from '@components/slides/InViewX';
+import SectionY from '@components/slides/InViewY';
 
 
 
@@ -20,25 +22,24 @@ const Service = () => {
     return(
         <>
             <section className="bg-ads360black-100 pt-20 text-ads360light-100">
-                <div className="text-4xl md:text-6xl px-5 font-sgb md:text-center">
-                    <h3>services/ <span className="text-ads360black-50">we offer</span></h3>
+                <div className="text-4xl md:text-6xl px-5 font-[600] md:text-center">
+                    <h3>services / <span className="text-ads360black-50">we offer</span></h3>
                     <h3>this is what we do best.</h3>
                 </div>
             </section>
-            <section id='reach' className='bg-ads360black-100 py-24 text-ads360light-100'>
+            <section id='reach' className='bg-ads360black-100 pb-24 pt-16 text-ads360light-100'>
                 <div className='mx-auto w-11/12 md:w-10/12 xl:w-9/12'>
                     <h5 className="text-ads360yellow-100  text-right mb-14">Discorvery @ 360 ads</h5>
 
-                    <h3 className='text-center'>
-                        With over <span className='text-ads360yellow-100'>70 million</span> target audience we connect your business to the 
-                        right customer using our BILLBOARDS, SMART SMS, DISPLAY ADS, 
-                        VOICE SMS and TOP INFLUENCERS who will promote your brand 
-                        and products.
+                    <h3 className='text-justify md:text-center'>
+
+                        At 360ads we offer an extensive range of automated advertising solutions that are tailored to suit your unique goals and target audience. Our platform simplifies and automates the entire process, allowing you to effortlessly manage your ad placements and achieve maximum results.
+
                     </h3>
                     <div className='md:flex flex-row-reverse mt-10'>
                         <div className='bg-ads360black-50 rounded-10 drop-shadow-2xl basis-1/3 pt-2'>
                            <h3 className='mb-4 px-2'>Grow Your Business with our seamless <span className='text-ads360yellow-100'>options...</span></h3>
-                           <h4 className='mb-4 text-sm px-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit, tempor incididunt ut labore et dolore magna aliqua.</h4>
+                           <h4 className='mb-4 text-sm px-2 text-justify'> We are your comprehensive solution for automating your ad placements, offering a platform that streamlines the entire process</h4>
                             <div className='mx-auto w-1/2 md:w-3/4 xl:w-3/5 mb-10 md:mb-0'>
                                 <Image width={0} height={0} src={Group} className="mx-auto w-full  sm:w-1/2 md:w-full" alt='...'/>
                             </div>
@@ -63,11 +64,12 @@ const Service = () => {
             </section>
 
 
-            <section className="bg-ads360light-100 py-24">
+    
+            <section className="bg-ads360light-100 py-20">
 
                 <div className='mx-auto w-11/12 md:w-10/12 xl:w-9/12'>
-                    <div className="mb-16">
-                    <h5 className="text-ads360yellow-100  mb-10">Our Services</h5>
+                    <div className="mb-14">
+                    <h5 className="text-ads360yellow-100  mb-8">Our Services</h5>
                     <h3 className="text-2xl lg:text-4xl lg:mb-4 mb-2">
                         Discover Our Automated Advertising Solutions
                     </h3>
@@ -75,91 +77,113 @@ const Service = () => {
                     <div className="hidden md:block">
 
                         <div id='influencer' className="flex my-10">
+                          
                             <div className="basis-1/2 -rotate-12">
+                              <SectionX val={-200}>
                                 <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span> Influencer Marketing</div>
                                 <Image width={0} height={0} src={influencer} alt='...'/>
+                              </SectionX>
                             </div>
-                            <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
+                            <div className="basis-1/2 grid grid-cols-1 content-center">
+                              <SectionY val={-200}>
                                 Leverage the power of influencers to amplify your brand's reach. Our platform connects 
                                 you with a diverse network of influencers, allowing you to tap into their engaged
                                  audiences and drive brand awareness.
-
+                              </SectionY>
                             </div>
-                        </div>
+                        </div> 
 
-                        <div id='digital' className="flex flex-row-reverse my-10">
+                        <div id='twitter' className="flex flex-row-reverse my-10 space-x-4">
                             <div className="basis-1/2 rotate-6">
-                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                              <SectionX val={200}>
+                                <div className='flex mb-2 justify-center'><span className='flex items-center'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span>Twitter Spaces</div>
                                 <Image width={0} height={0} src={digital} alt='...'/>
-                            </div>
+                              </SectionX>
+                            </div> 
                             <div className="basis-1/2 grid grid-cols-1 content-center">
-                            Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads.ng connects you with influential voices on Twitter, empowering you to host interactive audio sessions that foster engagement and build brand loyalty. Amplify your reach and create valuable connections with your target audience through our network of influential partners. Discover the power of hosting impactful Twitter Spaces with 360ads.ng
-
+                              <SectionY val={200}>
+                                Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads.ng connects you with influential voices on Twitter, empowering you to host interactive audio sessions that foster engagement and build brand loyalty. Amplify your reach and create valuable connections with your target audience through our network of influential partners. Discover the power of hosting impactful Twitter Spaces with 360ads.ng
+                              </SectionY>
                             </div>
                         </div>
 
 
-                        <div id='smartsms' className="flex my-10">
+                        <div id='sms' className="flex my-10 space-x-4">
                             <div className="basis-1/2 -rotate-12">
-                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                              <SectionX val={-200}>
+                                <div className='flex mb-2 justify-center'><span className='flex items-center'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span>SMS Campaigns</div>
                                 <Image width={0} height={0} src={happy} alt='...'/>
+                              </SectionX>
                             </div>
-                            <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
-                            Engage customers directly through personalised SMS campaigns. Our platform enables you 
-                            to create and send targeted messages, keeping your audience informed, and driving conversions.
+                            <div className="basis-1/2 grid grid-cols-1 content-center">
+                              <SectionY val={-200}>   
+                                Engage customers directly through personalised SMS campaigns. Our platform enables you 
+                                to create and send targeted messages, keeping your audience informed, and driving conversions.
+                              </SectionY>
                             </div>
-                        </div>
+                        </div> 
 
 
-                        <div id='billboard' className="flex flex-row-reverse my-10">
+                        <div id='billboard' className="flex flex-row-reverse my-10 space-x-4">
                             <div className="basis-1/2 rotate-6">
-                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                              <SectionX val={200}>
+                                <div className='flex mb-2 justify-center'><span className='flex items-center'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span>Billboard Advertisements</div>
                                 <Image width={0} height={0} src={billboard} alt='...'/>
-                            </div>
+                              </SectionX>
+                            </div> 
                             <div className="basis-1/2 grid grid-cols-1 content-center">
-                            Capture attention and make a lasting impact with our billboard advertising module.
-                             We connect you to billboards strategically placed 
-                            in high-traffic areas, ensuring maximum visibility for your brand.
+                              <SectionY val={200}>
+                                Capture attention and make a lasting impact with our billboard advertising module.
+                                We connect you to billboards strategically placed 
+                                in high-traffic areas, ensuring maximum visibility for your brand.
+                              </SectionY>
                             </div>
-                        </div>
+                        </div> 
 
 
-                        <div id='whatsapp' className="flex my-10">
+                        <div id='whatsapp' className="flex my-10 space-x-4">
                             <div className="basis-1/2 -rotate-12">
-                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                              <SectionX val={-200}>
+                                <div className='flex mb-2 justify-center'><span className='flex items-center'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span>WhatsApp Status Ads</div>
-                                <Image width={0} height={0} src={whatsapp} alt='...'/>
+                                <Image width={0} height={0} src={digital} alt='...'/>
+                              </SectionX>
                             </div>
-                            <div className="basis-1/2 grid grid-cols-1 content-center pl-10">
-                             Showcase your brand in the WhatsApp ecosystem.
-                             With our platform, you can seamlessly place ads in WhatsApp status,
-                             reaching a vast user base and generating buzz around your products or services.
+                            <div className="basis-1/2 grid grid-cols-1 content-center">
+                              <SectionY val={-200}>
+                                Showcase your brand in the WhatsApp ecosystem.
+                                With our platform, you can seamlessly place ads in WhatsApp status,
+                                reaching a vast user base and generating buzz around your products or services.
+                             </SectionY>
                             </div>
                         </div>
 
 
 
-                        <div id='billboard' className="flex flex-row-reverse my-10">
+                        <div id='blog' className="flex flex-row-reverse my-10 space-x-4">
                             <div className="basis-1/2 rotate-6">
-                                <div className='flex mb-2 justify-center'><span className='flex items-center pr-3'>
+                              <SectionX val={200}>
+                                <div className='flex mb-2 justify-center'><span className='flex items-center'>
                                     <Image width={0} height={0} src={Yellowdot} alt='...'/>
                                 </span>Blog Advertisements</div>
                                 <Image width={0} height={0} src={billboard} alt='...'/>
+                              </SectionX> 
                             </div>
                             <div className="basis-1/2 grid grid-cols-1 content-center">
-                             Expand your online presence by placing ads on popular blogs. Our platform allows you to negotiate and secure ad placements on relevant blogs, effectively reaching your target audience.
-
+                              <SectionY val={200}>
+                                Expand your online presence by placing ads on popular blogs. Our platform allows you to negotiate and secure ad placements on relevant blogs, effectively reaching your target audience.
+                              </SectionY>
                             </div>
-                        </div>
+                        </div> 
                        
 
 
@@ -190,7 +214,7 @@ const Service = () => {
                             </div>
                         </div>
                         <div className="flex justify-center md:mt-5">
-                            <Image width={0} height={0} src={manads2} alt="..."/>
+                            <Image width={0} height={0} src={manads2} className='w-2/3' alt="..."/>
                         </div>
                     </div>
                 </div>

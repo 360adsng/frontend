@@ -30,7 +30,7 @@ function Home() {
         <section id="Hero" className='bg-ads360light-100 pt-24'>
                   <div className="mx-auto w-11/12 md:w-10/12 xl:w-9/12">
                       <div>
-                          <div className='text-5xl sm:text-6xl md:text-7xl font-sgb'>
+                          <div className='text-5xl sm:text-6xl md:text-7xl font-[600]'>
                               <h3>All day,</h3> 
                               <h3>Ad campaign </h3>
                               <h3 className='text-ads360yellow-100'>360...</h3>
@@ -50,15 +50,15 @@ function Home() {
 
               <section id='reach' className='bg-ads360black-100 py-24 text-ads360light-100'>
                   <div className='mx-auto w-11/12 md:w-10/12 xl:w-9/12'>
-                      <h3 className='text-center'>
+                      <h3 className='text-justify md:text-center'>
                           
-                          At 360ads, our platform is designed to revolutionise the way you handle your advertising needs. With our cutting-edge <br/> technology, we provide you with the tools and capabilities to efficiently manage your ad placements <br/>and maximise your brand's visibility. Our platform simplifies the process, empowering you <br/> to take full control of your advertising campaigns.
+                          At 360ads, our platform is designed to <span className='text-ads360yellowBtn-100'>revolutionise</span> the way you handle your advertising needs. With our cutting-edge technology, we provide you with the tools and capabilities to efficiently manage your ad placements and maximise your brand's visibility. Our platform simplifies the process, empowering you to take full control of your advertising campaigns.
 
                       </h3>
                       <div className='md:flex flex-row-reverse mt-10'>
-                          <div className='bg-ads360black-50 rounded-10 drop-shadow-2xl basis-1/3 pt-2'>
+                          <div className='bg-ads360black-50 rounded-10 shadow-2xl shadow-black basis-1/3 pt-2'>
                             <h3 className='mb-4 px-2'>Grow Your Business with our seamless <span className='text-ads360yellow-100'>options...</span></h3>
-                            <h4 className='mb-4 text-sm px-2'>
+                            <h4 className='mb-4 text-sm px-3 text-justify'>
                                 We are your comprehensive solution for automating your ad placements, offering a platform that streamlines the entire process
                             </h4>
                               <div className='mx-auto w-1/2 md:w-3/4 xl:w-3/5 mb-10 md:mb-0'>
@@ -128,31 +128,31 @@ function Home() {
                             </h3>
                         <h6 className="">Get in<span className="text-ads360yellow-100"> touch </span>with us today</h6>
                     </div>
-                    <div className='md:flex md:space-x-7'>
-                        <div className='bg-white drop-shadow-2xl h-[440px] rounded px-3 md:px-5 py-10 md:py-7 lg:py-10 md:w-8/12 lg:w-6/12'>
+                    <div className='md:flex md:space-x-12'>
+                        <div className='bg-white shadow-2xl shadow-zinc-600 rounded px-3 md:px-12 py-7 md:w-8/12 lg:w-6/12'>
                             <div className='my-5'>
                                 <label htmlFor='name'>Your Name:</label>
                                 <br/>
-                                <input type='text' id='name' className='border focus:outline-none drop-shadow-md rounded bg-[#E4E4E4] h-[38px] md:h-[45px] w-full px-2' placeholder='Enter Your Name...'/>
+                                <input type='text' id='name' className='border focus:outline-none drop-shadow-md rounded bg-[#E4E4E4] h-[38px] w-full px-2' placeholder='Enter Your Name...'/>
                             </div>
 
                             <div className='my-5'>
                                 <label htmlFor='number'>Phone Number:</label>
                                 <br/>
-                                <input type='text' id='number' className='border focus:outline-none drop-shadow-md rounded bg-[#E4E4E4] h-[38px] md:h-[45px] w-full px-2' placeholder='Enter Phine Number...'/>
+                                <input type='text' id='number' className='border focus:outline-none drop-shadow-md rounded bg-[#E4E4E4] h-[38px] w-full px-2' placeholder='Enter Phine Number...'/>
                             </div>
 
                             <div className='my-5'>
                                 <label htmlFor='email'>Your Email:</label>
                                 <br/>
-                                <input type='text' id='emain' className='border focus:outline-none drop-shadow-md rounded h-[38px] md:h-[45px] bg-[#E4E4E4] w-full px-2' placeholder='Enter Email Address...'/>
+                                <input type='text' id='emain' className='border focus:outline-none drop-shadow-md rounded h-[38px] bg-[#E4E4E4] w-full px-2' placeholder='Enter Email Address...'/>
                             </div>
-                            <div className='mx-3 my-4 mt-8 flex justify-center'>
+                            <div className='mx-3 mt-12 flex justify-center'>
                                 <BlackButtons text='Contact Us'/>
                             </div>
                         </div>
                         <div>
-                            <Image width={0} height={0} src={adsgirl} className='w-9/12 md:w-full mx-auto' alt="..."/>
+                            <Image width={0} height={0} src={adsgirl} className='md:h-[400px] mx-auto' alt="..."/>
                         </div>
                     </div>
                 </div>

@@ -334,7 +334,7 @@ function Onboard() {
         <div className='flex justify-end'>
             
             <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
-              <Link href={`/ads/billboard/${billboard.id}/onboard/checkout`}>Next</Link>
+              <Link href={`/ads/billboard/${2}/onboard/checkout`}>Next</Link>
             </button>
           </div>
 

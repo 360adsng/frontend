@@ -107,8 +107,8 @@ function Ads() {
             {
               ads.map((ad, i)=>(
 
-                <Link href={ad.link}>
-                  <div key={i} className="group shadow flex justify-between rounded px-3 md:px-10 py-5 bg-white border border-ads360yellow-100 items-center">
+                <Link key={i} href={ad.link}>
+                  <div className="group shadow flex justify-between rounded px-3 md:px-10 py-5 bg-white border border-ads360yellow-100 items-center">
                    
                    <div className='flex items-center'>
                       <Image

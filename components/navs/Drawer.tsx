@@ -66,23 +66,25 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
                     </div>
                 </div>
                 <div className='text-ads360light-100'>
-                    <h3 className='text-2xl my-2'><Link href="/about">About Us</Link></h3>
-                    <h3 className='text-2xl my-2'><Link href="/discovery">Our Services</Link></h3>
-                    <h3 className='text-2xl my-2'><Link href="/faq">FAQs</Link></h3>
-                    <h3 className='text-2xl my-2'><Link href="/contact">Contact Us</Link></h3>
+                    <h3 className='text-2xl my-2'><Link href="/about" onClick={toggleDrawer}>About Us</Link></h3>
+                    <h3 className='text-2xl my-2'><Link href="/discovery" onClick={toggleDrawer}>Our Services</Link></h3>
+                    <h3 className='text-2xl my-2'><Link href="/faq" onClick={toggleDrawer}>FAQs</Link></h3>
+                    <h3 className='text-2xl my-2'><Link href="/contact" onClick={toggleDrawer}>Contact Us</Link></h3>
                 </div>
                 <hr className='my-5'/>
                 <div className='flex flex-col text-ads360light-100 mb-5'>
                     <h5 className='text-ads360yellow-100 my-3'>OUR SERVICES</h5>
-                    <Link href='' className='my-2'>Billboard Marketing</Link>
-                    <Link href='' className='my-2'>Digital Ads</Link>
-                    <Link href='' className='my-2'>Smart SMS</Link>
-                    <Link href='' className='my-2'>WhatsApp Cluster</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>Billboard Advertisement</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>Blog Advertisements</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>SMS Campaigns</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>WhatsApp Status Ads</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>Influencer Marketing</Link>
+                    <Link href='' className='my-2' onClick={toggleDrawer}>Twitter Spaces</Link>
                 </div>
 
                 <Link href="/signup">
                     <span className='group flex w-[168px]'>
-                        <button className='group-hover:translate-x-32 group-hover:bg-ads360light-100 w-10 transition bg-ads360yellowBtn-100 mx-1  h-12 flex justify-center items-center rounded-[50%] color-white'><FiArrowRight size={28}/></button>
+                        <button className='group-hover:translate-x-32 group-hover:bg-ads360light-100 w-12 transition bg-ads360yellowBtn-100 mx-1  h-12 flex justify-center items-center rounded-[50%] color-white'><FiArrowRight size={28}/></button>
                         <button className='group-hover:-translate-x-10 w-32 group-hover:bg-ads360light-100  transition rounded-10 bg-ads360yellowBtn-100 h-12'>Get Started</button>
                     </span>
                 </Link>

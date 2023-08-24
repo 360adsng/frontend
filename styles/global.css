@@ -114,6 +114,13 @@ body::-webkit-scrollbar-thumb{
     transform: translateX(-100%);
    }
 
+   .hide{
+    display: none;
+   }
+
+   .show{
+    display: block;
+   }
    /* @keyframes signUpISlider {
      0% {left: 50%;}
      25% {left: 10%;}

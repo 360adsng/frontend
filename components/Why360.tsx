@@ -43,11 +43,11 @@ const Why360 = () => {
 
                         {
                             why360ads.map((values, i)=>(
-                                <div key={i} className="bg-ads360black-50 my-14 rounded md:my-0 text-center pt-2 px-2 drop-shadow-2xl">
+                                <div key={i} className="bg-ads360black-50 my-14 rounded-10 md:my-0 text-center pt-5 px-5 shadow-2xl shadow-black">
                                     <div className='text-ads360yellow-100 text-lg mb-2'>
                                         {values.yellowWriteUp}
                                     </div>
-                                    <div className='text-ads360light-100 my-4'>
+                                    <div className='text-ads360light-100 my-4 text-justify'>
                                         {values.whiteWripeUp}
                                     </div>
                                     <div className='mx-auto w-1/2'>

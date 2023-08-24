@@ -10,6 +10,8 @@ import twitter from '@public/icons/twitter2.svg'
 import google from '@public/icons/Google2.svg'
 import Image from "next/image";
 import Link from "next/link";
+import ReactAdsLogo from '@public/logo/adsWhite.svg';
+
 
 
 
@@ -22,7 +24,7 @@ const Contact = () => {
         <>
             <section className='bg-ads360light-100 py-24'>
                 <div className='mx-auto w-11/12 md:w-10/12 xl:w-7/12'>
-                    <div className="text-4xl md:text-6xl font-sgb">
+                    <div className="text-4xl md:text-6xl font-[600]">
                         <h3>ready when</h3>
                         <h3>you are—Let’s kickstart</h3>
                         <h3>your campaign.</h3>
@@ -38,7 +40,7 @@ const Contact = () => {
 
             <section className='bg-ads360black-100 py-24 text-ads360light-100'>
                 <div className='mx-auto w-11/12 md:w-10/12 xl:w-9/12'>
-                    <div className="md:flex my-10">
+                    <div className="md:flex my-8">
                         <div className="basis-8/12 text-right md:text-left">
                             <h5 className="text-ads360yellow-100">Our Office</h5>
                         </div>
@@ -57,10 +59,13 @@ const Contact = () => {
                         </div>
                         <div className="basis-4/12">
                             <div>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={phone} alt='phone number'/> +2347082436214</h5>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={email} alt='email'/> hello@360ads.ng</h5>
-                                <h5 className="flex justify-end my-2"><Image width={0} height={0} src={time} alt='time'/> 24/7</h5>
-                                <div className="flex justify-end my-2"><Image width={0} height={0} src={React360Logo} className="hover:-rotate-90 transistion duration-300" alt='logo'/></div>
+                                <h5 className="flex justify-end my-2 space-x-1"><Image width={0} height={0} src={phone} alt='phone number'/><span> +2347082436214</span></h5>
+                                <h5 className="flex justify-end my-2 space-x-1"><Image width={0} height={0} src={email} alt='email'/><span> hello@360ads.ng</span> </h5>
+                                <h5 className="flex justify-end my-2 space-x-1"><Image width={0} height={0} src={time} alt='time'/><span> 24/7</span></h5>
+                                <div className="flex justify-end my-2">
+                                    <Image width={0} height={0} src={React360Logo} className="hover:-rotate-90 transistion duration-300" alt='logo'/>
+                                    <Image src={ReactAdsLogo} width={0}height={0} alt="" />
+                                </div>
                             </div>
                             <div></div>
                         </div>

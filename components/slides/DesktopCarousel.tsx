@@ -22,7 +22,6 @@ import digital  from '@public/images/digitalads3.png';
 import billboard  from '@public/images/Billboard.png';
 import happy from '@public/images/happy.png';
 import influencer from '@public/images/influencer1.png';
-import whatsapp from '@public/images/whatsapp.png';
 
 
 
@@ -37,31 +36,25 @@ const DesktopCaruosel = () => {
     const items = [
         {
             image:billboard,
-            text:'With Billboards displayed in strategic locations across the country, you can reach your customers with promotional information, product offers and alerts.',
+            text:'Capture attention and make a lasting impact with our billboard advertising module.We connect you to billboards strategically placed in high-traffic areas, ensuring maximum visibility for your brand.',
             link:'',
             Name:'Billboard Ads'
         },
         {
-            image:digital,
-            text:'We utilize display ads to reach our target audience when consuming relevant content on the network. With this data, we combine the best approach to reach them.',
-            link:'',
-            Name:'Digital Ads'
-        },
-        {
             image:happy,
-            text:'Our SMS Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            text:'Engage customers directly through personalised SMS campaigns. Our platform enables you to create and send targeted messages, keeping your audience informed, and driving conversions..',
             link:'',
-            Name:'Smart SMS'
+            Name:'SMS Ads'
         },
         {
             image:influencer,
-            text:'Our SMS Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            text:"Leverage the power of influencers to amplify your brand's reach. Our platform connects you with a diverse network of influencers, allowing you to tap into their engagedaudiences and drive brand awareness.",
             link:'',
             Name:'Influencer Ads'
         },
         {
-            image:whatsapp,
-            text:'Our WhatsApp Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            image:digital,
+            text:'Showcase your brand in the WhatsApp ecosystem. With our platform, you can seamlessly place ads in WhatsApp status,reaching a vast user base and generating buzz around your products or services.',
             link:'',
             Name:'WhatsApp Ads'
         },
@@ -131,7 +124,7 @@ const DesktopCaruosel = () => {
                             </div>
                             <div className='grid grid-cols-1 content-center basis-5/6 px-5 lg:px-8'>
                                 <div>
-                                    <p className=''>
+                                    <p className='text-justify'>
                                         {values.text}
                                     </p>
                             
