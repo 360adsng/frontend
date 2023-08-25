@@ -69,7 +69,7 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
                 <div className='text-ads360light-100'>
                     <h3 className='text-2xl my-2'><Link href="/about" onClick={toggleDrawer}>About Us</Link></h3>
                     <h3 className='text-2xl my-2'><Link href="/discovery" onClick={toggleDrawer}>Our Services</Link></h3>
-                    <h3 className='text-2xl my-2'><Link href="/" onClick={toggleDrawer}>FAQs</Link></h3>
+                    <h3 className='text-2xl my-2'><Link href="/faqs" onClick={toggleDrawer}>FAQs</Link></h3>
                     <h3 className='text-2xl my-2'><Link href="/contact" onClick={toggleDrawer}>Contact Us</Link></h3>
                 </div>
                 <hr className='my-5'/>
