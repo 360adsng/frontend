@@ -48,7 +48,7 @@ const MobileCaruosel : React.FC<Props> = ({display}) => {
 
     const prev = (current:number) => {
         if(current === 0){
-            slides?.current?.swiper.slideTo(4);
+            slides?.current?.swiper.slideTo(5);
         }else{
             slides?.current?.swiper.slidePrev();
         }
@@ -58,34 +58,40 @@ const MobileCaruosel : React.FC<Props> = ({display}) => {
     const items = [
         {
             image:billboard,
-            text:'With Billboards displayed in strategic locations across the country, you can reach your customers with promotional information, product offers and alerts.',
+            text:'Capture attention and make a lasting impact with our billboard advertising module.We connect you to billboards strategically placed in high-traffic areas, ensuring maximum visibility for your brand.',
             link:'',
             name:'Billboard Ads'
         },
         {
-            image:digital,
-            text:'We utilize display ads to reach our target audience when consuming relevant content on the network. With this data, we combine the best approach to reach them.',
-            link:'',
-            name:'Digital Ads'
-        },
-        {
             image:happy,
-            text:'Our SMS Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            text:'Engage customers directly through personalised SMS campaigns. Our platform enables you to create and send targeted messages, keeping your audience informed, and driving conversions..',
             link:'',
-            name:'Smart SMS'
+            name:'SMS Ads'
         },
         {
             image:influencer,
-            text:'Our SMS Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            text:"Leverage the power of influencers to amplify your brand's reach. Our platform connects you with a diverse network of influencers, allowing you to tap into their engagedaudiences and drive brand awareness.",
             link:'',
             name:'Influencer Ads'
         },
         {
-            image:whatsapp,
-            text:'Our WhatsApp Marketing service mostly delivers messages on latest updates, time-sensitive offers, product launches, alerts, notifications and any other form of promotional information.',
+            image:digital,
+            text:'Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads connects you with influential voices on Twitter, empowering you to host interactive audio sessions that foster engagement and build brand loyalty.',
+            link:'',
+            name:'Twitter Spaces'
+        },
+        {
+            image:happy,
+            text:'Expand your online presence by placing ads on popular blogs. Our platform allows you to negotiate and secure ad placements on relevant blogs, effectively reaching your target audience.',
+            link:'',
+            name:'Blog Ads'
+        },
+        {
+            image:influencer,
+            text:'Showcase your brand in the WhatsApp ecosystem. With our platform, you can seamlessly place ads in WhatsApp status, reaching a vast user base and generating buzz around your products or services.',
             link:'',
             name:'WhatsApp Ads'
-        },
+        }
     ]
    
     return(
@@ -135,7 +141,7 @@ const MobileCaruosel : React.FC<Props> = ({display}) => {
                     <button onClick={()=>prev(slides?.current?.swiper.activeIndex as number)} className='group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-50  h-50 flex justify-center items-center rounded-[50%] color-white'>
                         <Image width={0} height={0} src={Arrowleft} alt=''/>
                     </button>
-                    <span className='text-[#777777] px-7 flex py-3'>{slide + 1} / 4</span>
+                    <span className='text-[#777777] px-7 flex py-3'>{slide + 1} / {items.length}</span>
                     <button onClick={()=>next(slides?.current?.swiper.activeIndex as number)} className='group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-50  h-50 flex justify-center items-center rounded-[50%] color-white'>
                         <Image width={0} height={0} src={Arrowright} alt=''/>
                     </button>

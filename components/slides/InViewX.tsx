@@ -16,11 +16,11 @@ const SectionX = ({ children, val }: SectionProps) => {
     <section ref={ref}>
       <span
         style={{
-          transform: isInView ? "none" : `translateX(${val}px)`,
+          transform: isInView ? "none" : `translateX(${50}px)`,
           opacity: isInView ? 1 : 0,
           transition: "all cubic-bezier(0.17, 0.55, 0.55, 1) 1s"
         }}
-        className="-translate-x-10 block opacity-0"
+        className="-translate-x-20 block opacity-0"
       >
         {children}
       </span>

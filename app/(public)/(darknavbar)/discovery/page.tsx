@@ -90,7 +90,7 @@ const Service = () => {
                               <SectionY val={-200}>
                                 Leverage the power of influencers to amplify your brand's reach. Our platform connects 
                                 you with a diverse network of influencers, allowing you to tap into their engaged
-                                 audiences and drive brand awareness.
+                                audiences and drive brand awareness.
                               </SectionY>
                             </div>
                         </div> 
@@ -106,7 +106,10 @@ const Service = () => {
                             </div> 
                             <div className="basis-1/2 grid grid-cols-1 content-center">
                               <SectionY val={200}>
-                                Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads.ng connects you with influential voices on Twitter, empowering you to host interactive audio sessions that foster engagement and build brand loyalty. Amplify your reach and create valuable connections with your target audience through our network of influential partners. Discover the power of hosting impactful Twitter Spaces with 360ads.ng
+                                Connect with Influencers on Twitter to Host Engaging Twitter Spaces 360ads connects you with influential voices on Twitter, 
+                                empowering you to host interactive audio sessions that foster engagement and build brand loyalty. Amplify your reach and create 
+                                valuable connections with your target audience through our network of influential partners. Discover the power of hosting 
+                                impactful Twitter Spaces with 360ads
                               </SectionY>
                             </div>
                         </div>
@@ -146,7 +149,7 @@ const Service = () => {
                                 in high-traffic areas, ensuring maximum visibility for your brand.
                               </SectionY>
                             </div>
-                        </div> 
+                        </div>  
 
 
                         <div id='whatsapp' className="flex my-10 space-x-4">
@@ -183,7 +186,7 @@ const Service = () => {
                                 Expand your online presence by placing ads on popular blogs. Our platform allows you to negotiate and secure ad placements on relevant blogs, effectively reaching your target audience.
                               </SectionY>
                             </div>
-                        </div> 
+                        </div>  
                        
 
 
