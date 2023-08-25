@@ -60,7 +60,7 @@ const Faqs = () =>{
                                     </button>
                                 </div>
                             </div>
-                            <div style={{transition:'max-height 1s'}} className={`overflow-hidden transition duration-700 ease-out ${index === i ?'max-h-[200px]':'max-h-0'}`}>
+                            <div style={{transition:'max-height 1s'}} className={`overflow-hidden transition duration-700 ease-out ${index === i ?'max-h-[250px]':'max-h-0'}`}>
                                 {item.answers}
                             </div>
                         </div>
