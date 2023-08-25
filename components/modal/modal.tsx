@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
 
 interface ModalProps {
     children:React.ReactNode
@@ -11,7 +11,7 @@ function Modal({ isOpen, children }: ModalProps) {
 
   const modalRef = useRef<HTMLDivElement>(null)
   const modalContentRef = useRef<HTMLDivElement>(null)
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen) {
         if(modalRef.current !== null){
             modalRef.current.classList.remove('hide')
@@ -38,6 +38,7 @@ function Modal({ isOpen, children }: ModalProps) {
   }, [isOpen]);
 
   
+
 
   return (
     <div ref={modalRef} className='hide transition duration-500 opacity-0 w-full fixed z-[100000] h-full bg-black/50 top-0'>
