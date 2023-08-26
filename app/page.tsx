@@ -37,7 +37,7 @@ function Home() {
                           </div>
                           
                       
-                          <Link className='block mt-5' href='/'> <BlackButtons text="Let's dive in"/></Link>
+                          <Link className='block mt-5' href='/signin'> <BlackButtons text="Let's dive in"/></Link>
                           
                       </div>
                       <div className='md:ml-[217px] md:mt-[-117px]'>

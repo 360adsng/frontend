@@ -4,7 +4,8 @@ import Link  from 'next/link';
 import Image from 'next/image';
 import SmallBtnYello from '../buttons/SmallBtnYellow';
 import instagram from '@public/icons/Instagram.svg';
-import facebook from '@public/icons/Facbook.svg';
+// import facebook from '@public/icons/Facbook.svg';
+import whatsapp from '@public/icons/whiteWhatsapp.svg'
 import twitter from '@public/icons/Twitter.svg';
 
 
@@ -57,9 +58,9 @@ const Footer = () =>{
                     <div className='flex'>
                         <Link href='' className='mx-2 hidden md:inline'>Terms & Conditions</Link>
                         <div className='flex'>
-                            <Link href='' className='mr-1 md:mx-2'><Image height={0} width={0} src={instagram} alt='instagram logo'/></Link>
-                            <Link href='' className='mx-2'><Image height={0} width={0} src={facebook} alt='facebook logo'/></Link>
-                            <Link href='' className='mx-2'><Image height={0} width={0} src={twitter} alt='twitter logo'/></Link>
+                            <Link href='https://www.instagram.com/360ads.ng/' className='mr-1 md:mx-2'><Image height={0} width={0} src={instagram} alt='instagram logo'/></Link>
+                            <Link href='https://wa.me/+2347082436214?text=urlencodedtext' className='mx-2'><Image height={0} width={0} src={whatsapp} alt='facebook logo'/></Link>
+                            <Link href='https://twitter.com/360adsNg' className='mx-2'><Image height={0} width={0} src={twitter} alt='twitter logo'/></Link>
                         </div>
                     </div>
                 </div>

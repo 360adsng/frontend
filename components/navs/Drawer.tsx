@@ -83,7 +83,7 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
                     <Link href='/discovery/#twitter' className='my-2' onClick={toggleDrawer}>Twitter Spaces</Link>
                 </div>
 
-                <Link href="/signup">
+                <Link href="/signup" onClick={toggleDrawer}>
                     <span className='group flex w-[168px]'>
                         <button className='group-hover:translate-x-32 group-hover:bg-ads360light-100 w-12 transition bg-ads360yellowBtn-100 mx-1  h-12 flex justify-center items-center rounded-[50%] color-white'><FiArrowRight size={28}/></button>
                         <button className='group-hover:-translate-x-10 w-32 group-hover:bg-ads360light-100  transition rounded-10 bg-ads360yellowBtn-100 h-12'>Get Started</button>
