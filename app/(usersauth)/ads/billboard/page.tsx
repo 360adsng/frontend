@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+
 //import images
 import billboardImage1 from "@public/del/billboard1.png";
 import billboardImage2 from "@public/del/billboard2.png";
@@ -363,7 +364,7 @@ function Billboards() {
             </div>
           </div>
 
-          {filter && (
+          {filter === false && (
             <div className="fixed w-full left-3 bottom-5 lg:hidden">
               <button
                 disabled={filter}
@@ -378,6 +379,8 @@ function Billboards() {
           )}
         </section>
       </section>
+
+      
 
       <Modal isOpen={filter}>
         <div className="bg-white my-10 p-5 w-10/12 mx-auto rounded-10">
