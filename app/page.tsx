@@ -94,7 +94,7 @@ function Home() {
                               <h3 className="text-2xl lg:text-4xl lg:mb-4 mb-2">We're challengers at heart and builders by nature.</h3>
                               <h6 className="">We work as one team and deliver projects <span className="text-ads360yellow-100">concurrently...</span></h6>
                           </div>
-                          <Link className='block mt-5' href='/'><YellowButtons text='Dive into our culture'/></Link>
+                          <Link className='block mt-5' href='/signup'><YellowButtons text='Dive into our culture'/></Link>
                       </div>
                       <Image width={0} height={0} src={think1} alt=''/>
                   </div>

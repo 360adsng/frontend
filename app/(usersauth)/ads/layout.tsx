@@ -1,5 +1,3 @@
-
-import UserSideNav from '@components/navs/UserSideNav'
 import UsersNav from '@components/navs/UsersNav'
 
 //add other meta tags here

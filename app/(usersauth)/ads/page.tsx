@@ -12,6 +12,7 @@ import Arrowleft from '@public/icons/Arrowleft.svg'
 
 
 
+
 function Ads() {
 
   const ads = [
@@ -52,51 +53,64 @@ function Ads() {
        
        
        <div className="flex items-center font-bold">
-          <button className='group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white'>
+        <Link href='/users'  className='group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white'>
           <Image
             src={Arrowleft}
             width={0}
             height={0}
             alt="arrow"
           />
-        </button>
+        </Link>
         Create an ad campaign
       </div>
 
 
-            {/* <div className="flex items-center justify-center mx-auto my-5">
+            <div className="hidden items-center justify-center mx-auto mt-5 mb-10 md:flex">
               <div className="font-bold text-sm">
                 <div className="flex items-center">
                     <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-                    <div className="w-full md:w-[200px] border border-gray-300 h-0"></div>
+                    <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
                 </div>
-                Select Campaign
+                <div className="relative -left-10">
+                  Select Campaign
+                </div>
+              </div>
+
+              <div className="font-bold text-sm">
+                <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
+                    <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
+                </div>
+                <div className="relative -left-10">
+                  Select Campaign
+                </div>
               </div>
 
 
               <div className="font-bold text-sm text-left">
                 <div className="flex items-center">
                     <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-                    <div className="w-full md:w-[200px] border border-gray-300 h-0"></div>
+                    <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
                 </div>
-                Onboarding
+                <div className="relative -left-7">
+                  Onboarding
+                </div>
               </div>
               
               <div className="font-bold text-sm">
                 <div className="flex items-center">
                     <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
                 </div>
-                Checkout
+                <div className="relative -left-5">
+                  Checkout
+                </div>
               </div>
               
-            </div> */}
+            </div>  
 
-
-            <div>
-
+            <div className="font-bold md:hidden text-right mt-5 mb-10">
+               #1 - select campaign
             </div>
-            
-    
 
           <p className="text-stone-400 text-center">
             Select the goal that would make the campaign successful for you.
