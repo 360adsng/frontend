@@ -5,6 +5,7 @@ import billboardImage2 from '@public/del/billboard2.png'
 import Image from 'next/image'
 import { FiXCircle } from 'react-icons/fi'
 import { Space_Grotesk } from 'next/font/google'
+import { Modal } from '@components/modal/modal'
 const space_grotesk = Space_Grotesk({
     subsets:['latin'],
     display: 'swap',
@@ -30,7 +31,8 @@ const Checkout = () => {
 
 
   return (
-    <section className='px-4 md:px-10 py-24'>
+    <>
+    <section className='mx-4 md:mx-10 py-24'>
         
         <div>
           <Image
@@ -88,36 +90,26 @@ const Checkout = () => {
           </button>
         </div>
         
-
-
-        
-
-
-
-        { negotia && createPortal(
-          <div className={`fixed top-0 left-0 bg-black/40 w-full h-full z-[10000] ${space_grotesk.className}`}>
-            <div className='flex justify-center items-center pt-28'>
-              <div className='bg-white p-3 rounded-10'>
-                <div className='flex justify-between my-3'>
-                  <h4 className=''>Enter Amount</h4>
-                  <button onClick={()=>setNegotia(false)}><FiXCircle/></button>
-                </div>
-                <input type='number' className='p-2 focus:outline-none w-full border rounded-10'/>
-                <div className='mt-2'>
-                  <p className='text-red-500 text-sm'>You can only Negotiat once</p>
-                  <p className='text-red-500 text-sm'>You cannot Negotiat lower than ₦26000</p>
-                </div>
-                <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-                  Proceed
-                </button>
-              </div>
-            </div>
-            
-          </div>, document.body
-        )
-
-        }
     </section>
+    <Modal isOpen={negotia}>
+    <div className='bg-white p-2 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10'>
+      <div className='bg-white p-3 rounded-10'>
+        <div className='flex justify-between my-3'>
+          <h4 className=''>Enter Amount</h4>
+          <button onClick={()=>setNegotia(false)}><FiXCircle/></button>
+        </div>
+        <input type='number' className='p-2 focus:outline-none w-full border rounded-10'/>
+        <div className='mt-2'>
+          <p className='text-red-500 text-sm'>You can only Negotiat once</p>
+          <p className='text-red-500 text-sm'>You cannot Negotiat lower than ₦26000</p>
+        </div>
+        <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
+          Proceed
+        </button>
+      </div> 
+    </div>
+  </Modal>
+  </>
   )
 }
 

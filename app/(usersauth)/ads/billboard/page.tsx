@@ -13,12 +13,9 @@ import { useState } from "react";
 import { FiXCircle } from "react-icons/fi";
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 
-import { Space_Grotesk } from "next/font/google";
-import Modal from "@components/modal/modal";
-const space_grotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-});
+import { Modal } from "@components/modal/modal";
+
+
 
 function Billboards() {
   const [filter, setFilter] = useState(false);
@@ -367,7 +364,6 @@ function Billboards() {
           {filter === false && (
             <div className="fixed w-full left-3 bottom-5 lg:hidden">
               <button
-                disabled={filter}
                 className="rounded-full font-bold border bg-ads360yellow-100 shadow-md border-white w-16 h-16"
                 onClick={() => {
                   setFilter(true);
@@ -381,9 +377,8 @@ function Billboards() {
       </section>
 
       
-
       <Modal isOpen={filter}>
-        <div className="bg-white my-10 p-5 w-10/12 mx-auto rounded-10">
+        <div className="bg-white p-2 w-10/12 mx-auto rounded-10">
             <div className="flex justify-between">
             <p>Filter billboard</p>
 

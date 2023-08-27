@@ -1,53 +1,46 @@
-"use client"
-import { useEffect, useRef, useLayoutEffect } from "react";
+"use client";
+import * as React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-interface ModalProps {
-    children:React.ReactNode
-    isOpen:Boolean
-}
+type ModalProps = {
+  isOpen: boolean;
+  children: React.ReactNode;
+};
 
-
-function Modal({ isOpen, children }: ModalProps) {
-
-  const modalRef = useRef<HTMLDivElement>(null)
-  const modalContentRef = useRef<HTMLDivElement>(null)
-  useLayoutEffect(() => {
-    if (isOpen) {
-        if(modalRef.current !== null){
-            modalRef.current.classList.remove('hide')
-            modalRef.current.classList.add('show')
-        }
-      setTimeout(()=>{
-        if(modalRef.current !== null && modalContentRef.current !== null){
-            modalRef.current.style.opacity = '1'
-            modalContentRef.current.style.transform = 'scale(1)'
-        }
-      }, 300)
-    } else {
-        if(modalRef.current !== null && modalContentRef.current !== null){
-            modalRef.current.style.opacity = '0'
-            modalContentRef.current.style.transform = 'scale(0)'
-        }
-      setTimeout(()=>{
-        if(modalRef.current !== null){
-            modalRef.current.classList.remove('show')
-            modalRef.current.classList.add('hide')
-        }
-      }, 1000)
-    }
-  }, [isOpen]);
-
-  
-
-
+export const Modal = ({ isOpen, children }: ModalProps) => {
   return (
-    <div ref={modalRef} className='hide transition duration-500 opacity-0 w-full fixed z-[100000] h-full bg-black/50 top-0'>
-      <div ref={modalContentRef} className="transition duration-500">
-        {children}
-      </div>
-    </div>
+    <AnimatePresence>
+      {isOpen && (
+        <div>
+          <motion.div
+            className="fixed z-[10000000] top-0 w-full h-full"
+            initial={{
+              opacity: 0,
+              scale: 0.75,
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              transition: {
+                ease: "easeOut",
+                duration: 0.15,
+              },
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.75,
+              transition: {
+                ease: "easeIn",
+                duration: 0.15,
+              },
+            }}
+          >
+            <div className="bg-black/50 w-full h-full grid grid-cols-1 content-center">
+              {children}
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
-}
-
-export default Modal;
-
+};

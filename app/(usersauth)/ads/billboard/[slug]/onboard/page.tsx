@@ -2,13 +2,12 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Calendar from 'react-calendar'
-import 'react-calendar/dist/Calendar.css'
 import Link from 'next/link';
+import { useParams } from 'next/navigation'
 //import images
 
-import billboardImage2 from '@public/del/billboard2.png'
 import Arrowleft from '@public/icons/Arrowleft.svg'
-import cancel from '@public/icons/cancel.svg'
+import mark from "@public/icons/mark.svg";
 import tick2 from '@public/icons/tick2.svg'
 import tick3 from '@public/icons/tick3.svg'
 import billboardbanner from '@public/images/billboardbanner.png'
@@ -16,6 +15,7 @@ import { Value } from 'react-calendar/dist/cjs/shared/types'
 
 
 import { Toaster, toast } from 'sonner';
+import { MdOutlineCancel } from 'react-icons/md';
 
 
 
@@ -30,9 +30,11 @@ function Onboard() {
     const [previewImage, setPreviewImage] = useState<Preview>()
     const [previewVideo, setPreviewVideo] = useState<Preview>()
     const [previewYoutube, setPreviewYoutube] = useState<string>()
-
     const inputImage = useRef<HTMLInputElement>(null)
     const inputVideo = useRef<HTMLInputElement>(null)
+    const params = useParams()
+    const selectedBillBoard = params.slug
+
 
     const handlePlan = (e:React.ChangeEvent<HTMLSelectElement>) => {
         const { value } = e.target
@@ -112,11 +114,11 @@ function Onboard() {
                 
       
   return (
-    <section className='px-4 md:px-10 py-24'>
+    <section className='px-4 md:px-7 xl:px-20 py-24'>
         
         <h3 className='text-2xl'></h3>
 
-        <div className="flex items-center font-bold">
+        <Link href={`/ads/billboard/${selectedBillBoard}`} className="flex items-center font-bold">
           <button className='group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white'>
           <Image
             src={Arrowleft}
@@ -126,39 +128,97 @@ function Onboard() {
           />
         </button>
         BillBoard Marketing
-      </div>
+      </Link>
+
+
+
+      {/* steps */}
+      <div className="hidden items-center justify-center mx-auto mt-5 mb-14 md:flex">
+              <div className="font-bold text-sm">
+                <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full border flex justify-center bg-ads360yellow-100">
+                      <Image src={mark} width={0} height={0} alt=""/>
+                    </div>
+                    <div className="w-[150px] lg:w-[200px] border border-ads360yellow-100 h-0"></div>
+                </div>
+                <div className="relative -left-10">
+                  Select Campaign
+                </div>
+              </div>
+
+              <div className="font-bold text-sm">
+                <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full border bg-ads360yellow-100 flex justify-center">
+                        <Image src={mark} width={0} height={0} alt=""/>
+                    </div>
+                    <div className="w-[150px] lg:w-[200px] border border-ads360yellow-100 h-0"></div>
+                </div>
+                <div className="relative -left-10">
+                  Onboarding
+                </div>
+              </div>
+
+
+              <div className="font-bold text-sm text-left">
+                <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
+                    <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
+                </div>
+                <div className="relative -left-7">
+                  completion
+                </div>
+              </div>
+              
+              <div className="font-bold text-sm">
+                <div className="flex items-center">
+                    <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
+                </div>
+                <div className="relative -left-5">
+                  Checkout
+                </div>
+              </div>
+              
+            </div>  
+
+            <div className="font-bold md:hidden text-right mt-5 mb-10">
+               #3 - Completing
+            </div>
+
+      {/* steps */}
+
+
+
+        
+            <p className='text-stone-400 text-center'>Provide all requested details to help complete the campaign creation</p>
+        
+
         
 
 
-        <section className='md:flex my-10'>
+        <section className='md:flex my-10 md:space-x-5 xl:space-x-16'>
 
             
-            <div className='basis-1/2 md:px-8'>
+            <div className='md:basis-6/12 xl:basis-5/12'>
                 <p className="text-stone-400">Choose day(s) to run campaign</p>
-                <select onChange={handlePlan} className='my-3 bg-white focus:outline-none w-[200px] p-2 rounded-10'>
-                    <option>Selete</option>
+                <select onChange={handlePlan} className='mb-3 bg-white focus:outline-none w-full p-2 rounded-10'>
+                    <option>Select</option>
                     <option>Daily</option>
                     <option>Weekly</option>
                     <option>Monthly</option>
                 </select>
             {
                 plan === 'Daily'? 
-                <div className='flex'>
-                    <Calendar onChange={(value)=>{onChange; addDate(value)}} className={`shadow-lg rounded-l-10`} value={value} />
-                    <div className='bg-white overflow-y-scroll selectedDate h-[19rem] px-1 shadow-lg rounded-r-10'>
+                <div className='flex w-full'>
+                    <Calendar onChange={(value)=>{onChange; addDate(value)}} className={`shadow-lg rounded-l-10 basis-[70%]`} value={value} />
+                    <div className='bg-white overflow-y-scroll basis-[30%] selectedDate h-[19rem] px-1 shadow-lg rounded-r-10 w-full'>
                         <p className="text-stone-400 text-center text-sm">Seleted days</p>
                         <div>
                             {selectedDate?.map((date, i)=>(
-                                <div key={i} className='flex p-1 rounded  text-sm bg-[#006edc] text-white my-1'>
-                                    <span className='px-1 basis-10/12'>{date?.toLocaleDateString()}</span>
-                                    <Image
-                                        height={0}
-                                        width={0}
-                                        alt='remove date'
-                                        src={cancel}
-                                        onClick={()=>removeDate(date)}
-                                        className='basis-2/12'
-                                    />
+                                <div key={i} className='flex p-1 rounded justify-center text-sm bg-[#006edc] text-white my-1'>
+                                    <span className='px-1 basis-9/12'>{date?.toLocaleDateString()}</span>
+                                    <button onClick={()=>removeDate(date)}>
+                                        <MdOutlineCancel/>
+                                    </button>
                                 </div>
                             ))}
                         </div>
@@ -280,12 +340,17 @@ function Onboard() {
 
 
 
-            <div className='basis-1/2 px-3 md:px-5 my-10 lg:my-0'>
+
+
+
+
+
+
+
+
+
+            <div className='lg:basis-7/12 md:basis-6/12 lg:my-0'>
                 <div className='rounded-10 w-full'>
-
-
-                    
-
 
                     {attachmentType === 'video' && previewVideo ?  
 
@@ -303,13 +368,13 @@ function Onboard() {
                             width={0}
                             alt='billboard'
                             src={previewImage.src}
-                            className='mx-auto w-full rounded-10 h-56'
+                            className='mx-auto w-full rounded-10 h-72'
                         />
                     :
                     attachmentType === 'youtube' && previewYoutube ?
 
                     
-                            <iframe className='w-full h-56 rounded-10'
+                            <iframe className='w-full h-72 rounded-10'
                                 src={previewYoutube}>
                             </iframe>
             
@@ -319,7 +384,7 @@ function Onboard() {
                             width={0}
                             alt='billboard'
                             src={billboardbanner}
-                            className='mx-auto w-full h-56'
+                            className='mx-auto w-full h-72'
                         />
                     }
                 </div>
