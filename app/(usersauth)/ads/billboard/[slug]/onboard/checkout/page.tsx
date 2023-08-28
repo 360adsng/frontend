@@ -1,15 +1,11 @@
 "use client"
-import { createPortal } from 'react-dom'
 import { useState } from 'react'
 import billboardImage2 from '@public/del/billboard2.png'
 import Image from 'next/image'
 import { FiXCircle } from 'react-icons/fi'
-import { Space_Grotesk } from 'next/font/google'
 import { Modal } from '@components/modal/modal'
-const space_grotesk = Space_Grotesk({
-    subsets:['latin'],
-    display: 'swap',
-})
+import Link from 'next/link'
+
 
 
 
@@ -86,7 +82,7 @@ const Checkout = () => {
           </button>
 
           <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-            Pay Now
+            <Link href={`/ads/${2}`}>Pay Now</Link>
           </button>
         </div>
         
