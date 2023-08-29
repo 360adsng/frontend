@@ -346,6 +346,7 @@ function Billboards() {
                   <option value="abuja" />
                   <option value="victoria island" />
                   <option value="warri" />
+                  <option value="Benin" />
                 </datalist>
               </div>
 
