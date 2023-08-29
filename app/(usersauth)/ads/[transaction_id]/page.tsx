@@ -169,9 +169,9 @@ const Payment = () => {
                 disabled={wallet < amount ? true : false}
                 className={`${
                   wallet < amount
-                    ? "bg-ads360gray-100"
-                    : "bg-ads360black-100/95 hover:bg-ads360black-100"
-                } rounded mt-5  text-white  w-5/6 h-10`}
+                    ? "bg-ads360gray-100 mt-5"
+                    : "bg-ads360black-100/95 hover:bg-ads360black-100 mt-10"
+                } rounded  text-white  w-5/6 h-10`}
               >
                 Proceed
               </button>
@@ -202,13 +202,7 @@ const Payment = () => {
 
             <div className="flex justify-center">
               <button
-                disabled={wallet < amount ? true : false}
-                className={`${
-                  wallet < amount
-                    ? "bg-ads360gray-100"
-                    : "bg-ads360black-100/95 hover:bg-ads360black-100"
-                } rounded mt-5  text-white  w-5/6 h-10`}
-              >
+                className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-10  text-white  w-5/6 h-10">
                 Proceed
               </button>
             </div>

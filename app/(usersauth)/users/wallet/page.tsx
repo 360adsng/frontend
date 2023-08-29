@@ -81,14 +81,14 @@ const WalletSection = () => {
 
         <div className="flex justify-end">
           <div className="">
-            <select className="rounded mx-2 p-2 focus:outline-none">
+            <select className="rounded mx-2 p-2 focus:outline-none bg-ads360light-100">
               <option>select</option>
               <option>funded wallet</option>
               <option>debited wallet</option>
             </select>
           </div>
           <div className="flex">
-            <input type="date" className="rounded p-2 focus:outline-none"/>
+            <input type="date" className="rounded p-2 focus:outline-none bg-ads360light-100"/>
           </div>
         </div>
 
