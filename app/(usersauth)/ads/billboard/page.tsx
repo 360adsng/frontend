@@ -9,6 +9,7 @@ import naira from "@public/icons/naira.svg";
 import location from "@public/icons/yellowlocation.svg";
 import mark from "@public/icons/mark.svg";
 import Arrowleft from "@public/icons/Arrowleft.svg";
+import cancel from "@public/icons/usericon/modalCancelBotton.svg";
 import { useState } from "react";
 import { FiXCircle } from "react-icons/fi";
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
@@ -300,7 +301,7 @@ function Billboards() {
 
               <div className="my-2">
                 <p>Billboard Type</p>
-                <select className="px-2 py-1 border focus:outline-none rounded-10">
+                <select className="p-2 w-full border focus:outline-none rounded">
                   <option>select</option>
                   <option>Double faced Gantry LED</option>
                   <option>Single faced Gantry LED</option>
@@ -315,7 +316,7 @@ function Billboards() {
                     <label>from:</label>
                     <input
                       type="number"
-                      className="rounded-10 w-full border focus:outline-none px-2 py-1"
+                      className="rounded w-full border focus:outline-none p-2"
                     />
                   </div>
 
@@ -323,7 +324,7 @@ function Billboards() {
                     <label>to:</label>
                     <input
                       type="number"
-                      className="rounded-10 w-full border focus:outline-none px-2 py-1"
+                      className="rounded w-full border focus:outline-none p-2"
                     />
                   </div>
                 </div>
@@ -335,7 +336,7 @@ function Billboards() {
                   list="location"
                   name="browser"
                   id="browser"
-                  className="border focus:outline-none rounded-10 px-2 py-1"
+                  className="border w-full focus:outline-none rounded p-2"
                 />
 
                 <datalist id="location" className="">
@@ -349,22 +350,26 @@ function Billboards() {
 
               <div className="my-2">
                 <p>Status</p>
-                <select className="px-2 py-1 border focus:outline-none rounded-10">
+                <select className="p-2 w-full border focus:outline-none rounded">
                   <option>Negotiable</option>
                   <option>Non Negotiable</option>
                 </select>
               </div>
 
-              <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-                Filter
-              </button>
+              <button 
+              className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3  text-white  w-2/6 h-10'>
+              Search
+          </button>
             </div>
           </div>
+
+
+
 
           {filter === false && (
             <div className="fixed w-full left-3 bottom-5 lg:hidden">
               <button
-                className="rounded-full font-bold border bg-ads360yellow-100 shadow-md border-white w-16 h-16"
+                className="rounded-10 font-bold border bg-ads360yellow-100 shadow-md border-white w-12 h-12"
                 onClick={() => {
                   setFilter(true);
                 }}
@@ -378,18 +383,24 @@ function Billboards() {
 
       
       <Modal isOpen={filter}>
-        <div className="bg-white p-2 w-10/12 mx-auto rounded-10">
+        <div className="bg-white p-3 w-10/12 md:w-9/12 mx-auto rounded-10">
             <div className="flex justify-between">
             <p>Filter billboard</p>
 
-            <div onClick={()=>setFilter(false)}>
-                <FiXCircle/>
-            </div>
+            <button onClick={() => setFilter(false)}>
+              <Image
+                src={cancel}
+                width={0}
+                height={0}
+                alt="modal cancel botton"
+                className="w-5"
+              />
+            </button>
             </div>
 
             <div className="my-2">
             <p>Billboard Type</p>
-            <select className="px-2 py-1 border focus:outline-none rounded-10">
+            <select className="p-2 border focus:outline-none rounded w-full">
                 <option>select</option>
                 <option>Double faced Gantry LED</option>
                 <option>Single faced Gantry LED</option>
@@ -404,7 +415,7 @@ function Billboards() {
                 <label>from:</label>
                 <input
                     type="number"
-                    className="rounded-10 w-full border focus:outline-none px-2 py-1"
+                    className="rounded w-full border focus:outline-none p-2"
                 />
                 </div>
 
@@ -412,7 +423,7 @@ function Billboards() {
                 <label>to:</label>
                 <input
                     type="number"
-                    className="rounded-10 w-full border focus:outline-none px-2 py-1"
+                    className="rounded w-full border focus:outline-none p-2"
                 />
                 </div>
             </div>
@@ -424,7 +435,7 @@ function Billboards() {
                 list="location"
                 name="browser"
                 id="browser"
-                className="border focus:outline-none rounded-10 px-2 py-1"
+                className="border focus:outline-none rounded w-full p-2"
             />
 
             <datalist id="location" className="">
@@ -438,15 +449,15 @@ function Billboards() {
 
             <div className="my-2">
             <p>Status</p>
-            <select className="px-2 py-1 border focus:outline-none rounded-10">
+            <select className="p-2 border focus:outline-none rounded w-full">
                 <option>Negotiable</option>
                 <option>Non Negotiable</option>
             </select>
             </div>
-
-            <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-            Filter
-            </button>
+            <button 
+              className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5  text-white  w-2/6 h-10'>
+              Search
+          </button>
         </div>
       </Modal>
     </>
