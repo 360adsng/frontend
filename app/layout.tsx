@@ -1,12 +1,5 @@
 import '@styles/global.css'
-import { Space_Grotesk } from 'next/font/google'
-
-
-
-const space_grotesk = Space_Grotesk({
-    subsets:['latin'],
-    display: 'swap',
-})
+import { space_grotesk } from '@components/fonts'
 
 
 

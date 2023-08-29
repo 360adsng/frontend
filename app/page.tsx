@@ -22,6 +22,8 @@ import think1 from '@public/images/think1.jpg';
 import adsgirl from '@public/images/adsgirl.png';
 import adsgirl3 from '@public/images/adsgirl3.png';
 
+import { lexend } from '@components/fonts';
+
 
 function Home() {
   return (
@@ -57,7 +59,7 @@ function Home() {
                       </h3>
                       <div className='md:flex flex-row-reverse mt-10'>
                           <div className='bg-ads360black-50 rounded-10 shadow-2xl shadow-black basis-1/3 pt-2'>
-                            <h3 className='mb-4 px-2'>Grow Your Business with our seamless <span className='text-ads360yellow-100'>options...</span></h3>
+                            <h3 className={`mb-4 px-2 ${lexend.className}`}>Grow Your Business with our seamless <span className='text-ads360yellow-100'>options...</span></h3>
                             <h4 className='mb-4 text-sm px-3 text-justify'>
                                 We are your comprehensive solution for automating your ad placements, offering a platform that streamlines the entire process
                             </h4>
@@ -87,11 +89,11 @@ function Home() {
 
               <section id='howWeThink' className='bg-ads360light-100 pt-20'>
                   <div className='mx-auto w-11/12 md:w-10/12 xl:w-9/12'>
-                      <h4 className='text-ads360yellow-100 mb-10'>How we think</h4>
+                      <h4 className={`text-ads360yellow-100 mb-10 ${lexend.className}`}>How we think</h4>
 
                       <div className='md:flex justify-between mb-10'>
                           <div>
-                              <h3 className="text-2xl lg:text-4xl lg:mb-4 mb-2">We're challengers at heart and builders by nature.</h3>
+                              <h3 className={`text-2xl lg:text-4xl lg:mb-4 mb-2 ${lexend.className}`}>We're challengers at heart and builders by nature.</h3>
                               <h6 className="">We work as one team and deliver projects <span className="text-ads360yellow-100">concurrently...</span></h6>
                           </div>
                           <Link className='block mt-5' href='/signup'><YellowButtons text='Dive into our culture'/></Link>
