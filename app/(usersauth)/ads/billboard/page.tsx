@@ -341,7 +341,6 @@ function Billboards() {
 
                 <datalist id="location" className="">
                   <option value="Ikeja" />
-                  <option value="ikotun" />
                   <option value="port harcourt" />
                   <option value="abuja" />
                   <option value="victoria island" />
