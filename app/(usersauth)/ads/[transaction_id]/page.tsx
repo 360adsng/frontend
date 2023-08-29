@@ -16,7 +16,7 @@ import { Modal } from "@components/modal/modal";
 
 const Payment = () => {
   const amount = 27000;
-  const wallet = 30000;
+  const wallet = 0;
   const router = useRouter();
   const [selected, setSelected] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -159,7 +159,7 @@ const Payment = () => {
               <div className="my-3">
                 <p className="text-red-700 text-xs">
                   Not enough money on wallet, please use a different option. or
-                  click <Link href="/">here</Link> to fun wallet
+                  click <Link href="/users/wallet/fundwallet" className="text-red-900 font-semibold">here</Link> to fun wallet
                 </p>
               </div>
             ) : null}
