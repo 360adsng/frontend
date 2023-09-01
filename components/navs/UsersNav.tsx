@@ -30,7 +30,7 @@ function UsersNav() {
       <nav className="bg-white md:flex md:px-14 py-3 justify-between items-center hidden">
         {pathname.split("/")[1] !== "users" && (
           <div>
-            <button className="flex items-center">
+            <Link href="/" className="flex items-center">
               <Image
                 src={React360Logo}
                 width={0}
@@ -39,7 +39,7 @@ function UsersNav() {
                 className="hover:-rotate-90 transistion duration-300"
               />
               <Image src={ReactAdsLogo} width={0} height={0} alt="" />
-            </button>
+            </Link>
           </div>
         )}
         <div>{/* might add search later */}</div>
