@@ -102,7 +102,7 @@ const Checkout = () => {
                 : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"
             }`}
           >
-            Negotiat
+            Negotiate
           </button>
 
           <button disabled={billboard.paid === 'yes' ? true : false} className={`${billboard.paid === 'yes' ? 'bg-ads360yellow-100/50 text-black/50' : 'hover:animate-changeColor hover:text-white bg-ads360yellow-100'} w-123 h-12 rounded-10 my-2 `}>

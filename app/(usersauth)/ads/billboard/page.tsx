@@ -224,7 +224,7 @@ function Billboards() {
                   {
                     billboard.negotiable === 'yes' && 
                     <div className="absolute w-1/2 md:w-2/3 xl:w-1/2 bg-ads360black-100/70 text-ads360light-100 rounded right-3 top-4 text-center py-2">
-                      open for negotiation
+                      Negotiable
                     </div>
                   }
 

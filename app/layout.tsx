@@ -1,5 +1,5 @@
 import '@styles/global.css'
-import { space_grotesk } from '@components/fonts'
+import { lexend } from '@components/fonts'
 
 
 
@@ -13,7 +13,7 @@ function Rootlayout({children}:{children:React.ReactNode}) {
   return (
     <html lang='en'>
         <body>
-            <main className={space_grotesk.className} >
+            <main className={lexend.className} >
                 {children}
             </main>
         </body>
