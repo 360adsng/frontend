@@ -10,8 +10,7 @@ import location from "@public/icons/yellowlocation.svg";
 import mark from "@public/icons/mark.svg";
 import Arrowleft from "@public/icons/Arrowleft.svg";
 import cancel from "@public/icons/usericon/modalCancelBotton.svg";
-import { useState } from "react";
-import { FiXCircle } from "react-icons/fi";
+import { useState } from "react";;
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 
 import { Modal } from "@components/modal/modal";

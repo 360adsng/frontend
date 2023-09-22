@@ -72,7 +72,7 @@ function UserSideNav() {
     }
 
   return (
-    <aside className="group bg-[#292728] w-[5.7%] pt-5 hover:w-[17%] xl:hover:w-[13%] transistion duration-300 fixed overflow-hidden h-full text-white">
+    <aside className="group bg-[#292728] w-[5.7%] pt-5 hover:w-[18.5%] xl:hover:w-[14.5%] transistion duration-300 fixed overflow-hidden h-full text-white">
         <div className='mx-1 xl:mx-2'>
             <Link href='/'>
                 <Image

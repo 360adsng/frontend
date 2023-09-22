@@ -7,7 +7,7 @@ function Layout({children}:{children:React.ReactNode}) {
   return (
     <>
       <main className='md:flex'>
-        <section className='group hidden transistion duration-300 md:block basis-[6%] hover:basis-[20.2%] xl:hover:basis-[14.8%] '>
+        <section className='group hidden transistion duration-300 md:block basis-[6%] hover:basis-[18.2%] xl:hover:basis-[15.8%] '>
           <UserSideNav/>
         </section>
         <section className='md:basis-[100%]'>

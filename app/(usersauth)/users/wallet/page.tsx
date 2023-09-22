@@ -1,5 +1,6 @@
 import Image from "next/image"
 import naira from "@public/icons/naira.svg"
+import filter from "@public/icons/filter.svg"
 import makepayment from "@public/icons/makepayment.svg"
 import whatsAppPoint from "@public/icons/usericon/whatsappPoint.svg"
 
@@ -79,7 +80,15 @@ const WalletSection = () => {
         </div>
 
 
-        <div className="flex justify-end">
+        <div className="group">
+          <div className="flex justify-end">
+            <button className="flex space-x-2 bg-[#E4E4E4] p-1 rounded-full px-5">
+            <Image src={filter} alt="filter" className="py-2" width={20} height={20}/>
+            <span>filter</span> 
+            </button>
+          </div>
+
+          <div className="flex justify-end">
           <div className="">
             <select className="rounded mx-2 p-2 focus:outline-none bg-ads360light-100">
               <option>select</option>
@@ -91,6 +100,11 @@ const WalletSection = () => {
             <input type="date" className="rounded p-2 focus:outline-none bg-ads360light-100"/>
           </div>
         </div>
+        </div>
+
+
+
+
 
         <div className="bg-white p-4 shadow-md my-3 rounded-10 border border-ads360yellow-100">
             <h3 className="text-lg mb-2">Transaction History</h3>

@@ -7,7 +7,7 @@ module.exports = {
   ],
   theme: {
     extend: {
-      //for colord
+      //for colors
       colors:{
         ads360yellow:{
           100:'#D0B301',
