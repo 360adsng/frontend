@@ -1,4 +1,4 @@
-"use client"
+
 import why1 from '@public/icons/why1.svg';
 import why2 from '@public/icons/why2.svg';
 import why3 from '@public/icons/why3.svg';

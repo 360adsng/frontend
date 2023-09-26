@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image";
 import Arrowleft from "@public/icons/Arrowleft.svg";
 import { useRouter } from "next/navigation";
