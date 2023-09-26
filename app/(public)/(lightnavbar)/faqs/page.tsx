@@ -1,4 +1,4 @@
-import Faqs from "@components/Faqs";
+import Faqs from "@components/ui/Faqs";
 import BlackButtons from "@components/buttons/BlackButton";
 
 const Faq = () =>{

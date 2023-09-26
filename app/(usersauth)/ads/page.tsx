@@ -8,6 +8,7 @@ import sms from "@public/icons/sms.svg";
 import influencer from "@public/icons/influencer.svg";
 import whatsapp from "@public/icons/whatsappCluster.svg";
 import Arrowleft from "@public/icons/Arrowleft.svg";
+import BackBtn from "@components/buttons/BackBtn";
 
 function Ads() {
   const ads = [
@@ -44,15 +45,7 @@ function Ads() {
   ];
   return (
     <section className="px-4 md:px-10 py-24">
-      <div className="flex items-center font-bold">
-        <Link
-          href="/users"
-          className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white"
-        >
-          <Image src={Arrowleft} width={0} height={0} alt="arrow" />
-        </Link>
-        Create an ad campaign
-      </div>
+      <BackBtn>Create an ad campaign</BackBtn>
 
       <div className="hidden items-center justify-center mx-auto mt-5 mb-10 md:flex">
         <div className="font-bold text-sm">

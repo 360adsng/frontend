@@ -45,6 +45,40 @@ body::-webkit-scrollbar-thumb{
 }
 
 
+
+.textscroll::-webkit-scrollbar{
+  width: 0.5em;
+}
+
+.textscroll::-webkit-scrollbar-track{
+  box-shadow: inset 0 0 4px #f1f5f9;
+  border-radius: 3px;
+}
+
+.textscroll::-webkit-scrollbar-thumb{
+  background-color: #cbd5e1;
+  outline: 1px solid #cbd5e1;
+  border-radius: 3px;
+}
+
+
+
+.prevText::-webkit-scrollbar{
+  width: 0.5em;
+}
+
+.prevText::-webkit-scrollbar-track{
+  box-shadow: inset 0 0 4px #f1f5f9;
+  border-radius: 3px;
+}
+
+.prevText::-webkit-scrollbar-thumb{
+  background-color: #cbd5e1;
+  outline: 1px solid #cbd5e1;
+  border-radius: 3px;
+}
+
+
    /* drawer Animation start */
 .forward{
     animation: OpenDrawer 0.7s ease-out forwards;

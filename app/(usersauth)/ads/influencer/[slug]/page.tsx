@@ -11,6 +11,7 @@ import facebook from "@public/icons/Facebook2.svg";
 
 import Link from "next/link";
 import { Modal } from "@components/modal/modal";
+import BackBtn from "@components/buttons/BackBtn";
 
 const InfluencerDetails = () => {
 
@@ -28,12 +29,7 @@ const InfluencerDetails = () => {
   return (
     <>
       <section className="bg-[#E9E9E9] px-4 md:px-10 pt-24 pb-7">
-        <Link href='/ads/influencer' className="flex items-center font-bold">
-          <button className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white">
-            <Image src={Arrowleft} width={0} height={0} alt="arrow" />
-          </button>
-          influencer Details
-        </Link>
+        <BackBtn>influencer Details</BackBtn>
 
         <p className="text-stone-400 mb-5 mt-3">
           View full details of influencer and proceed to checkout
@@ -71,14 +67,14 @@ const InfluencerDetails = () => {
 
               <div className="basis-1/3">
                 <h4 className="my-3 font-semibold">Platforms</h4>
-                <p className="my-3"><Image alt="" src={whatsapp} className="inline w-5 h-5"/> Whatsapp:<span className="font-semibold"> 36000</span></p>
+                <p className="my-3"><Image alt="" src={whatsapp} className="inline w-5 h-5"/> blog:<span className="font-semibold"> 36000</span></p>
                 <p className="my-3"><Image alt="" src={twitter} className="inline w-5 h-5"/> Twitter: <span className="font-semibold"> 59000</span></p>
                 <p className="my-3"><Image alt="" src={facebook} className="inline w-5 h-5"/> Facebook: <span className="font-semibold"> 20000</span></p>
                 <p className="mt-3 mb-7">₦40,000 (per post)</p>
 
                 <div className="">
                   <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
-                    <Link href={`/ads/influencer/${influencer.id}/onboard`}>
+                    <Link href={`/ads/influencer/${influencer.id}/onboarding`}>
                       Select influencer
                     </Link>
                   </button>

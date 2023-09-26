@@ -6,33 +6,31 @@ import Link from "next/link";
 
 //import from components
 import BlackButtons from "@components/buttons/BlackButton";
-import YellowButtons from "@components/buttons/YellowButton";
 import MobileCarousel from "@components/slides/MobileCarousel";
 import DesktopCarousel from "@components/slides/DesktopCarousel";
-import SmallBtnYello from "@components/buttons/SmallBtnYellow";
-import Why360 from "@components/Why360";
-import CountUp from "@components/CountUp";
+import Why360 from "@components/ui/Why360";
+import HowWeThink from "@components/ui/HowWeThink";
+import NewsLetter from "@components/ui/NewsLetter";
+import CountUp from "@components/ui/CountUp";
 import LightNavbar from "@components/navs/LightNavBar";
 import Footer from "@components/navs/Footer";
 
 //import images
 import heroGirl from "@public/images/herogirl.png";
 import Group from "@public/images/Group.png";
-import think1 from "@public/images/think1.jpg";
 import adsgirl from "@public/images/adsgirl.png";
 import adsgirl3 from "@public/images/adsgirl3.png";
-
-import { space_grotesk } from "@components/fonts";
 
 function Home() {
   return (
     <>
       <LightNavbar />
-      <section id="Hero" className="bg-ads360light-100 pt-24">
-        <div className="mx-auto w-11/12 md:w-10/12 xl:w-9/12">
+      <section id="Hero" className="bg-ads360light-100 pt-20">
+        <div className="flex justify-center mx-auto w-11/12 md:w-10/12 xl:w-9/12">
+          <div className="">
           <div>
             <div
-              className={`text-5xl sm:text-6xl md:text-7xl font-[600]`}
+              className='md:mr-[190px] text-5xl md:text-6xl lg:text-7xl font-[600]'
             >
               <h3>All day,</h3>
               <h3>Ad campaign </h3>
@@ -40,12 +38,12 @@ function Home() {
             </div>
 
             <Link className="block mt-5" href="/signin">
-              {" "}
               <BlackButtons text="Let's dive in" />
             </Link>
           </div>
-          <div className="md:ml-[217px] md:mt-[-117px]">
+          <div className="md:ml-[190px] md:-mt-[130px]">
             <Image width={0} height={0} src={heroGirl} alt="hero" />
+          </div>
           </div>
         </div>
       </section>
@@ -115,27 +113,7 @@ function Home() {
         </div>
       </section>
 
-      <section id="howWeThink" className="bg-ads360light-100 pt-20">
-        <div className="mx-auto w-11/12 md:w-10/12 xl:w-9/12">
-          <h4 className="text-ads360yellow-100 mb-10">How we think</h4>
-
-          <div className="md:flex justify-between mb-10">
-            <div>
-              <h3 className="text-2xl lg:text-4xl lg:mb-4 mb-2">
-                We're challengers at heart and builders by nature.
-              </h3>
-              <h6 className="">
-                We work as one team and deliver projects{" "}
-                <span className="text-ads360yellow-100">concurrently...</span>
-              </h6>
-            </div>
-            <Link className="block mt-5" href="/signup">
-              <YellowButtons text="Dive into our culture" />
-            </Link>
-          </div>
-          <Image width={0} height={0} src={think1} alt="" />
-        </div>
-      </section>
+      <HowWeThink/>
 
       <section id="ourService" className="py-24 bg-ads360light-100">
         <div className="mx-auto w-11/12 md:w-10/12 xl:w-9/12">
@@ -222,39 +200,8 @@ function Home() {
           </div>
         </div>
       </section>
+      <NewsLetter img={adsgirl3}/>
 
-      <section id="newsletter" className="bg-ads360light-100 pt-20 md:pb-20">
-        <div className="mx-auto px-1 md:px-0 pt-5 w-11/12 md:w-10/12 xl:w-9/12 text-center text-white md:bg-ads360black-100 md:rounded">
-          <div className="relative">
-            <div className="bg-ads360black-100 pt-10 pb-10 md:pb-5 rounded md:rounded-none">
-              <h3 className="text-2xl lg:text-4xl">
-                Subscribe to Our Newsletter
-              </h3>
-              <h6 className="">
-                For exclusives updates &{" "}
-                <span className="text-ads360yellow-100">news</span>
-              </h6>
-              <div className="mt-5 md:mt-10">
-                {/* <form> */}
-                <div className="flex text-black px-1 rounded h-[38px] md:h-[45px] w-11/12 md:w-1/2 mx-auto items-center justify-center bg-ads360light-100">
-                  <input
-                    type="text"
-                    className="w-full focus:outline-none bg-transparent h-[38px] md:h-[45px]"
-                    placeholder="Enter Email..."
-                  />
-                  <div>
-                    <SmallBtnYello text="Submit" />
-                  </div>
-                </div>
-                {/* </form> */}
-              </div>
-            </div>
-            <div className="flex justify-center md:mt-5">
-              <Image width={0} height={0} src={adsgirl3} alt="..." />
-            </div>
-          </div>
-        </div>
-      </section>
       <Footer />
     </>
   );

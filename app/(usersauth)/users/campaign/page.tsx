@@ -2,7 +2,7 @@
 import Image from "next/image"
 import dash from '@public/icons/dash.svg'
 import { useState } from 'react'
-import Table from "@components/Table"
+import Table from "@components/ui/Table"
 
 const Campaign = () => {
   

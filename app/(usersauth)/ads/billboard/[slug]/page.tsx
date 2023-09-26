@@ -13,6 +13,7 @@ import billboardImage2 from "@public/del/billboard2.png";
 import Link from "next/link";
 import { Modal } from "@components/modal/modal";
 import { motion, AnimatePresence } from "framer-motion";
+import BackBtn from "@components/buttons/BackBtn";
 
 const Billboard = () => {
   const [view, setView] = useState("Billboard Overview");
@@ -32,12 +33,8 @@ const Billboard = () => {
   return (
     <>
       <section className="bg-[#E9E9E9] px-4 md:px-10 pt-24">
-        <Link href='/ads/billboard' className="flex items-center font-bold">
-          <button className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white">
-            <Image src={Arrowleft} width={0} height={0} alt="arrow" />
-          </button>
-          Billboard Details
-        </Link>
+       
+        <BackBtn> Billboard Details</BackBtn>
 
         <p className="text-stone-400 mb-5 mt-3">
           View full details of billboard and proceed to checkout

@@ -1,39 +1,44 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import Calendar from "react-calendar";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-//import images
-
-import Arrowleft from "@public/icons/Arrowleft.svg";
-import mark from "@public/icons/mark.svg";
-import tick2 from "@public/icons/tick2.svg";
-import tick3 from "@public/icons/tick3.svg";
-import billboardbanner from "@public/images/billboardbanner.png";
 import { Value } from "react-calendar/dist/cjs/shared/types";
-
 import { Toaster, toast } from "sonner";
-import { MdOutlineCancel } from "react-icons/md";
+
+//import images
+import mark from "@public/icons/mark.svg";
+import Checkbox from "@components/inputs/Checkbox";
+
+//components
+import FilesInput from "@components/inputs/FilesInput";
+import Tick from "@components/inputs/Tick";
+import CalenderBox from "@components/inputs/CalenderBox";
+import Preview from "@components/ui/Preview";
+import BackBtn from "@components/buttons/BackBtn";
 
 function Onboard() {
-  const [plan, setPlan] = useState("selete");
-  const [value, onChange] = useState<valuePiece | [valuePiece, valuePiece]>(
-    new Date()
-  );
+  const [plan, setPlan] = useState("");
+  const [writeup, setWriteup] = useState("");
+  const [startWeek, setStartWeek] = useState<Duration>({
+    startday: "",
+    duration: "",
+  });
+  const [startMonth, setStartMonth] = useState<Duration>({
+    startday: "",
+    duration: "",
+  });
+  const [platform, setPlatform] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<valuePiece[]>([]);
   const [attachmentType, setAttachmentType] = useState("image");
   const [previewImage, setPreviewImage] = useState<Preview>();
   const [previewVideo, setPreviewVideo] = useState<Preview>();
-  const [previewYoutube, setPreviewYoutube] = useState<string>();
-  const inputImage = useRef<HTMLInputElement>(null);
-  const inputVideo = useRef<HTMLInputElement>(null);
   const params = useParams();
-  const selectedBillBoard = params.slug;
+  const selectedinfluencer = params.slug;
 
   const handlePlan = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
-    if (value === "Selete") {
+    if (value === "Select") {
       toast.error("kindly selete a duration plan");
       setPlan("");
     } else {
@@ -47,7 +52,7 @@ function Onboard() {
     });
 
     if (check) {
-      toast.error("You havealready selected this date");
+      toast.error("You have selected this date already");
     } else {
       setSelectedDate((prev) => [...prev, info as valuePiece]);
     }
@@ -58,63 +63,67 @@ function Onboard() {
     setSelectedDate(updateDate);
   };
 
-  const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: string
+  ) => {
     const file = e.target.files;
     if (file !== null && file.length > 0) {
       const objectUrl = URL.createObjectURL(file[0]);
-      setPreviewYoutube("");
-      setPreviewImage({
-        src: objectUrl,
-        name: file[0].name,
-      });
-      setPreviewVideo(undefined);
+
+      if (type === "image") {
+        setPreviewVideo(undefined);
+        setPreviewImage({
+          src: objectUrl,
+          name: file[0].name,
+        });
+      } else {
+        setPreviewImage(undefined);
+        setPreviewVideo({
+          src: objectUrl,
+          name: file[0].name,
+        });
+      }
     }
   };
 
-  const handleChangeVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files;
-    if (file !== null && file.length > 0) {
-      const objectUrl = URL.createObjectURL(file[0]);
-      setPreviewYoutube("");
-      setPreviewImage(undefined);
-      setPreviewVideo({
-        src: objectUrl,
-        name: file[0].name,
-      });
+  const handlePlatform = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    value: string
+  ) => {
+    if (e.target.checked) {
+      setPlatform((current) => [...current, value]);
+    } else {
+      setPlatform((current) => current.filter((each) => each !== value));
     }
   };
 
-  const handleChangeYoutube = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPreviewYoutube(e.target.value);
-    setPreviewImage(undefined);
-    setPreviewVideo(undefined);
+  const handleDuration = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: string
+  ) => {
+    const { value, name } = e.target;
+    if (type === "week") {
+      setStartWeek((current) => ({ ...current, [name]: value }));
+      setStartMonth({
+        startday: "",
+        duration: "",
+      });
+    } else {
+      setStartMonth((current) => ({ ...current, [name]: value }));
+      setSelectedDate([]);
+      setStartWeek({
+        startday: "",
+        duration: "",
+      });
+    }
+    setSelectedDate([]);
   };
-
-  const [billboard, setBillboard] = useState({
-    id: "",
-    plan: plan,
-    attachment:
-      attachmentType === "image"
-        ? previewImage
-        : attachmentType === "video"
-        ? previewVideo
-        : previewYoutube,
-    dates: selectedDate,
-  });
 
   return (
     <section className="px-4 md:px-7 xl:px-20 py-24">
-      <h3 className="text-2xl"></h3>
-
-      <Link
-        href={`/ads/billboard/${selectedBillBoard}`}
-        className="flex items-center font-bold"
-      >
-        <button className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white">
-          <Image src={Arrowleft} width={0} height={0} alt="arrow" />
-        </button>
-        BillBoard Marketing
-      </Link>
+      <BackBtn>Influencer Marketing</BackBtn>
+     
 
       {/* steps */}
       <div className="hidden items-center justify-center mx-auto mt-5 mb-14 md:flex">
@@ -166,241 +175,152 @@ function Onboard() {
 
       <section className="md:flex my-10 md:space-x-5 xl:space-x-16">
         <div className="md:basis-6/12 xl:basis-5/12">
-          <p className="text-stone-400">Choose day(s) to run campaign</p>
+          <h4 className="font-bold my-3">Choose day(s) to run campaign</h4>
           <select
             onChange={handlePlan}
             className="mb-3 bg-white focus:outline-none w-full p-2 rounded-10"
           >
             <option>Select</option>
-            <option>Daily</option>
-            <option>Weekly</option>
-            <option>Monthly</option>
+            <option>Immediate</option>
+            <option>Days</option>
+            <option>Weeks</option>
+            <option>Months</option>
           </select>
-          {plan === "Daily" ? (
-            <div className="flex w-full">
-              <Calendar
-                onChange={(value) => {
-                  onChange;
-                  addDate(value);
-                }}
-                className={`shadow-lg rounded-l-10 basis-[67%] md:basis-[70%]`}
-                value={value}
-              />
-              <div className="bg-white overflow-y-scroll basis-[33%] md:basis-[30%] selectedDate h-[19rem] px-1 shadow-lg rounded-r-10 w-full">
-                <p className="text-stone-400 text-center text-sm">
-                  Seleted days
-                </p>
-                <div>
-                  {selectedDate?.map((date, i) => (
-                    <div
-                      key={i}
-                      className="flex p-1 rounded justify-center text-sm bg-[#006edc] text-white my-1"
-                    >
-                      <span className="px-1 basis-9/12">
-                        {date?.toLocaleDateString()}
-                      </span>
-                      <button onClick={() => removeDate(date)}>
-                        <MdOutlineCancel />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+          {plan === "Days" ? (
+            <CalenderBox
+              addDate={addDate}
+              selectedDate={selectedDate}
+              removeDate={removeDate}
+            />
+          ) : plan === "Weeks" ? (
+            <div className="flex justify-between space-x-2 md:space-x-0 my-3">
+              <div>
+                <p>Start day</p>
+                <input
+                  type="date"
+                  value={startWeek?.startday}
+                  name="startday"
+                  onChange={(e) => handleDuration(e, "week")}
+                  className="w-full bg-white rounded-10 p-2 focus:outline-none"
+                />
+              </div>
+              <div>
+                <p>Number of weeks</p>
+                <input
+                  value={startWeek?.duration}
+                  name="duration"
+                  type="number"
+                  onChange={(e) => handleDuration(e, "week")}
+                  className="w-full bg-white rounded-10 p-2 focus:outline-none"
+                />
               </div>
             </div>
-          ) : plan === "Weekly" ? (
-            <div>
-              <input
-                type="date"
-                className="w-full bg-white rounded-10 my-5 p-2 focus:outline-none"
-              />
-              <br />
-              <input
-                type="number"
-                className="w-full bg-white rounded-10 my-5 p-2 focus:outline-none"
-              />
-            </div>
-          ) : plan === "Monthly" ? (
-            <div>
-              <input
-                type="date"
-                className="w-full bg-white rounded-10 my-5 p-2 focus:outline-none"
-              />
-              <br />
-              <input
-                type="number"
-                className="w-full bg-white rounded-10 my-5 p-2 focus:outline-none"
-              />
+          ) : plan === "Months" ? (
+            <div className="flex justify-between space-x-2 md:space-x-0 my-3">
+              <div>
+                <p>Start day</p>
+                <input
+                  value={startMonth?.startday}
+                  name="startday"
+                  onChange={(e) => handleDuration(e, "month")}
+                  type="date"
+                  className="w-full bg-white rounded-10 p-2 focus:outline-none"
+                />
+              </div>
+              <div>
+                <p>Number of Months</p>
+                <input
+                  value={startMonth?.duration}
+                  name="duration"
+                  onChange={(e) => handleDuration(e, "month")}
+                  type="number"
+                  className="w-full bg-white rounded-10 p-2 focus:outline-none"
+                />
+              </div>
             </div>
           ) : null}
 
-          {/* attachment */}
+          {/* platform */}
+          <div className="my-5">
+            <h4 className="font-bold my-3">Chose Platform</h4>
+            <Checkbox
+              id="facebook"
+              onClick={handlePlatform}
+              label="Facebook 38000"
+            />
+            <Checkbox id="blog" onClick={handlePlatform} label="Blog 39000" />
+            <Checkbox
+              id="twitter"
+              onClick={handlePlatform}
+              label="Twitter 39000"
+            />
+          </div>
+          {/* message */}
+          <div className="my-5">
+            <h4 className="font-bold my-3">Message</h4>
+            <textarea
+              value={writeup}
+              onChange={(e) => setWriteup(e.target.value)}
+              rows={9}
+              className="textscroll p-2 w-full border focus:outline-none  rounded-10 border-ads360yellowBtn-100"
+            ></textarea>
+          </div>
 
+          {/* attachment */}
           <div className="mt-5">
             <h4 className="font-bold my-3">Attachments</h4>
 
-            <div className="flex justify-between">
-              <h5 className="flex space-x-3">
-                {attachmentType === "image" ? (
-                  <Image height={17} width={17} alt="tick2" src={tick3} />
-                ) : (
-                  <Image
-                    height={17}
-                    width={17}
-                    alt="tick2"
-                    src={tick2}
-                    onClick={() => setAttachmentType("image")}
-                  />
-                )}
-                <span>Image Assets</span>
-              </h5>
+            <div className="flex space-x-3">
+              <Tick
+                label="Image Assets"
+                asset="image"
+                setAttachmentType={setAttachmentType}
+                attachmentType={attachmentType}
+              />
 
-              <h5 className="flex space-x-3">
-                {attachmentType === "video" ? (
-                  <Image height={17} width={17} alt="tick2" src={tick3} />
-                ) : (
-                  <Image
-                    height={17}
-                    width={17}
-                    alt="tick2"
-                    src={tick2}
-                    onClick={() => setAttachmentType("video")}
-                  />
-                )}
-                <span>Video Assets</span>
-              </h5>
-
-              <h5 className="flex space-x-3">
-                {attachmentType === "youtube" ? (
-                  <Image height={17} width={17} alt="tick2" src={tick3} />
-                ) : (
-                  <Image
-                    height={17}
-                    width={17}
-                    alt="tick2"
-                    src={tick2}
-                    onClick={() => setAttachmentType("youtube")}
-                  />
-                )}
-                <span>YouTube Link</span>
-              </h5>
+              <Tick
+                label="Video Assets"
+                asset="video"
+                setAttachmentType={setAttachmentType}
+                attachmentType={attachmentType}
+              />
             </div>
             {attachmentType === "image" ? (
-              <div>
-                <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-5 w-full ...">
-                  <div>
-                    {previewImage?.name !== undefined &&
-                    previewImage?.name.length > 10
-                      ? previewImage?.name.slice(0, 9) +
-                        "..." +
-                        previewImage?.name.slice(-3)
-                      : previewImage?.name}
-                  </div>
-                  <button
-                    className="p-2 rounded-r-10 bg-ads360gray-100"
-                    onClick={() => inputImage.current?.click()}
-                  >
-                    browse
-                  </button>
-                </div>
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => handleChangeImage(e)}
-                  ref={inputImage}
-                  accept="image/*"
-                />
-                <p className="text-red-500 mb-6">
-                  Required billboard image dimension: 496(H) by 800(W)
-                </p>
-              </div>
-            ) : attachmentType === "video" ? (
-              <div>
-                <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-5">
-                  <span className="truncate ... w-1/2 overflow-hidden">
-                    {previewVideo?.name !== undefined &&
-                    previewVideo?.name.length > 10
-                      ? previewVideo?.name.slice(0, 9) +
-                        "..." +
-                        previewVideo?.name.slice(-3)
-                      : previewVideo?.name}
-                  </span>
-                  <button
-                    className="p-2 rounded-r-10 bg-ads360gray-100"
-                    onClick={() => inputVideo.current?.click()}
-                  >
-                    browse
-                  </button>
-                </div>
-                <input
-                  type="file"
-                  hidden
-                  onChange={(e) => handleChangeVideo(e)}
-                  ref={inputVideo}
-                  accept="video/*"
-                />
-                <p className="text-red-500">
-                  Required billboard video dimension: 496(H) by 800(W)
-                </p>
-              </div>
+              <FilesInput
+                previewName={previewImage?.name as string}
+                accept="image"
+                handleChange={handleChange}
+                warning="Required influencer image dimension: 496(H) by 800(W)"
+              />
             ) : (
-              <div>
-                <input
-                  type="url"
-                  value={previewYoutube}
-                  onChange={(e) => handleChangeYoutube(e)}
-                  className="w-full rounded-10 my-5 p-2 focus:outline-none"
-                />
-                <p className="text-red-500">Only youtube link allowed</p>
-              </div>
+              <FilesInput
+                previewName={previewVideo?.name as string}
+                accept="video"
+                handleChange={handleChange}
+                warning="Required influencer video dimension: 496(H) by 800(W)"
+              />
             )}
           </div>
         </div>
 
         <div className="lg:basis-7/12 md:basis-6/12 lg:my-0">
-          <div className="rounded-10 w-full">
-            {attachmentType === "video" && previewVideo ? (
-              <video className="rounded-10" controls>
-                <source
-                  className="w-full"
-                  src={previewVideo.src}
-                  type="video/mp4"
-                />
-                <source
-                  className="w-full"
-                  src={previewVideo.src}
-                  type="video/webm"
-                />
-                Your browser does not support the video tag.
-              </video>
-            ) : attachmentType === "image" && previewImage ? (
-              <Image
-                height={0}
-                width={0}
-                alt="billboard"
-                src={previewImage.src}
-                className="mx-auto w-full rounded-10 h-64"
-              />
-            ) : attachmentType === "youtube" && previewYoutube ? (
-              <iframe
-                className="w-full h-64 rounded-10"
-                src={previewYoutube}
-              ></iframe>
-            ) : (
-              <Image
-                height={0}
-                width={0}
-                alt="billboard"
-                src={billboardbanner}
-                className="mx-auto w-full h-64"
-              />
-            )}
-          </div>
+          <Preview
+            previewImage={previewImage as Preview}
+            attachmentType={attachmentType}
+            previewVideo={previewVideo as Preview}
+            needPlatform={true}
+            needMessage={true}
+            platform={platform}
+            writeup={writeup}
+            plan={plan}
+            selectedDate={selectedDate}
+          />
         </div>
       </section>
 
       <div className="flex justify-end">
         <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
-          <Link href={`/ads/billboard/${2}/onboard/checkout`}>Next</Link>
+          <Link href={`/ads/influencer/${2}/onboard/checkout`}>Next</Link>
         </button>
       </div>
 

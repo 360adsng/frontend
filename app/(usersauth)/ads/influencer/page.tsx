@@ -15,6 +15,7 @@ import { useState } from "react";
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 
 import { Modal } from "@components/modal/modal";
+import BackBtn from "@components/buttons/BackBtn";
 
 function Influencer() {
   const [filter, setFilter] = useState(false);
@@ -173,19 +174,8 @@ function Influencer() {
   return (
     <>
       <section className="px-4 md:px-10 py-24">
-        <h3 className="text-2xl"></h3>
-
-        <div className="flex justify-between">
-          <div className="flex items-center font-bold">
-            <Link
-              href="/ads"
-              className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white"
-            >
-              <Image src={Arrowleft} width={0} height={0} alt="arrow" />
-            </Link>
-            influencer Marketing
-          </div>
-        </div>
+    
+        <BackBtn>influencer Marketing</BackBtn>
 
         {/* steps */}
         <div className="hidden items-center justify-center mx-auto mt-5 mb-14 md:flex">

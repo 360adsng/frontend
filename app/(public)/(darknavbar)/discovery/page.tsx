@@ -3,16 +3,15 @@ import digital  from '@public/images/digitalads3.png';
 import billboard  from '@public/images/Billboard.png';
 import happy from '@public/images/happy.png';
 import influencer from '@public/images/influencer1.png';
-import whatsapp from '@public/images/whatsapp.png';
 import Yellowdot from '@public/icons/yellowdot.svg';
 import MobileCarousel from '@components/slides/MobileCarousel';
-import Why360 from '@components/Why360';
-import SmallBtnYello from '@components/buttons/SmallBtnYellow';
+import Why360 from '@components/ui/Why360';
 import manads2 from '@public/images/manads2.png';
 import Image from 'next/image';
-import CountUp from '@components/CountUp'
+import CountUp from '@components/ui/CountUp'
 import SectionX from '@components/slides/InViewX';
 import SectionY from '@components/slides/InViewY';
+import NewsLetter from '@components/ui/NewsLetter';
 
 
 
@@ -199,29 +198,8 @@ const Service = () => {
 
             <Why360/>
 
-            <section id='newsletter' className='bg-ads360light-100 pt-20 md:pb-20'>
-                <div className="mx-auto px-1 md:px-0 pt-5 w-11/12 md:w-10/12 xl:w-9/12 text-center text-white md:bg-ads360black-100 md:rounded">
-                    <div className="relative">
-                        <div className='bg-ads360black-100 pt-10 pb-10 md:pb-5 rounded md:rounded-none'>
-                            <h3 className='text-2xl lg:text-4xl'>Subscribe to Our Newsletter</h3>
-                            <h6 className="">For exclusives sales. updates & <span className="text-ads360yellow-100">news</span></h6>
-                            <div className='mt-5 md:mt-10'>
-                                {/* <form> */}
-                                    <div className='flex text-black px-1 rounded h-[38px] md:h-[45px] w-11/12 md:w-1/2 mx-auto items-center justify-center bg-ads360light-100'>
-                                        <input type="text" className='w-full focus:outline-none bg-transparent h-[38px] md:h-[50px]' placeholder='Enter Email...' />
-                                        <div>
-                                            <SmallBtnYello text='Submit'/>
-                                        </div>
-                                    </div>
-                                {/* </form> */}
-                            </div>
-                        </div>
-                        <div className="flex justify-center md:mt-5">
-                            <Image width={0} height={0} src={manads2} className='w-2/3' alt="..."/>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <NewsLetter img={manads2}/>
+  
         </>
     )
 }
