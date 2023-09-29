@@ -1,30 +1,30 @@
 "use client";
 import { useState } from "react";
-import billboardImage2 from "@public/del/billboard2.png";
 import cancel from "@public/icons/usericon/modalCancelBotton.svg";
 import success from "@public/icons/usericon/checkSuccess.svg";
 import Image from "next/image";
 import { Modal } from "@components/modal/modal";
 import Link from "next/link";
-import Steps from "@components/ui/Steps";
 import BackBtn from "@components/buttons/BackBtn";
+import card from "@public/del/cards.png";
+import influencerImg from "@public/del/girl.jpg";
+
+
 
 const Checkout = () => {
   const [negotia, setNegotia] = useState(false);
   const [negotiatedAmount, setNegotiatedAmount] = useState("");
   const [successfull, setSuccessfull] = useState(false);
-  const [billboard, setBillboard] = useState({
+  const [influencer, setinfluencer] = useState({
     id: 2,
-    name: "Adetokunbo Ademola led, victoria island",
-    location: "Along Adetokunbo Ademola Street by Bishop",
-    image: billboardImage2,
+    name: "Egbami",
+    image: influencerImg,
     paid:'no',
-    pricepd: "30000",
+    platform: ['facebook 30000', 'twitter 45000', 'instagram 15000'],
     negotiationCount: 0,
-    Impressions: "40 per day",
-    minimumNegotiableAmount: 26000,
-    type: "Double faced Gantry LED",
-    duration: "14hrs (6am - 9pm) 6days/week",
+    minimumNegotiableAmount: 85000,
+    type: "influencer",
+    duration: "3 days",
   });
 
   const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +35,7 @@ const Checkout = () => {
     e.preventDefault();
     setSuccessfull(true);
     setNegotia(false);
-    setBillboard((prev) => ({ ...prev, negotiationCount: 1 }));
+    setinfluencer((prev) => ({ ...prev, negotiationCount: 1 }));
     setTimeout(() => {
       setSuccessfull(false);
     }, 4000);
@@ -44,66 +44,84 @@ const Checkout = () => {
   return (
     <>
       <section className="mx-4 md:mx-10 pt-32 pb-24">
-      <BackBtn>billboard Marketing</BackBtn>
+      <BackBtn>influencer Marketing</BackBtn>
 
-      <Steps step={4} text="#1 - Checkout"/>
-
-        <div>
-          <Image
-            height={0}
-            width={0}
-            alt="billboard"
-            src={billboardImage2}
-            className="mx-auto"
-          />
+        <div className="mt-10 md:flex justify-between my-10">
+            <div className="basis-5/12">
+                <h4 className="my-5 text-[#292728] text-xl">Post Message</h4>
+                <p className="mb-5">
+                    "Unlock the road to convenience with our rideshare app. Say goodbye to traffic woes and hello to hassle-free rides!" 
+                    Contact us @drapmeinc or mail us info@drapme.co
+                    #rideshare #luxurycars #chaffeurservices
+                </p>
+            </div>
+            <div className="basis-5/12">
+                <Image
+                height={0}
+                width={0}
+                alt="influencer"
+                src={card}
+                className="mx-auto"
+                />
+            </div>
         </div>
         <div className="w-full overflow-x-auto my-5">
           <table className="min-w-full bg-white">
             <thead className="bg-[#D0B301]/40">
               <tr>
-                <th className="py-2 px-2 md:px-3 border-b">Name</th>
-                <th className="py-2 px-2 md:px-3 border-b">Location</th>
-                <th className="py-2 px-2 md:px-3 border-b">Size</th>
+                <th className="py-2 px-2 md:px-3 border-b">Vendor</th>
+                <th className="py-2 px-2 md:px-3 border-b">Type</th>
+                <th className="py-2 px-2 md:px-3 border-b">Platform/Price</th>
                 <th className="py-2 px-2 md:px-3 border-b">Duration</th>
                 <th className="py-2 px-2 md:px-3 border-b">Start Date</th>
                 <th className="py-2 px-2 md:px-3 border-b">End Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">Cost/day</th>
+                <th className="py-2 px-2 md:px-3 border-b">Total Amount</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-center">
               <tr>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  Eko hotel LED, Victoria Island
+                <td className="py-2 px-2 md:px-3">
+                <Image alt="" src={influencer.image} className="inline" width={40} height={40}/>
+                {influencer.name}
                 </td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                  Along Adetokunbo Ademola Street by Eko Hotels
+                  Influencer
                 </td>
-                <td className="py-2 px-2 md:px-3 border-b">4m(H) by 12m(W)</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                    <div>
+                        Facebook<span className="text-sm text-gray-400"> ₦30000</span>
+                    </div>
+                    <div>
+                        Twitter<span className="text-sm text-gray-400"> ₦45000</span>
+                    </div>
+                    <div>
+                        Instagram<span className="text-sm text-gray-400"> ₦15000</span>
+                    </div>
+                </td>
                 <td className="py-2 px-2 md:px-3 border-b">1 day(s)</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-20</td>
                 <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
-                <td className="py-2 px-2 md:px-3 border-b">₦30,000</td>
+                <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
+                <td className="py-2 px-2 md:px-3 border-b">₦90,000</td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div className="flex justify-end">
-          <div className="bg-[#D0B301]/40 flex justify-between w-full p-5 md:w-1/2 lg:w-1/3">
+          <div className="bg-[#D0B301]/40 flex justify-between w-full py-10  px-5 md:w-1/2 lg:w-1/3">
             <h4>Total Amount</h4>
             <div>
-              <div className="font-bold">₦30,000</div>
-              <div>cost x 1 day(s)</div>
+              <div className="font-bold">₦90,000</div>
             </div>
           </div>
         </div>
 
         <div className="flex md:justify-end space-x-3 my-3">
           <button
-            disabled={billboard.negotiationCount > 0 ? true : false}
+            disabled={influencer.negotiationCount > 0 ? true : false}
             onClick={() => setNegotia(true)}
             className={`w-123 h-12 rounded-10 my-2 ${
-              billboard.negotiationCount > 0
+              influencer.negotiationCount > 0
                 ? "bg-ads360yellow-100/50 text-black/50"
                 : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"
             }`}
@@ -111,7 +129,7 @@ const Checkout = () => {
             Negotiate
           </button>
 
-          <button disabled={billboard.paid === 'yes' ? true : false} className={`${billboard.paid === 'yes' ? 'bg-ads360yellow-100/50 text-black/50' : 'hover:animate-changeColor hover:text-white bg-ads360yellow-100'} w-123 h-12 rounded-10 my-2 `}>
+          <button disabled={influencer.paid === 'yes' ? true : false} className={`${influencer.paid === 'yes' ? 'bg-ads360yellow-100/50 text-black/50' : 'hover:animate-changeColor hover:text-white bg-ads360yellow-100'} w-123 h-12 rounded-10 my-2 `}>
             <Link href={`/ads/${2}`}>Pay Now</Link>
           </button>
         </div>
@@ -147,7 +165,7 @@ const Checkout = () => {
             <div className="my-3">
               <p className="text-red-700 text-xs">
                 You cannot negotiat lower than ₦
-                {billboard.minimumNegotiableAmount}
+                {influencer.minimumNegotiableAmount}
               </p>
               <p className="text-red-700 text-xs">You can only negotiat once</p>
             </div>
@@ -155,13 +173,13 @@ const Checkout = () => {
               <button
                 disabled={
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
+                  parseInt(negotiatedAmount) < influencer.minimumNegotiableAmount
                     ? true
                     : false
                 }
                 className={`${
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
+                  parseInt(negotiatedAmount) < influencer.minimumNegotiableAmount
                     ? "bg-ads360gray-100"
                     : "bg-ads360black-100/95 hover:bg-ads360black-100"
                 } rounded mt-5  text-white  w-5/6 h-10`}

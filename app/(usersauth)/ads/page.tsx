@@ -7,8 +7,8 @@ import billboard from "@public/icons/led2.svg";
 import sms from "@public/icons/sms.svg";
 import influencer from "@public/icons/influencer.svg";
 import whatsapp from "@public/icons/whatsappCluster.svg";
-import Arrowleft from "@public/icons/Arrowleft.svg";
 import BackBtn from "@components/buttons/BackBtn";
+import Steps from "@components/ui/Steps";
 
 function Ads() {
   const ads = [
@@ -47,42 +47,7 @@ function Ads() {
     <section className="px-4 md:px-10 py-24">
       <BackBtn>Create an ad campaign</BackBtn>
 
-      <div className="hidden items-center justify-center mx-auto mt-5 mb-10 md:flex">
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-            <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
-          </div>
-          <div className="relative -left-10">Select Campaign</div>
-        </div>
-
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-            <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
-          </div>
-          <div className="relative -left-10">Onboarding</div>
-        </div>
-
-        <div className="font-bold text-sm text-left">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-            <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
-          </div>
-          <div className="relative -left-7">Completing</div>
-        </div>
-
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-          </div>
-          <div className="relative -left-5">Checkout</div>
-        </div>
-      </div>
-
-      <div className="font-bold md:hidden text-right mt-5 mb-10">
-        #1 - select campaign
-      </div>
+      <Steps step={1} text="#1 - select campaign"/>
 
       <p className="text-stone-400 text-center">
         Select the goal that would make the campaign successful for you.

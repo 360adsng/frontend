@@ -2,7 +2,7 @@
 import flogo from '@public/icons/footerlogo.svg';
 import Link  from 'next/link';
 import Image from 'next/image';
-import SmallBtnYello from '../buttons/SmallBtnYellow';
+import SmallBtnYello from '../../buttons/SmallBtnYellow';
 import instagram from '@public/icons/Instagram.svg';
 // import facebook from '@public/icons/Facbook.svg';
 import whatsapp from '@public/icons/whiteWhatsapp.svg'

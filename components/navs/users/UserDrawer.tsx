@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link  from 'next/link'
 import Image from 'next/image'
-import React360Logo from '@public/logo/360white.svg'
-import ReactAdsLogo from '@public/logo/adsWhite.svg'
 import CloseAside from '@public/icons/closeAside.svg'
-import SmallBtnYello from '../buttons/SmallBtnYellow'
 import { usePathname, useRouter } from 'next/navigation'
 
 
@@ -24,6 +21,7 @@ import analysis from '@public/icons/usericon/whiteanalysis.svg'
 import onanalysis from '@public/icons/usericon/onanalysis.svg'
 import logout from '@public/icons/usericon/whitelogout.svg'
 import onlogout from '@public/icons/usericon/onlogout.svg'
+import WhiteLogo from '@components/logo/WhiteLogo'
 
 
 
@@ -110,20 +108,8 @@ const UserDrawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
         <aside ref={drawer}   className='bg-ads360black-100 text-white z-30 -left-[100%] md:hidden fixed w-full h-full top-0 overflow-y-scroll'>
             <div className='px-5'>
                 <div className='flex justify-between  py-5'>
-                    <div className="flex items-center">
-                        <Image 
-                            src={React360Logo} 
-                            width={0}
-                            height={0}
-                            alt=""
-                            className="hover:-rotate-90 transistion duration-300"
-                        />
-                        <Image 
-                            src={ReactAdsLogo} 
-                            width={0}
-                            height={0}
-                            alt=""
-                        />
+                    <div className='py-5'>
+                    <WhiteLogo/>
                     </div>
                     <div className="md:hidden" onClick={toggleDrawer}>
                     <Image 

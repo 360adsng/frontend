@@ -2,11 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import React360Logo from '@public/logo/360black.svg'
-import ReactAdsLogo from '@public/logo/ads.svg'
 import MobileMenu from '@public/icons/menu.svg'
 import Drawer from "./Drawer";
 import { useState } from 'react';
+import BlackLogo from '@components/logo/BlackLogo'
 
 
 
@@ -24,23 +23,7 @@ const LightNavbar = () => {
     return(
         <>
             <nav className="flex px-5 md:px-0 justify-between md:justify-evenly body-font font-poppins py-5 bg-ads360light-100 text-base">
-                <div>
-                    <Link href='/' className="flex items-center">
-                        <Image 
-                            src={React360Logo} 
-                            width={0}
-                            height={0}
-                            alt=""
-                            className="hover:-rotate-90 transistion duration-300"
-                        />
-                        <Image 
-                            src={ReactAdsLogo} 
-                            width={0}
-                            height={0}
-                            alt=""
-                        />
-                    </Link>
-                </div>
+                <BlackLogo/>
                 <ul className="py-3 hidden md:flex text-center">
                     <li className="group">
                         <Link href="/about" className="mx-4 transition duration-300 hover:text-ads360yellow-100">About Us</Link>

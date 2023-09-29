@@ -35,7 +35,7 @@ export const Modal = ({ isOpen, children }: ModalProps) => {
               },
             }}
           >
-            <div className="bg-black/50 w-full h-full grid grid-cols-1 content-center">
+            <div className="bg-black/50 fixed z-50 w-full h-full grid grid-cols-1 content-center">
               {children}
             </div>
           </motion.div>

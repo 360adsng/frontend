@@ -1,6 +1,6 @@
 
 
-function layout({children}:{children:React.ReactNode}) {
+const Layout = ({children}:{children:React.ReactNode}) => {
   return (
     <>
           {children}
@@ -11,4 +11,4 @@ function layout({children}:{children:React.ReactNode}) {
   )
 }
 
-export default layout
+export default Layout

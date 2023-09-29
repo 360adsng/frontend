@@ -4,18 +4,17 @@ import wallet from "@public/icons/wallet.svg";
 import bell from "@public/icons/bell.svg";
 import avatar from "@public/icons/user.png";
 import { FiMenu } from "react-icons/fi";
-import React360Logo from "@public/logo/360black.svg";
-import ReactAdsLogo from "@public/logo/ads.svg";
-import Link from "next/link";
 import logout from "@public/icons/usericon/onlogout.svg";
 import { useState } from "react";
-import UserDrawer from "./UserDrawer";
+import BillBoardDrawer from "./BillBoardDrawer";
 import { usePathname } from "next/navigation";
+import BlackLogo from "@components/logo/BlackLogo";
 
-function UsersNav() {
+const BillBoardNav = () => {
   const [dropDown, setDropDown] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  console.log(pathname)
 
   const handleToggleDrawer = () => {
     if (isOpen) {
@@ -29,18 +28,7 @@ function UsersNav() {
     <>
       <nav className="bg-white md:flex md:px-14 py-3 justify-between items-center hidden">
         {pathname.split("/")[1] !== "users" && (
-          <div>
-            <Link href="/" className="flex items-center">
-              <Image
-                src={React360Logo}
-                width={0}
-                height={0}
-                alt=""
-                className="hover:-rotate-90 transistion duration-300"
-              />
-              <Image src={ReactAdsLogo} width={0} height={0} alt="" />
-            </Link>
-          </div>
+          <BlackLogo/>
         )}
         <div>{/* might add search later */}</div>
         <div>
@@ -71,34 +59,18 @@ function UsersNav() {
 
       <nav className="bg-white md:hidden md:px-14 py-3 justify-between items-center flex">
         <div className="py-1 px-2 flex items-center space-x-3">
-          {pathname.split("/")[1] === "users" && (
+         
             <div
               className="rounded-full border shadow-md border-ads360yellow-100 p-2"
               onClick={handleToggleDrawer}
             >
               <FiMenu size={24} />
             </div>
-          )}
+       
 
           <div>
-            <div>
-              <Link href="/" className="flex items-center">
-                <Image
-                  src={React360Logo}
-                  width={0}
-                  height={0}
-                  alt=""
-                  className="hover:-rotate-90 transistion duration-300"
-                />
-                <Image
-                  src={ReactAdsLogo}
-                  width={0}
-                  height={0}
-                  alt=""
-                  className=""
-                />
-              </Link>
-            </div>
+            <BlackLogo/>
+              
           </div>
         </div>
 
@@ -150,9 +122,9 @@ function UsersNav() {
         </div>
       </nav>
 
-      <UserDrawer isOpen={isOpen} toggleDrawer={handleToggleDrawer} />
+      <BillBoardDrawer isOpen={isOpen} toggleDrawer={handleToggleDrawer} />
     </>
   );
 }
 
-export default UsersNav;
+export default BillBoardNav;

@@ -5,7 +5,7 @@ const FilesInput = ({ handleChange, warning, accept, previewName }: FileInputPro
 
   return (
     <div>
-      <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-5 w-full ...">
+      <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-2 w-full ...">
         <div>
           {previewName !== undefined &&
                 previewName.length > 10

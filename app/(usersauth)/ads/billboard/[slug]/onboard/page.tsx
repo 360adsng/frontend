@@ -1,15 +1,9 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Value } from "react-calendar/dist/cjs/shared/types";
 import { Toaster, toast } from "sonner";
-
-//import images
-import Arrowleft from "@public/icons/Arrowleft.svg";
-import mark from "@public/icons/mark.svg";
-import Checkbox from "@components/inputs/Checkbox";
 
 //components
 import FilesInput from "@components/inputs/FilesInput";
@@ -17,10 +11,10 @@ import Tick from "@components/inputs/Tick";
 import CalenderBox from "@components/inputs/CalenderBox";
 import Preview from "@components/ui/Preview";
 import BackBtn from "@components/buttons/BackBtn";
+import Steps from "@components/ui/Steps";
 
 function Onboard() {
   const [plan, setPlan] = useState("");
-  const [writeup, setWriteup] = useState("");
   const [startWeek, setStartWeek] = useState<Duration>({
     startday: "",
     duration: "",
@@ -88,17 +82,6 @@ function Onboard() {
     }
   };
 
-  const handlePlatform = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    value: string
-  ) => {
-    if (e.target.checked) {
-      setPlatform((current) => [...current, value]);
-    } else {
-      setPlatform((current) => current.filter((each) => each !== value));
-    }
-  };
-
   const handleDuration = (
     e: React.ChangeEvent<HTMLInputElement>,
     type: string
@@ -121,55 +104,13 @@ function Onboard() {
     setSelectedDate([]);
   };
 
+
+
   return (
     <section className="px-4 md:px-7 xl:px-20 py-24">
       
       <BackBtn>billboard Marketing</BackBtn>
-     
-
-      {/* steps */}
-      <div className="hidden items-center justify-center mx-auto mt-5 mb-14 md:flex">
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border flex justify-center bg-ads360yellow-100">
-              <Image src={mark} width={0} height={0} alt="" />
-            </div>
-            <div className="w-[150px] lg:w-[200px] border border-ads360yellow-100 h-0"></div>
-          </div>
-          <div className="relative -left-10">Select Campaign</div>
-        </div>
-
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border bg-ads360yellow-100 flex justify-center">
-              <Image src={mark} width={0} height={0} alt="" />
-            </div>
-            <div className="w-[150px] lg:w-[200px] border border-ads360yellow-100 h-0"></div>
-          </div>
-          <div className="relative -left-10">Onboarding</div>
-        </div>
-
-        <div className="font-bold text-sm text-left">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-            <div className="w-[150px] lg:w-[200px] border border-gray-300 h-0"></div>
-          </div>
-          <div className="relative -left-7">completion</div>
-        </div>
-
-        <div className="font-bold text-sm">
-          <div className="flex items-center">
-            <div className="w-5 h-5 rounded-full border border-ads360yellow-100"></div>
-          </div>
-          <div className="relative -left-5">Checkout</div>
-        </div>
-      </div>
-
-      <div className="font-bold md:hidden text-right mt-5 mb-10">
-        #3 - Completing
-      </div>
-
-      {/* steps */}
+      <Steps step={3} text="#3 - Completing"/>
 
       <p className="text-stone-400 text-center">
         Provide all requested details to help complete the campaign creation
@@ -289,7 +230,7 @@ function Onboard() {
             platform={platform}
             needPlatform={false}
             needMessage={false}
-            writeup={writeup}
+            writeup={''}
             plan={plan}
             selectedDate={selectedDate}
           />

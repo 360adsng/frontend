@@ -1,5 +1,5 @@
-import LightNavbar from '@components/navs/LightNavBar'
-import Footer from '@components/navs/Footer'
+import LightNavbar from '@components/navs/public/LightNavBar'
+import Footer from '@components/navs/public/Footer'
 
 //add other meta tags here
 // export const metadata = {

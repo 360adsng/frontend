@@ -1,4 +1,4 @@
-import UsersNav from '@components/navs/UsersNav'
+import UsersNav from '@components/navs/users/UsersNav'
 
 //add other meta tags here
 // export const metadata = {

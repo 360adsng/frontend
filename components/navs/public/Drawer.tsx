@@ -6,12 +6,13 @@ import Image from 'next/image';
 import React360Logo from '@public/logo/360white.svg';
 import ReactAdsLogo from '@public/logo/adsWhite.svg';
 import CloseAside from '@public/icons/closeAside.svg';
-import SmallBtnYello from '../buttons/SmallBtnYellow';
+import SmallBtnYello from '../../buttons/SmallBtnYellow';
 import instagram from '@public/icons/Instagram.svg'
 import whatsapp from '@public/icons/whiteWhatsapp.svg'
 // import facebook from '@public/icons/Facbook.svg'
 import twitter from '@public/icons/Twitter.svg'
 import { FiArrowRight } from "react-icons/fi"
+import WhiteLogo from '@components/logo/WhiteLogo';
 
 
 
@@ -42,21 +43,10 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
         <aside ref={drawer}   className='bg-ads360black-100 z-30 -left-[100%] md:hidden fixed w-full h-full top-0 overflow-y-scroll'>
             <div className='px-5'>
                 <div className='flex justify-between  py-5'>
-                        <Link href='/' className="flex items-center" onClick={toggleDrawer}>
-                            <Image 
-                                src={React360Logo} 
-                                width={0}
-                                height={0}
-                                alt=""
-                                className="hover:-rotate-90 transistion duration-300"
-                            />
-                            <Image 
-                                src={ReactAdsLogo} 
-                                width={0}
-                                height={0}
-                                alt=""
-                            />
-                        </Link>
+                    <div className='py-3'>
+                    <WhiteLogo/>
+
+                    </div>
                     <div className="md:hidden" onClick={toggleDrawer}>
                     <Image 
                         src={CloseAside} 

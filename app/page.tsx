@@ -12,8 +12,8 @@ import Why360 from "@components/ui/Why360";
 import HowWeThink from "@components/ui/HowWeThink";
 import NewsLetter from "@components/ui/NewsLetter";
 import CountUp from "@components/ui/CountUp";
-import LightNavbar from "@components/navs/LightNavBar";
-import Footer from "@components/navs/Footer";
+import LightNavbar from "@components/navs/public/LightNavBar";
+import Footer from "@components/navs/public/Footer";
 
 //import images
 import heroGirl from "@public/images/herogirl.png";

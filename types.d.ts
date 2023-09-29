@@ -49,3 +49,8 @@ declare type Duration = {
     startday:string
     duration:string
 }
+
+declare type StepProps = {
+    step:number, 
+    text:string
+}

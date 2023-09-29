@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import '@styles/global.css'
 
-import Footer from '@components/navs/Footer'
-import DarkNavbar from '@components/navs/DarkNavbar'
+import Footer from '@components/navs/public/Footer'
+import DarkNavbar from '@components/navs/public/DarkNavbar'
 
 //add other meta tags here
 // export const metadata = {
