@@ -27,9 +27,7 @@ const BillBoardNav = () => {
   return (
     <>
       <nav className="bg-white md:flex md:px-14 py-3 justify-between items-center hidden">
-        {pathname.split("/")[1] !== "users" && (
-          <BlackLogo/>
-        )}
+     
         <div>{/* might add search later */}</div>
         <div>
           <ul className="flex justify-between space-x-7 items-center">

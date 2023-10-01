@@ -13,7 +13,7 @@ function Rootlayout({children}:{children:React.ReactNode}) {
   return (
     <html lang='en'>
         <body>
-            <main className={lexend.className} >
+            <main className={`${lexend.className} font-light `} >
                 {children}
             </main>
         </body>

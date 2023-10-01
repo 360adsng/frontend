@@ -5,17 +5,17 @@ import { useState } from "react"
 import { useRouter } from "next/navigation";
 
 
-const Add = () => {
+const Edit = () => {
 
-  const [successfull, setSuccessfull] = useState(false);
+  
   const router = useRouter()
   const handleSubmitTemp = (e:React.FormEvent) => {
     e.preventDefault()
-    setSuccessfull(true)
+  
   }
 
   return (
-    <>
+
     <section className='min-h-screen bg-ads360-hash px-4 md:px-10 py-14'>
         <div className="md:flex">
             <div className="basis-6/12 px-5">
@@ -109,7 +109,7 @@ const Add = () => {
 
                 <div>
                     <button onClick={handleSubmitTemp} className={`bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5  text-white p-2`}>
-                        Send Request
+                        Edit Board
                     </button>
                 </div>
                 </form>
@@ -121,32 +121,8 @@ const Add = () => {
             </div>
         </div>
     </section>
-    <Modal isOpen={successfull}>
-    <div className="bg-white py-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10 grid grid-cols-1 content-center">
-        <p className="text-green-500 border-b text-center font-semibold">
-          Billboard Added Successfully
-        </p>
-        <p className="text-center py-5 border-b">
-          Do you want to add another board
-        </p>
-        <div className="flex justify-end space-x-2 p-3">
-
-            <button onClick={()=>setSuccessfull(false)} className={`rounded bg-green-600 text-white p-2`}>
-                Add Billboard
-            </button>
-            <button onClick={()=>router.push('/vendors/billboards/listing')} className={`rounded bg-ads360yellow-100 p-2`}>
-                No
-            </button>
-
-        </div>
-      
-      <div>
-        
-      </div>
-    </div>
-  </Modal>
-    </>
+  
   )
 }
 
-export default Add
+export default Edit

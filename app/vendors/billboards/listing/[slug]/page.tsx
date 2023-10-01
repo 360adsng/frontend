@@ -30,9 +30,7 @@ const Billboard = () => {
 
   return (
     <>
-      <section className="bg-[#E9E9E9] px-4 md:px-10 pt-24">
-       
-        <BackBtn> Billboard Details</BackBtn>
+      <section className="bg-[#E9E9E9] px-4 md:px-10 pt-5">
 
         <p className="text-stone-400 mb-5 mt-3">
           View full details of billboard and proceed to checkout
@@ -182,11 +180,15 @@ const Billboard = () => {
                   on the billboard.
                 </p>
 
-                <div className="flex justify-end">
+                <div className="flex space-x-4 justify-end">
                   <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
-                    <Link href={`/ads/billboard/${billboard.id}/onboard`}>
-                      Select Billboard
+                    <Link href={`/vendors/billboards/listing/${billboard.id}/edit`}>
+                      Edit Billboard
                     </Link>
+                  </button>
+
+                  <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
+                      Delete Billboard
                   </button>
                 </div>
               </div>
