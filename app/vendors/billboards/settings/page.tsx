@@ -156,7 +156,7 @@ const EditBillboardComponent = () => {
                     <div className='md:w-[40%] px-3'>
 
                         <div className='my-3'>
-                            <label>Occupation:</label>
+                            <label>Company Name:</label>
                             <br/>
                             <input
                                 type="text"
@@ -170,7 +170,7 @@ const EditBillboardComponent = () => {
                         
 
                         <div className='my-3'>
-                            <label>Residential Address:</label>
+                            <label>Address:</label>
                             <br/>
                             <textarea
                             name="residentialAddress"

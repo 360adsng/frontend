@@ -71,7 +71,7 @@ const WalletSection = () => {
             </button>
           </div>
 
-          <div className="flex justify-end">
+          {/* <div className="flex justify-end">
           <div className="">
             <select className="rounded mx-2 p-2 focus:outline-none bg-ads360light-100">
               <option>select</option>
@@ -82,7 +82,7 @@ const WalletSection = () => {
           <div className="flex">
             <input type="date" className="rounded p-2 focus:outline-none bg-ads360light-100"/>
           </div>
-        </div>
+        </div> */}
         </div>
 
 

@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type ModalProps = {
@@ -13,7 +12,7 @@ export const Modal = ({ isOpen, children }: ModalProps) => {
       {isOpen && (
         <div>
           <motion.div
-            className="fixed z-[10000000] top-0 w-full h-full"
+            className="fixed z-[10000000] left-0 top-0 w-full bg-black/50 h-full"
             initial={{
               opacity: 0,
               scale: 0.75,

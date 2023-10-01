@@ -11,7 +11,6 @@ import billboardImage2 from "@public/del/billboard2.png";
 import Link from "next/link";
 import { Modal } from "@components/modal/modal";
 import { motion, AnimatePresence } from "framer-motion";
-import BackBtn from "@components/buttons/BackBtn";
 
 const Billboard = () => {
   const [view, setView] = useState("Billboard Overview");
@@ -33,7 +32,7 @@ const Billboard = () => {
       <section className="bg-[#E9E9E9] px-4 md:px-10 pt-5">
 
         <p className="text-stone-400 mb-5 mt-3">
-          View full details of billboard and proceed to checkout
+          View full details of billboard
         </p>
         <div className="w-full flex text-sm md:text-base justify-between md:justify-start md:space-x-3">
           <button
@@ -181,14 +180,14 @@ const Billboard = () => {
                 </p>
 
                 <div className="flex space-x-4 justify-end">
-                  <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
+                  <button className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2">
                     <Link href={`/vendors/billboards/listing/${billboard.id}/edit`}>
-                      Edit Billboard
+                      Edit
                     </Link>
                   </button>
 
-                  <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
-                      Delete Billboard
+                  <button className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2">
+                      Delete
                   </button>
                 </div>
               </div>

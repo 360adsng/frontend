@@ -3,9 +3,10 @@
 import  Link  from "next/link";
 import Image from "next/image";
 import MobileMenu from '@public/icons/menu.svg';
-import Drawer from "./Drawer";
+import Drawer from '@components/modal/Drawer'
 import { useState } from 'react'
 import WhiteLogo from "@components/logo/WhiteLogo";
+import DrawerContent from "./DrawerContent";
 
 
 
@@ -24,7 +25,9 @@ const DarkNavbar = () => {
     return(
         <>
             <nav className="flex px-5 md:px-0 justify-between md:justify-evenly -left-[100%] text-ads360light-100 py-5 bg-ads360black-100 text-base">
-                <WhiteLogo/>
+                <div className='py-2'>
+                    <WhiteLogo/>
+                </div>
                 <ul className="py-3 hidden md:flex text-center">
                     <li className="group">
                         <Link href="/about" className="mx-4 transition duration-300 hover:text-ads360yellow-100">About Us</Link>
@@ -61,7 +64,9 @@ const DarkNavbar = () => {
                     />
                 </div>
            </nav>
-           <Drawer isOpen={isOpen} toggleDrawer={handleToggleDrawer}/>
+            <Drawer isOpen={isOpen} toggleDrawer={handleToggleDrawer}>
+                <DrawerContent toggleDrawer={handleToggleDrawer}/>
+            </Drawer>
         </>
     )
 }

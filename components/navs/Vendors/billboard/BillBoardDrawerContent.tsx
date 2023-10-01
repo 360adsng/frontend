@@ -1,13 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import Link  from 'next/link'
 import Image from 'next/image'
-import CloseAside from '@public/icons/closeAside.svg'
 import { usePathname, useRouter } from 'next/navigation'
-
-
-
 
 import settings from '@public/icons/usericon/whitesettings.svg'
 import onsettings from '@public/icons/usericon/onsettings.svg'
@@ -19,46 +15,26 @@ import wallet from '@public/icons/usericon/whitewallet.svg'
 import onwallet from '@public/icons/usericon/onwallet.svg'
 import logout from '@public/icons/usericon/whitelogout.svg'
 import onlogout from '@public/icons/usericon/onlogout.svg'
-import WhiteLogo from '@components/logo/WhiteLogo'
 import add from '@public/icons/usericon/add.svg'
 import list from '@public/icons/usericon/list.svg'
 import onlist from '@public/icons/usericon/yellowlist.svg'
 import onAdd from '@public/icons/usericon/addyellow.svg'
 
 
-
-
 interface Props {
-    isOpen:boolean,
     toggleDrawer: ()=>void
 }
 
-const BillBoardDrawer : React.FC<Props> = ({isOpen, toggleDrawer}) => {
+const BillBoardDrawerContent : React.FC<Props> = ({toggleDrawer}) => {
 
     const pathname = usePathname()
     const router = useRouter()
-    const drawer = useRef<HTMLElement>(null)
     const [onLogout, setOnLogout] = useState(false)
     const handleLogout = () =>{
         setOnLogout(true)
         router.push('/')
     }
-    useEffect(()=>{
-
-        if(isOpen){
-            drawer.current?.classList.add('forward')
-            drawer.current?.classList.remove('reverse')
-            drawer.current?.classList.remove('-left-[100%]')
-
-        }else{
-            drawer.current?.classList.add('reverse')
-            drawer.current?.classList.remove('forward')
-        }
     
-    }, [isOpen])
-
-
-
     const navItem1 = [
         {
             link:'/vendors/billboards',
@@ -110,25 +86,7 @@ const BillBoardDrawer : React.FC<Props> = ({isOpen, toggleDrawer}) => {
 
   return (
     <>
-    <aside ref={drawer}   className='bg-ads360black-100 text-white z-30 -left-[100%] md:hidden fixed w-full h-full top-0 overflow-y-scroll'>
-        <div className='px-5'>
-            <div className='flex justify-between  py-5'>
-                <div className='py-5'>
-                <WhiteLogo/>
-                </div>
-                <div className="md:hidden" onClick={toggleDrawer}>
-                <Image 
-                    src={CloseAside} 
-                    width={0}
-                    height={0}
-                    alt=""
-                />
-                </div>
-            </div>
-
-
-
-
+    
             <ul className='space-y-4 my-14 '>
             {
                 navItem1.map((items, i)=>(
@@ -235,14 +193,11 @@ const BillBoardDrawer : React.FC<Props> = ({isOpen, toggleDrawer}) => {
                         }
                     </li>
             </ul>
-
-        </div>
-    </aside>
     </>
   )
 }
 
-export default BillBoardDrawer
+export default BillBoardDrawerContent
 
 
 

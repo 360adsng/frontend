@@ -1,61 +1,28 @@
 "use client"
 
-import { useEffect, useRef } from 'react';
 import Link  from 'next/link';
 import Image from 'next/image';
-import React360Logo from '@public/logo/360white.svg';
-import ReactAdsLogo from '@public/logo/adsWhite.svg';
-import CloseAside from '@public/icons/closeAside.svg';
 import SmallBtnYello from '../../buttons/SmallBtnYellow';
 import instagram from '@public/icons/Instagram.svg'
 import whatsapp from '@public/icons/whiteWhatsapp.svg'
 // import facebook from '@public/icons/Facbook.svg'
 import twitter from '@public/icons/Twitter.svg'
 import { FiArrowRight } from "react-icons/fi"
-import WhiteLogo from '@components/logo/WhiteLogo';
 
 
 
 interface Props {
-    isOpen:boolean,
     toggleDrawer: ()=>void
 }
 
-const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
+const DrawerContent: React.FC<Props> = ({toggleDrawer}) => {
 
-    const drawer = useRef<HTMLElement>(null)
-    useEffect(()=>{
 
-        if(isOpen){
-            drawer.current?.classList.add('forward')
-            drawer.current?.classList.remove('reverse')
-            drawer.current?.classList.remove('-left-[100%]')
-
-        }else{
-            drawer.current?.classList.add('reverse')
-            drawer.current?.classList.remove('forward')
-        }
-    
-    }, [isOpen])
 
     return(
         <>
-        <aside ref={drawer}   className='bg-ads360black-100 z-30 -left-[100%] md:hidden fixed w-full h-full top-0 overflow-y-scroll'>
-            <div className='px-5'>
-                <div className='flex justify-between  py-5'>
-                    <div className='py-3'>
-                    <WhiteLogo/>
-
-                    </div>
-                    <div className="md:hidden" onClick={toggleDrawer}>
-                    <Image 
-                        src={CloseAside} 
-                        width={0}
-                        height={0}
-                        alt=""
-                    />
-                    </div>
-                </div>
+        
+                <section>
                 <div className='text-ads360light-100'>
                     <h3 className='text-2xl my-2'><Link href="/about" onClick={toggleDrawer}>About Us</Link></h3>
                     <h3 className='text-2xl my-2'><Link href="/discovery" onClick={toggleDrawer}>Our Services</Link></h3>
@@ -74,7 +41,7 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
                 </div>
 
                 <Link href="/signup" onClick={toggleDrawer}>
-                    <span className='group flex w-[168px]'>
+                    <span className='group flex w-[168px] text-ads360black-100'>
                         <button className='group-hover:translate-x-32 group-hover:bg-ads360light-100 w-12 transition bg-ads360yellowBtn-100 mx-1  h-12 flex justify-center items-center rounded-[50%] color-white'><FiArrowRight size={28}/></button>
                         <button className='group-hover:-translate-x-10 w-32 group-hover:bg-ads360light-100  transition rounded-10 bg-ads360yellowBtn-100 h-12'>Get Started</button>
                     </span>
@@ -109,10 +76,9 @@ const Drawer: React.FC<Props> = ({isOpen, toggleDrawer}) => {
                         </div>
                     </div>
                 </div>
-            </div>
-        </aside>
+            </section>
         </>
     )
 }
 
-export default Drawer;
+export default DrawerContent;

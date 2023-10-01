@@ -14,6 +14,7 @@ import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 import { Modal } from "@components/modal/modal";
 import BackBtn from "@components/buttons/BackBtn";
 import Steps from "@components/ui/Steps";
+import BillboardSorter from "@components/ui/BillboardSorter";
 
 
 
@@ -148,7 +149,7 @@ function Billboards() {
         <BackBtn>BillBoard Marketing</BackBtn>
         <Steps step={2} text="#2 - Onboarding"/>
 
-        <section className="lg:flex my-5">
+        <section className="xl:flex my-5">
           <div className="gap-5 md:px-5 grid grid-cols-1 md:grid-cols-2 basis-4/5">
             {billboards.map((billboard) => (
               <div
@@ -176,7 +177,7 @@ function Billboards() {
                     src={billboard.image}
                     className="w-full rounded-t h-auto"
                   />
-                  <div className="flex text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2">
+                  <div className="flex truncate ... text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2">
                     <Image 
                       src={location}
                       width={0}
@@ -230,73 +231,9 @@ function Billboards() {
             ))}
           </div>
 
-          <div className="basis-1/5 text-sm">
-            <div className="top-[12.5rem] sticky rounded p-3 border border-ads360yellow-100 bg-white hidden lg:block">
-              <p>Filter billboard</p>
-
-              <div className="my-2">
-                <p>Billboard Type</p>
-                <select className="p-2 w-full border focus:outline-none rounded">
-                  <option>select</option>
-                  <option>Double faced Gantry LED</option>
-                  <option>Single faced Gantry LED</option>
-                  <option>Double faced Gantry LED</option>
-                </select>
-              </div>
-
-              <div className="my-2">
-                <p>Price Range</p>
-                <div className="flex justify-between space-x-1">
-                  <div className="basis-1/2">
-                    <label>from:</label>
-                    <input
-                      type="number"
-                      className="rounded w-full border focus:outline-none p-2"
-                    />
-                  </div>
-
-                  <div className="basis-1/2">
-                    <label>to:</label>
-                    <input
-                      type="number"
-                      className="rounded w-full border focus:outline-none p-2"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="my-2">
-                <p>Location</p>
-                <input
-                  list="location"
-                  name="browser"
-                  id="browser"
-                  className="border w-full focus:outline-none rounded p-2"
-                />
-
-                <datalist id="location" className="">
-                  <option value="Ikeja" />
-                  <option value="ikotun" />
-                  <option value="port harcourt" />
-                  <option value="abuja" />
-                  <option value="victoria island" />
-                  <option value="warri" />
-                  <option value="Benin" />
-                </datalist>
-              </div>
-
-              <div className="my-2">
-                <p>Status</p>
-                <select className="p-2 w-full border focus:outline-none rounded">
-                  <option>Negotiable</option>
-                  <option>Non Negotiable</option>
-                </select>
-              </div>
-
-              <button 
-              className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3  text-white  w-2/6 h-10'>
-              Search
-          </button>
+          <div className="basis-1/5 text-sm hidden xl:block">
+            <div className="top-[12.5rem] sticky rounded p-3 border border-ads360yellow-100 bg-white">
+                <BillboardSorter modal={false} toggleModal={()=>{}}/>
             </div>
           </div>
 
@@ -304,7 +241,7 @@ function Billboards() {
 
 
           {filter === false && (
-            <div className="fixed w-full left-3 bottom-5 lg:hidden">
+            <div className="fixed w-full left-3 bottom-5 xl:hidden">
               <button
                 className="rounded-10 font-bold border bg-ads360yellow-100 shadow-md border-white w-12 h-12"
                 onClick={() => {
@@ -321,80 +258,7 @@ function Billboards() {
       
       <Modal isOpen={filter}>
         <div className="bg-white p-3 w-10/12 md:w-9/12 mx-auto rounded-10">
-            <div className="flex justify-between">
-            <p>Filter billboard</p>
-
-            <button onClick={() => setFilter(false)}>
-              <Image
-                src={cancel}
-                width={0}
-                height={0}
-                alt="modal cancel botton"
-                className="w-5"
-              />
-            </button>
-            </div>
-
-            <div className="my-2">
-            <p>Billboard Type</p>
-            <select className="p-2 border focus:outline-none rounded w-full">
-                <option>select</option>
-                <option>Double faced Gantry LED</option>
-                <option>Single faced Gantry LED</option>
-                <option>Double faced Gantry LED</option>
-            </select>
-            </div>
-
-            <div className="my-2">
-            <p>Price Range</p>
-            <div className="flex justify-between space-x-1">
-                <div className="basis-1/2">
-                <label>from:</label>
-                <input
-                    type="number"
-                    className="rounded w-full border focus:outline-none p-2"
-                />
-                </div>
-
-                <div className="basis-1/2">
-                <label>to:</label>
-                <input
-                    type="number"
-                    className="rounded w-full border focus:outline-none p-2"
-                />
-                </div>
-            </div>
-            </div>
-
-            <div className="my-2">
-            <p>Location</p>
-            <input
-                list="location"
-                name="browser"
-                id="browser"
-                className="border focus:outline-none rounded w-full p-2"
-            />
-
-            <datalist id="location" className="">
-                <option value="Ikeja" />
-                <option value="ikotun" />
-                <option value="port harcourt" />
-                <option value="abuja" />
-                <option value="victoria island" />
-            </datalist>
-            </div>
-
-            <div className="my-2">
-            <p>Status</p>
-            <select className="p-2 border focus:outline-none rounded w-full">
-                <option>Negotiable</option>
-                <option>Non Negotiable</option>
-            </select>
-            </div>
-            <button 
-              className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5  text-white  w-2/6 h-10'>
-              Search
-          </button>
+        <BillboardSorter modal={true} toggleModal={()=>setFilter(false)} />
         </div>
       </Modal>
     </>

@@ -6,20 +6,33 @@ import avatar from "@public/icons/user.png";
 import { FiMenu } from "react-icons/fi";
 import logout from "@public/icons/usericon/onlogout.svg";
 import { useState } from "react";
-import UserDrawer from "./UserDrawer";
 import { usePathname } from "next/navigation";
 import BlackLogo from "@components/logo/BlackLogo";
+import UserDrawerContent from "./UserDrawerContent";
+import Drawer from "@components/modal/Drawer";
+import { Notification } from "@components/modal/Notification";
+import Link from "next/link";
+import UserNotificationContent from "./UserNotificationContent";
 
 function UsersNav() {
   const [dropDown, setDropDown] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const pathname = usePathname();
 
   const handleToggleDrawer = () => {
-    if (isOpen) {
-      setIsOpen(false);
+    if (isDrawerOpen) {
+      setIsDrawerOpen(false);
     } else {
-      setIsOpen(true);
+      setIsDrawerOpen(true);
+    }
+  };
+
+  const handleToggleNotification = () => {
+    if (isNotificationOpen) {
+      setIsNotificationOpen(false);
+    } else {
+      setIsNotificationOpen(true);
     }
   };
 
@@ -33,15 +46,18 @@ function UsersNav() {
         <div>
           <ul className="flex justify-between space-x-7 items-center">
             <li>
+              <Link href='/users/wallet'>
               <Image width={0} height={0} src={wallet} alt="wallet" />
+              </Link>
             </li>
-            <li className="relative">
+            <li className="relative cursor-pointer" onClick={handleToggleNotification}>
               <span className="absolute -top-[5px] -left-[2px] px-1 bg-ads360yellow-100 rounded-[50%] text-xs text-center text-white">
                 0
               </span>
               <Image width={0} height={0} src={bell} alt="bell" />
             </li>
             <li>
+            <Link href='/users/settings'>
               <Image
                 className="border-4 rounded-[50%]"
                 width={45}
@@ -49,6 +65,7 @@ function UsersNav() {
                 src={avatar}
                 alt="avatar"
               />
+              </Link>
             </li>
           </ul>
         </div>
@@ -88,7 +105,8 @@ function UsersNav() {
               />
               {dropDown && (
                 <ul className="absolute right-0 top-10 bg-ads360light-100 z-[100000] w-[200px] rounded-10 p-3">
-                  <li className="flex items-center my-3">
+                  <li className="my-3">
+                  <Link href='/users/settings' className="flex items-center">
                     <Image
                       className="border-4 rounded-[50%] w-8 h-8"
                       width={0}
@@ -97,12 +115,15 @@ function UsersNav() {
                       alt="avatar"
                     />
                     <span className="px-3">Profile</span>
+                    </Link>
                   </li>
-                  <li className="flex items-center my-3">
+                  <li className="my-3">
+                    <Link href='/users/wallet' className="flex items-center">
                     <Image width={0} height={0} src={wallet} alt="wallet" />
                     <span className="px-3">Wallet</span>
+                    </Link>
                   </li>
-                  <li className="flex items-center my-3 relative">
+                  <li className="flex items-center my-3 cursor-pointer relative" onClick={handleToggleNotification}>
                     <span className="absolute -top-[5px] -left-[2px] px-1 bg-ads360yellow-100 rounded-[50%] text-xs text-center text-white">
                       0
                     </span>
@@ -121,7 +142,12 @@ function UsersNav() {
         </div>
       </nav>
 
-      <UserDrawer isOpen={isOpen} toggleDrawer={handleToggleDrawer} />
+      <Drawer isOpen={isDrawerOpen} toggleDrawer={handleToggleDrawer}>
+        <UserDrawerContent toggleDrawer={handleToggleDrawer}/>
+      </Drawer>
+      <Notification handleNotification={handleToggleNotification} isOpen={isNotificationOpen} >
+        <UserNotificationContent/>
+      </Notification>
     </>
   );
 }
