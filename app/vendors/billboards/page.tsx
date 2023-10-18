@@ -3,6 +3,8 @@ import naira from "@public/icons/usericon/naira.svg"
 import billboard from "@public/icons/led2.svg";
 import bluecampaign from "@public/icons/usericon/bluecampiagn.svg"
 
+
+
 const BillBoardDashboard = () => {
   return (
     <section className="bg-ads360-hash min-h-screen px-4 md:px-10 py-14">
@@ -61,6 +63,13 @@ const BillBoardDashboard = () => {
         <div className="">
 
         </div>
+      </div>
+
+
+
+      <div>
+          
+
       </div>
     </section>
   );

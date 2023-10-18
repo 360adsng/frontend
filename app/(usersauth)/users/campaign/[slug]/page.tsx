@@ -1,33 +1,51 @@
 "use client"
-import { createPortal } from 'react-dom'
 import { useState } from 'react'
+import cancel from "@public/icons/usericon/modalCancelBotton.svg";
 import billboardImage2 from '@public/del/billboard2.png'
 import Image from 'next/image'
-import { FiXCircle } from 'react-icons/fi'
-import { Space_Grotesk } from 'next/font/google'
-const space_grotesk = Space_Grotesk({
-    subsets:['latin'],
-    display: 'swap',
-})
-
+import { Modal } from '@components/modal/modal'
 
 
 
 const Checkout = ({params}:{params:{slug:string}}) => {
 
-  const [negotia, setNegotia] = useState(false)
 
-  const billboard = {
-    id:2,
-    name:'Adetokunbo Ademola led, victoria island',
-    location:'Along Adetokunbo Ademola Street by Bishop',
-    image:billboardImage2,
-    pricepd:'30000',
+const [negotia, setNegotia] = useState(false);
+  const [negotiatedAmount, setNegotiatedAmount] = useState("");
+  const [successfull, setSuccessfull] = useState(false);
+  const [billboard, setBillboard] = useState({
+    id: 2,
+    name: "Adetokunbo Ademola led, victoria island",
+    location: "Along Adetokunbo Ademola Street by Bishop",
+    image: billboardImage2,
     status:params.slug === '1' ? 'completed': params.slug === '2' ? 'negotiating' : 'ongoing',
-    Impressions:"40 per day",
-    type:'Double faced Gantry LED',
-    duration:'14hrs (6am - 9pm) 6days/week'
-}  
+    pricepd: "30000",
+    negotiationCount: 1,
+    feedback:'rejected',
+    finalprice:'29500',
+    yourPrice:'28000',
+    Impressions: "40 per day",
+    minimumNegotiableAmount: 26000,
+    type: "Double faced Gantry LED",
+    duration: "14hrs (6am - 9pm) 6days/week",
+  });
+
+  const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNegotiatedAmount(e.target.value);
+  };
+
+
+  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setSuccessfull(true);
+    setNegotia(false);
+    setBillboard((prev) => ({ ...prev, negotiationCount: 1 }));
+    setTimeout(() => {
+      setSuccessfull(false);
+    }, 4000);
+  };
+
+  
 
 
   return (
@@ -72,7 +90,22 @@ const Checkout = ({params}:{params:{slug:string}}) => {
           </table>
         </div>
 
-        <div className='flex justify-end'>
+        <div className='md:flex md:space-x-2 justify-end'>
+        {billboard.status === 'negotiating' &&
+
+        <div className='bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3 my-5 md:my-0'>
+
+        
+              <div className=''>
+                <h4 className='basis-1/2'>Remark</h4>
+                <div className='font-bold basis-1/2'>
+                  {billboard.feedback === 'rejected'?`the billboard owner has rejected your request, and their final price is ${billboard.finalprice}`:'the billboard owner has accepted your request, you can proceed to make payment'}
+                </div>
+              </div>
+          
+          
+          </div>
+            }
           <div className='bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3'>
             
             <div className='flex'>
@@ -85,7 +118,9 @@ const Checkout = ({params}:{params:{slug:string}}) => {
             <div className='flex'>
               <h4 className='basis-1/2'>Total Amount</h4>
               <div className='basis-1/2'>
-                <div className='font-bold'>₦30,000</div>
+                <div className='font-bold'>
+                   {billboard.finalprice !== '' && billboard.feedback === 'rejected' ? billboard.finalprice : billboard.feedback === 'accepted' ? billboard.yourPrice : '₦30,000'}
+                </div>
                 <div>cost x 1 day(s)</div>
               </div>
             </div>
@@ -95,12 +130,16 @@ const Checkout = ({params}:{params:{slug:string}}) => {
 
         {
            billboard.status === 'negotiating' &&
-          <div className='flex md:justify-end space-x-3 my-3'>
-          
-
+          <div className='flex md:justify-end space-x-3 my-3'> 
+          {
+            billboard.negotiationCount > 1 && billboard.feedback === 'rejected' &&
             <button onClick={()=>setNegotia(true)} className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
               Negotiat
-            </button>          
+            </button> 
+          }
+          
+
+                    
 
           <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
             Pay Now
@@ -108,33 +147,68 @@ const Checkout = ({params}:{params:{slug:string}}) => {
         </div>
         
         }
+
+
+<Modal isOpen={negotia}>
+        <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
+          <div className="flex justify-between mb-5">
+            <h4 className="">Input Amount</h4>
+            <button onClick={() => setNegotia(false)}>
+              <Image
+                src={cancel}
+                width={0}
+                height={0}
+                alt="modal cancel botton"
+                className="w-5"
+              />
+            </button>
+          </div>
+          <form onSubmit={submit}>
+            <div className="flex">
+              <div className="bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-1/5 content-center text-black/50">
+                {" "}
+                ₦{" "}
+              </div>
+              <input
+                type="number"
+                value={negotiatedAmount}
+                onChange={handleNegotiate}
+                className="p-2 focus:outline-none w-full border rounded-r"
+              />
+            </div>
+            <div className="my-3">
+              <p className="text-red-700 text-xs">
+                You cannot negotiat lower than ₦
+                {billboard.minimumNegotiableAmount}
+              </p>
+              <p className="text-red-700 text-xs">You can only negotiat once</p>
+            </div>
+            <div className="flex justify-center">
+              <button
+                disabled={
+                  negotiatedAmount === "" ||
+                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
+                    ? true
+                    : false
+                }
+                className={`${
+                  negotiatedAmount === "" ||
+                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
+                    ? "bg-ads360gray-100"
+                    : "bg-ads360black-100/95 hover:bg-ads360black-100"
+                } rounded mt-5  text-white  w-5/6 h-10`}
+              >
+                Send Request
+              </button>
+            </div>
+          </form>
+        </div>
+      </Modal>
         
 
 
 
-        { negotia && createPortal(
-          <div className={`fixed top-0 left-0 bg-black/40 w-full h-full z-[10000] ${space_grotesk.className}`}>
-            <div className='flex justify-center items-center pt-28'>
-              <div className='bg-white p-3 rounded-10'>
-                <div className='flex justify-between my-3'>
-                  <h4 className=''>Enter Amount</h4>
-                  <button onClick={()=>setNegotia(false)}><FiXCircle/></button>
-                </div>
-                <input type='number' className='p-2 focus:outline-none w-full border rounded-10'/>
-                <div className='mt-2'>
-                  <p className='text-red-500 text-sm'>this is your last negotiation</p>
-                  <p className='text-red-500 text-sm'>You cannot Negotiat lower than ₦26000</p>
-                </div>
-                <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-                  Proceed
-                </button>
-              </div>
-            </div>
-            
-          </div>, document.body
-        )
-
-        }
+      
     </section>
   )
 }

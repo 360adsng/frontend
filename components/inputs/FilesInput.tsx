@@ -5,7 +5,7 @@ const FilesInput = ({ handleChange, warning, accept, previewName }: FileInputPro
 
   return (
     <div>
-      <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-2 w-full ...">
+      <div className="bg-white flex items-center pl-3 justify-between rounded-10 my-1 w-full ...">
         <div>
           {previewName !== undefined &&
                 previewName.length > 10
@@ -28,7 +28,7 @@ const FilesInput = ({ handleChange, warning, accept, previewName }: FileInputPro
         ref={input}
         accept={`${accept}/*`}
       />
-      <p className="text-red-500 mb-6">
+      <p className="text-red-500 mb-1">
         {warning}
       </p>
     </div>

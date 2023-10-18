@@ -1,14 +1,13 @@
-import Link from 'next/link'
-import React from 'react'
-import search from "@public/icons/search.svg"
 import Image from 'next/image'
+import Link from 'next/link'
+import search from "@public/icons/search.svg"
 
-const Table = () => {
-    
+
+const Requests = () => {
   return (
     <>
-
-        <div className="flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10">
+      <section className="bg-ads360-hash min-h-screen px-4 md:px-10 py-14">
+      <div className="flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10">
           <button>
             <Image
               width={0}
@@ -37,16 +36,16 @@ const Table = () => {
                 <td className="py-2 px-2 md:px-3 border-b">2023-05-20</td>
                 <td className="py-2 px-2 md:px-3 border-b">new</td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                    <Link href={`/users/campaign/${1}`}>view</Link>
+                    <Link href={`/vendors/billboards/requests/${1}`}>view</Link>
                 </td>
               </tr>
               <tr>
-                <td className="py-2 px-2 md:px-3 border-br">#2</td>
+                <td className="py-2 px-2 md:px-3 border-br relative">#2 <div className='absolute px-1 bg-ads360yellowBtn-100 text-[10px] top-0 rounded-full'> new</div></td>
                 <td className="py-2 px-2 md:px-3 border-b">₦60000</td>
                 <td className="py-2 px-2 md:px-3 border-b">2023-05-4</td>
                 <td className="py-2 px-2 md:px-3 border-b">negotiating</td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                    <Link href={`/users/campaign/${2}`}>view</Link>
+                    <Link href={`/vendors/billboards/requests/${2}`}>view</Link>
                 </td>
               </tr>
               <tr>
@@ -55,16 +54,16 @@ const Table = () => {
                 <td className="py-2 px-2 md:px-3 border-b">2023-05-2</td>
                 <td className="py-2 px-2 md:px-3 border-b">paid</td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                    <Link href={`/users/campaign/${3}`}>view</Link>
+                    <Link href={`/vendors/billboards/requests/${3}`}>view</Link>
                 </td>
               </tr>
               <tr>
-                <td className="py-2 px-2 md:px-3 border-br">#3</td>
+                <td className="py-2 px-2 md:px-3 border-br">#4</td>
                 <td className="py-2 px-2 md:px-3 border-b">₦500000</td>
                 <td className="py-2 px-2 md:px-3 border-b">2023-05-2</td>
                 <td className="py-2 px-2 md:px-3 border-b">completed</td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                    <Link href={`/users/campaign/${3}`}>view</Link>
+                    <Link href={`/vendors/billboards/requests/${4}`}>view</Link>
                 </td>
               </tr>
             </tbody>
@@ -88,9 +87,9 @@ const Table = () => {
             </div>
 
         </div>
-        
+      </section>
     </>
   )
 }
 
-export default Table
+export default Requests

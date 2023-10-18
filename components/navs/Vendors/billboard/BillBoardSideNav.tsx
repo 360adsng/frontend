@@ -35,8 +35,8 @@ const BillBoardSideNav = () => {
 
         },
         {
-            link:'/vendors/billboards/offers',
-            name:'Offers',
+            link:'/vendors/billboards/requests',
+            name:'Requests',
             off:campaign,
             on:oncampaign
 

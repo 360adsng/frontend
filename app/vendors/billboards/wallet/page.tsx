@@ -2,7 +2,8 @@ import Image from "next/image"
 import naira from "@public/icons/naira.svg"
 import filter from "@public/icons/filter.svg"
 import makepayment from "@public/icons/makepayment.svg"
-import whatsAppPoint from "@public/icons/usericon/whatsappPoint.svg"
+import { GrTooltip } from "react-icons/gr"
+import Tooltip from "@components/ui/Tooltip"
 
 import Link from "next/link"
 
@@ -21,7 +22,15 @@ const WalletSection = () => {
           <p className="text-stone-400 text-xl my-4">Ayomike Charles</p>
 
           <div>
-          <p className="my-3">Balance</p>
+          <div className="my-3 flex items-center space-x-1">
+            <div className="relative group">
+              <GrTooltip/>
+              <div className="hidden group-hover:inline">
+              <Tooltip info='this is your real balance but you cannot widthdraw from it'/>
+              </div>
+            </div>
+            <p>Fixed Balance</p>
+          </div>
           <div className="flex">
             <Image
               height={0}
@@ -36,13 +45,43 @@ const WalletSection = () => {
             </div>
             </div>
           </div>
+
+          
           </div>
 
 
           <div>
-          <h3 className="mt-5 md:my-0">360ads Wallet ID</h3>
+
+            <div>
+            <h3 className="mt-5 md:my-0">360ads Wallet ID</h3>
           <p className="text-xl text-ads360yellow-100 my-4">3211711562</p>
-        
+            </div>
+
+            <div>
+          <div className="my-3 flex space-x-1 items-center">
+          <div className="relative group">
+              <GrTooltip/>
+              <div className="hidden group-hover:inline">
+              <Tooltip info='this is your actual balance that you can widthdraw from'/>
+              </div>
+            </div>
+            <p>Actual Balance</p>
+          </div>
+          <div className="flex">
+            <Image
+              height={0}
+              width={0}
+              alt="naira"
+              src={naira}
+              className="w-14 h-14"
+            />
+            <div className="px-3">
+              <p className="text-2xl">₦1000000.00</p>
+              <h3 className="text-stone-400 text-sm">Available Balance</h3>
+            </div>
+            </div>
+          </div>
+          
           </div>
 
 

@@ -11,6 +11,18 @@ const Edit = () => {
     setSuccessfull(true);
   };
 
+  const billboard = {
+    id: 9,
+    name: "Adetokunbo Ademola led, victoria island",
+    location: "Along Adetokunbo Ademola Street by Bishop",
+    image: '',
+    pricepd: "35000",
+    negotiable:'yes',
+    Impressions: "40 per day",
+    type: "Double faced Gantry LED",
+    duration: "14hrs (6am - 9pm) 6days/week",
+  }
+
   return (
     <>
       <section className="min-h-screen bg-ads360-hash py-14">
@@ -23,24 +35,37 @@ const Edit = () => {
             <div className="basis-6/12 md:pr-5">
               <div className="my-3">
                 <p>Billboard name</p>
-                <input className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" />
+                <input 
+                  value={billboard.name}
+                  className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
+                />
               </div>
               <div className="my-3">
                 <p>Price</p>
-                <input className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" />
+                <input 
+                  value={billboard.pricepd}
+                  className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" 
+                />
               </div>
               <div className="my-3">
                 <p>Location</p>
-                <input className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" />
+                <input 
+                  value={billboard.location}
+                  className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" 
+                />
               </div>
               <div className="my-3">
                 <p>Board Type</p>
-                <input className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" />
+                <input 
+                  value={billboard.type}
+                  className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" 
+                />
               </div>
               <div className="my-3">
                 <p>Daily Impressions</p>
                 <input
                   type="number"
+                  value={billboard.Impressions}
                   className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                 />
               </div>
@@ -48,12 +73,14 @@ const Edit = () => {
                 <p>Duration per display</p>
                 <input
                   type="number"
+                  value={billboard.duration}
                   className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                 />
               </div>
               <div className="my-3">
                 <p>Time</p>
                 <input
+                  value="14hrs (6am - 9pm) 6days/week"
                   placeholder="14hrs (6am - 9pm) 6days/week"
                   className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                 />
@@ -65,12 +92,14 @@ const Edit = () => {
                   <div className="basis-1/2">
                     <input
                       placeholder="width"
+                      value={800}
                       className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                     />
                   </div>
                   <div className="basis-1/2">
                     <input
                       placeholder="height"
+                      value={300}
                       className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                     />
                   </div>
@@ -82,12 +111,14 @@ const Edit = () => {
                   <div className="basis-1/2">
                     <input
                       placeholder="width"
+                      value={800}
                       className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                     />
                   </div>
                   <div className="basis-1/2">
                     <input
                       placeholder="height"
+                      value={300}
                       className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                     />
                   </div>
@@ -101,7 +132,7 @@ const Edit = () => {
                 <p>Orientation</p>
                 <select defaultValue='select' className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]">
                   <option disabled>select</option>
-                  <option>Potrait</option>
+                  <option selected>Potrait</option>
                   <option>Landscape</option>
                 </select>
               </div>
@@ -109,7 +140,7 @@ const Edit = () => {
                 <p>Negotiable</p>
                 <select defaultValue='select' className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]">
                   <option disabled>select</option>
-                  <option>Yes</option>
+                  <option selected>Yes</option>
                   <option>No</option>
                 </select>
               </div>
@@ -118,6 +149,7 @@ const Edit = () => {
                 <p>Traffic Description</p>
                 <textarea
                   rows={4}
+                  value="Facing Traffic Along Adetokumbo Ademola Street by Eko Hotels,Ahmadu Bello Way, Akin Adesola & Ajose Adeogun."
                   placeholder="Facing Traffic Along Adetokumbo Ademola Street by Eko Hotels,Ahmadu Bello Way, Akin Adesola & Ajose Adeogun."
                   className="bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
                 ></textarea>
