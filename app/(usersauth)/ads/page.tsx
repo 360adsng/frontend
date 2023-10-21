@@ -96,7 +96,7 @@ function Ads() {
       <Modal isOpen={open}>
         <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
         <div className="flex justify-between mb-5">
-            <h4 className="">Get Verified</h4>
+            <h4 className="font-bold">Get Verified</h4>
             <button onClick={() => setOpen(false)}>
               <Image
                 src={cancel}
@@ -111,6 +111,7 @@ function Ads() {
             <div>
               <p>enter your NIN to get verified</p>
               <input className="p-2 focus:outline-none w-full border rounded-r"/>
+              <button className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 text-white p-2">Verify</button>
             </div>
           </form>
         </div>

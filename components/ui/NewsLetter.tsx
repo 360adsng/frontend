@@ -2,7 +2,7 @@ import Image from "next/image"
 import SmallBtnYello from "@components/buttons/SmallBtnYellow";
 
 
-const NewsLetter = ({img}) => {
+const NewsLetter = ({img}:{img:string}) => {
   return (
     <section id="newsletter" className="bg-ads360light-100 pt-20 md:pb-20">
     <div className="mx-auto px-1 md:px-0 pt-5 w-11/12 xl:w-10/12 text-center text-white md:bg-ads360black-100 md:rounded">
