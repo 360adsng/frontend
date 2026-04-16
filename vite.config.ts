@@ -8,6 +8,11 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  // Bundle react-icons into SSR output. Netlify's Node ESM loader fails on
+  // named imports from react-icons' CJS/ESM entry (see AiOutlineDownload error).
+  ssr: {
+    noExternal: ['react-icons'],
+  },
   resolve: {
     alias: {
       '@components': path.resolve(__dirname, 'components'),

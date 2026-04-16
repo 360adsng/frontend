@@ -1,28 +1,158 @@
 import { a as clearAuthTokens, i as baseFetchJson, n as ACCESS_TOKEN_STORAGE_KEY, o as saveAccountType, r as ApiError, s as saveAuthTokens, t as COUNTRIES$1 } from "./countries-DNj5C3SE.js";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { HeadContent, Link, Outlet, Scripts, createFileRoute, createRootRoute, createRouter, lazyRouteComponent, redirect, useNavigate, useParams, useRouter, useRouterState } from "@tanstack/react-router";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
-import { FiArrowRight, FiMenu } from "react-icons/fi/index.esm.js";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper";
 import RawCountUp from "react-countup";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { CartesianGrid, Line, LineChart, Pie, PieChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-import { GrTooltip } from "react-icons/gr/index.esm.js";
-import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs/index.esm.js";
-import { FaAngleDown } from "react-icons/fa/index.esm.js";
-import { AiOutlineDownload } from "react-icons/ai/index.esm.js";
 import Calendar from "react-calendar";
-import { MdOutlineCancel } from "react-icons/md/index.esm.js";
 //#region node_modules/sonner/dist/styles.css?url
 var styles_default = "/assets/styles-DDCWxn3B.css";
 //#endregion
 //#region styles/global.css?url
 var global_default = "/assets/global-CLMe_eIB.css";
+//#endregion
+//#region node_modules/react-icons/lib/esm/iconContext.js
+var DefaultContext = {
+	color: void 0,
+	size: void 0,
+	className: void 0,
+	style: void 0,
+	attr: void 0
+};
+var IconContext = React.createContext && React.createContext(DefaultContext);
+//#endregion
+//#region node_modules/react-icons/lib/esm/iconBase.js
+var __assign = function() {
+	__assign = Object.assign || function(t) {
+		for (var s, i = 1, n = arguments.length; i < n; i++) {
+			s = arguments[i];
+			for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+		}
+		return t;
+	};
+	return __assign.apply(this, arguments);
+};
+var __rest = function(s, e) {
+	var t = {};
+	for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0) t[p] = s[p];
+	if (s != null && typeof Object.getOwnPropertySymbols === "function") {
+		for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i])) t[p[i]] = s[p[i]];
+	}
+	return t;
+};
+function Tree2Element(tree) {
+	return tree && tree.map(function(node, i) {
+		return React.createElement(node.tag, __assign({ key: i }, node.attr), Tree2Element(node.child));
+	});
+}
+function GenIcon(data) {
+	return function(props) {
+		return React.createElement(IconBase, __assign({ attr: __assign({}, data.attr) }, props), Tree2Element(data.child));
+	};
+}
+function IconBase(props) {
+	var elem = function(conf) {
+		var attr = props.attr, size = props.size, title = props.title, svgProps = __rest(props, [
+			"attr",
+			"size",
+			"title"
+		]);
+		var computedSize = size || conf.size || "1em";
+		var className;
+		if (conf.className) className = conf.className;
+		if (props.className) className = (className ? className + " " : "") + props.className;
+		return React.createElement("svg", __assign({
+			stroke: "currentColor",
+			fill: "currentColor",
+			strokeWidth: "0"
+		}, conf.attr, attr, svgProps, {
+			className,
+			style: __assign(__assign({ color: props.color || conf.color }, conf.style), props.style),
+			height: computedSize,
+			width: computedSize,
+			xmlns: "http://www.w3.org/2000/svg"
+		}), title && React.createElement("title", null, title), props.children);
+	};
+	return IconContext !== void 0 ? React.createElement(IconContext.Consumer, null, function(conf) {
+		return elem(conf);
+	}) : elem(DefaultContext);
+}
+//#endregion
+//#region node_modules/react-icons/fi/index.esm.js
+function FiArrowRight(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": {
+			"viewBox": "0 0 24 24",
+			"fill": "none",
+			"stroke": "currentColor",
+			"strokeWidth": "2",
+			"strokeLinecap": "round",
+			"strokeLinejoin": "round"
+		},
+		"child": [{
+			"tag": "line",
+			"attr": {
+				"x1": "5",
+				"y1": "12",
+				"x2": "19",
+				"y2": "12"
+			}
+		}, {
+			"tag": "polyline",
+			"attr": { "points": "12 5 19 12 12 19" }
+		}]
+	})(props);
+}
+function FiMenu(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": {
+			"viewBox": "0 0 24 24",
+			"fill": "none",
+			"stroke": "currentColor",
+			"strokeWidth": "2",
+			"strokeLinecap": "round",
+			"strokeLinejoin": "round"
+		},
+		"child": [
+			{
+				"tag": "line",
+				"attr": {
+					"x1": "3",
+					"y1": "12",
+					"x2": "21",
+					"y2": "12"
+				}
+			},
+			{
+				"tag": "line",
+				"attr": {
+					"x1": "3",
+					"y1": "6",
+					"x2": "21",
+					"y2": "6"
+				}
+			},
+			{
+				"tag": "line",
+				"attr": {
+					"x1": "3",
+					"y1": "18",
+					"x2": "21",
+					"y2": "18"
+				}
+			}
+		]
+	})(props);
+}
 //#endregion
 //#region components/NotFoundPage.tsx
 var notfound = "/images/404.png";
@@ -4366,6 +4496,22 @@ var EmailVerification = () => {
 };
 var Route$33 = createFileRoute("/_access/email-verification/")({ component: EmailVerification });
 //#endregion
+//#region node_modules/react-icons/gr/index.esm.js
+function GrTooltip(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": { "viewBox": "0 0 24 24" },
+		"child": [{
+			"tag": "path",
+			"attr": {
+				"fill": "none",
+				"strokeWidth": "2",
+				"d": "M16.5,18 L12,22.5 L7.5,18 L1,18 L1,1 L23,1 L23,18 L16.5,18 Z M6,10 L7,10 L7,9 L6,9 L6,10 Z M11.5,10 L12.5,10 L12.5,9 L11.5,9 L11.5,10 Z M17,10 L18,10 L18,9 L17,9 L17,10 Z"
+			}
+		}]
+	})(props);
+}
+//#endregion
 //#region components/ui/Tooltip.tsx
 var Tooltip = ({ info }) => {
 	return /* @__PURE__ */ jsx("div", {
@@ -7921,6 +8067,34 @@ function Sms() {
 }
 var Route$22 = createFileRoute("/_usersauth/ads/sms/")({ component: Sms });
 //#endregion
+//#region node_modules/react-icons/bs/index.esm.js
+function BsSuitHeartFill(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": {
+			"fill": "currentColor",
+			"viewBox": "0 0 16 16"
+		},
+		"child": [{
+			"tag": "path",
+			"attr": { "d": "M4 1c2.21 0 4 1.755 4 3.92C8 2.755 9.79 1 12 1s4 1.755 4 3.92c0 3.263-3.234 4.414-7.608 9.608a.513.513 0 0 1-.784 0C3.234 9.334 0 8.183 0 4.92 0 2.755 1.79 1 4 1z" }
+		}]
+	})(props);
+}
+function BsSuitHeart(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": {
+			"fill": "currentColor",
+			"viewBox": "0 0 16 16"
+		},
+		"child": [{
+			"tag": "path",
+			"attr": { "d": "m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595L8 6.236zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.55 7.55 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z" }
+		}]
+	})(props);
+}
+//#endregion
 //#region app/_usersauth/ads/influencer/index.tsx
 var inf = "/del/team.jpg";
 var inf2 = "/del/dav.png";
@@ -8710,6 +8884,18 @@ var Payment$1 = () => {
 	})] });
 };
 var Route$18 = createFileRoute("/_usersauth/ads/$transaction_id/")({ component: Payment$1 });
+//#endregion
+//#region node_modules/react-icons/fa/index.esm.js
+function FaAngleDown(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": { "viewBox": "0 0 320 512" },
+		"child": [{
+			"tag": "path",
+			"attr": { "d": "M143 352.3L7 216.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0l22.6 22.6c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.2 9.4-24.4 9.4-33.8 0z" }
+		}]
+	})(props);
+}
 //#endregion
 //#region components/ui/Faqs.tsx
 var Faqs = () => {
@@ -9613,6 +9799,18 @@ var VendorsLogin = () => {
 	});
 };
 var Route$12 = createFileRoute("/_access/vendors-acess/login/")({ component: VendorsLogin });
+//#endregion
+//#region node_modules/react-icons/ai/index.esm.js
+function AiOutlineDownload(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": { "viewBox": "0 0 1024 1024" },
+		"child": [{
+			"tag": "path",
+			"attr": { "d": "M505.7 661a8 8 0 0 0 12.6 0l112-141.7c4.1-5.2.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z" }
+		}]
+	})(props);
+}
 //#endregion
 //#region app/vendors/billboards/requests/$slug/index.tsx
 var cancel$4 = "/icons/usericon/modalCancelBotton.svg";
@@ -11161,6 +11359,25 @@ var Checkbox = ({ id, onClick, label }) => {
 		]
 	});
 };
+//#endregion
+//#region node_modules/react-icons/md/index.esm.js
+function MdOutlineCancel(props) {
+	return GenIcon({
+		"tag": "svg",
+		"attr": { "viewBox": "0 0 24 24" },
+		"child": [{
+			"tag": "path",
+			"attr": {
+				"fill": "none",
+				"d": "M0 0h24v24H0V0z",
+				"opacity": ".87"
+			}
+		}, {
+			"tag": "path",
+			"attr": { "d": "M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.59-13L12 10.59 8.41 7 7 8.41 10.59 12 7 15.59 8.41 17 12 13.41 15.59 17 17 15.59 13.41 12 17 8.41z" }
+		}]
+	})(props);
+}
 //#endregion
 //#region components/inputs/CalenderBox.tsx
 var CalenderBox = ({ addDate, selectedDate, removeDate }) => {
