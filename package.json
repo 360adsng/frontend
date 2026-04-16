@@ -1,0 +1,46 @@
+{
+  "name": "ads360",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "migrate-fs-routes": "node scripts/migrate-fs-routes.mjs",
+    "bulk-replace-next": "node scripts/bulk-replace-next.mjs",
+    "inject-routes": "node scripts/inject-create-file-route.mjs",
+    "fix-public-assets": "node scripts/fix-public-imports.mjs && node scripts/fix-glued-public-consts.mjs"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.99.0",
+    "@tanstack/react-router": "^1.168.17",
+    "@tanstack/react-start": "^1.167.30",
+    "@types/react": "18.2.6",
+    "@types/react-countup": "^4.3.1",
+    "@types/react-dom": "18.2.4",
+    "@vitejs/plugin-react": "^6.0.1",
+    "autoprefixer": "10.4.14",
+    "axios": "^1.4.0",
+    "framer-motion": "^10.16.1",
+    "libphonenumber-js": "^1.12.41",
+    "nitro": "^3.0.260311-beta",
+    "postcss": "8.4.23",
+    "react": "^18.2.0",
+    "react-calendar": "^4.2.1",
+    "react-countup": "^6.4.2",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.8.0",
+    "react-select": "^5.7.5",
+    "recharts": "^2.9.0",
+    "sonner": "^2.0.7",
+    "swiper": "^9.3.1",
+    "tailwindcss": "3.3.2",
+    "typescript": "5.0.4",
+    "vite": "^8.0.8",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "routesDirectory": "./app",
+  "generatedRouteTree": "./routeTree.gen.ts",
+  "verboseFileRoutes": true
+}
