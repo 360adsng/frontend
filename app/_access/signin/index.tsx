@@ -3,7 +3,9 @@ import { useState, type FormEvent } from "react";
 import { z } from "zod";
 import BlackButtons from "@components/buttons/BlackButton";
 import { useLogin } from "@endpoint/auth/useAuth";
+import { getAccountType } from "@endpoint/baseFetch";
 import { hasAccessToken } from "../../../lib/auth";
+import { getDashboardPathForAccountType } from "../../../lib/accountDashboard";
 
 const girl = "/images/adsgirlblank.png";
 const CloseAside = "/icons/closeAside.svg";
@@ -54,8 +56,10 @@ const SignIn = () => {
     }
 
     login(parsed.data, {
-      onSuccess: () => {
-        router.navigate({ to: "/users" });
+      onSuccess: (data) => {
+        router.navigate({
+          to: getDashboardPathForAccountType(data.accountType),
+        });
       },
     });
   };
@@ -168,7 +172,9 @@ export const Route = createFileRoute("/_access/signin/")({
   beforeLoad: () => {
     if (typeof window === "undefined") return;
     if (hasAccessToken()) {
-      throw redirect({ to: "/users" });
+      throw redirect({
+        to: getDashboardPathForAccountType(getAccountType()),
+      });
     }
   },
   component: SignIn,

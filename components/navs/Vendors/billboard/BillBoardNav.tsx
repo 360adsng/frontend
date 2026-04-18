@@ -139,7 +139,7 @@ const BillBoardNav = () => {
                       logoutVendor(undefined, {
                         onSettled: () => {
                           setDropDown(false);
-                          navigate({ to: "/vendors-acess/login" });
+                          navigate({ to: "/signin" });
                         },
                       });
                     }}

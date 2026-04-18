@@ -6,7 +6,7 @@ import {
   saveAccountType,
   saveAuthTokens,
 } from "../baseFetch";
-import { login, logout, register } from "./auth";
+import { login, logout, register, vendorOnboarding } from "./auth";
 import type { LoginResponse } from "./types";
 
 function errorMessage(error: unknown): string {
@@ -54,6 +54,15 @@ export function useLogout() {
     onError: (error) => {
       // Even if the backend fails (expired token), we still clear locally.
       clearAuthTokens();
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+export function useVendorOnboarding() {
+  return useMutation({
+    mutationFn: vendorOnboarding,
+    onError: (error) => {
       toast.error(errorMessage(error));
     },
   });

@@ -1,4 +1,8 @@
-export type AccountType = "regular_user" | "business_user" | "admin";
+export type AccountType =
+  | "regular_user"
+  | "business_user"
+  | "billboard_owner"
+  | "admin";
 
 export type MeResponse =
   | {

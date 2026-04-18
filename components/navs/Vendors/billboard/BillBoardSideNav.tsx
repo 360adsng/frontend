@@ -76,7 +76,7 @@ const BillBoardSideNav = () => {
     const handleLogout = () =>{
         logoutVendor(undefined, {
             onSettled: () => {
-                navigate({ to: '/vendors-acess/login' })
+                navigate({ to: '/signin' })
             }
         })
     }

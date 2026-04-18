@@ -1,6 +1,5 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 import UsersNav from '@components/navs/users/UsersNav'
-import { hasAccessToken } from '../../../lib/auth'
 
 function Layout() {
   return (
@@ -16,12 +15,6 @@ function Layout() {
 }
 
 export const Route = createFileRoute("/_usersauth/ads")({
-  beforeLoad: () => {
-    if (typeof window === 'undefined') return
-    if (!hasAccessToken()) {
-      throw redirect({ to: '/signin' })
-    }
-  },
   component: Layout,
 })
 

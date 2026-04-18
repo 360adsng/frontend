@@ -10,16 +10,19 @@
 
 import { Route as rootRouteImport } from './app/__root'
 import { Route as UsersauthRouteRouteImport } from './app/_usersauth/route'
+import { Route as AdminRouteRouteImport } from './app/_admin/route'
 import { Route as IndexRouteImport } from './app/index'
 import { Route as VendorsBillboardsRouteRouteImport } from './app/vendors/billboards/route'
 import { Route as UsersauthUsersRouteRouteImport } from './app/_usersauth/users/route'
 import { Route as UsersauthAdsRouteRouteImport } from './app/_usersauth/ads/route'
 import { Route as PublicLightnavbarRouteRouteImport } from './app/_public/_lightnavbar/route'
 import { Route as PublicDarknavbarRouteRouteImport } from './app/_public/_darknavbar/route'
+import { Route as AdminAdminRouteRouteImport } from './app/_admin/admin/route'
 import { Route as VendorsInfluencersIndexRouteImport } from './app/vendors/influencers/index'
 import { Route as VendorsBillboardsIndexRouteImport } from './app/vendors/billboards/index'
 import { Route as UsersauthUsersIndexRouteImport } from './app/_usersauth/users/index'
 import { Route as UsersauthAdsIndexRouteImport } from './app/_usersauth/ads/index'
+import { Route as AdminAdminIndexRouteImport } from './app/_admin/admin/index'
 import { Route as AccessSignupIndexRouteImport } from './app/_access/signup/index'
 import { Route as AccessSigninIndexRouteImport } from './app/_access/signin/index'
 import { Route as AccessEmailVerificationIndexRouteImport } from './app/_access/email-verification/index'
@@ -42,8 +45,7 @@ import { Route as PublicLightnavbarFaqsIndexRouteImport } from './app/_public/_l
 import { Route as PublicLightnavbarContactIndexRouteImport } from './app/_public/_lightnavbar/contact/index'
 import { Route as PublicLightnavbarAboutIndexRouteImport } from './app/_public/_lightnavbar/about/index'
 import { Route as PublicDarknavbarDiscoveryIndexRouteImport } from './app/_public/_darknavbar/discovery/index'
-import { Route as AccessVendorsAcessOnboardingIndexRouteImport } from './app/_access/vendors-acess/onboarding/index'
-import { Route as AccessVendorsAcessLoginIndexRouteImport } from './app/_access/vendors-acess/login/index'
+import { Route as AccessVendorAccessOnboardingIndexRouteImport } from './app/_access/vendor-access/onboarding/index'
 import { Route as VendorsBillboardsRequestsSlugIndexRouteImport } from './app/vendors/billboards/requests/$slug/index'
 import { Route as VendorsBillboardsListingSlugIndexRouteImport } from './app/vendors/billboards/listing/$slug/index'
 import { Route as UsersauthUsersWalletFundwalletIndexRouteImport } from './app/_usersauth/users/wallet/fundwallet/index'
@@ -59,6 +61,10 @@ import { Route as UsersauthAdsBillboardSlugOnboardCheckoutIndexRouteImport } fro
 
 const UsersauthRouteRoute = UsersauthRouteRouteImport.update({
   id: '/_usersauth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/_admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -89,6 +95,11 @@ const PublicDarknavbarRouteRoute = PublicDarknavbarRouteRouteImport.update({
   id: '/_public/_darknavbar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAdminRouteRoute = AdminAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const VendorsInfluencersIndexRoute = VendorsInfluencersIndexRouteImport.update({
   id: '/vendors/influencers/',
   path: '/vendors/influencers/',
@@ -108,6 +119,11 @@ const UsersauthAdsIndexRoute = UsersauthAdsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => UsersauthAdsRouteRoute,
+} as any)
+const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminAdminRouteRoute,
 } as any)
 const AccessSignupIndexRoute = AccessSignupIndexRouteImport.update({
   id: '/_access/signup/',
@@ -238,16 +254,10 @@ const PublicDarknavbarDiscoveryIndexRoute =
     path: '/discovery/',
     getParentRoute: () => PublicDarknavbarRouteRoute,
   } as any)
-const AccessVendorsAcessOnboardingIndexRoute =
-  AccessVendorsAcessOnboardingIndexRouteImport.update({
-    id: '/_access/vendors-acess/onboarding/',
-    path: '/vendors-acess/onboarding/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AccessVendorsAcessLoginIndexRoute =
-  AccessVendorsAcessLoginIndexRouteImport.update({
-    id: '/_access/vendors-acess/login/',
-    path: '/vendors-acess/login/',
+const AccessVendorAccessOnboardingIndexRoute =
+  AccessVendorAccessOnboardingIndexRouteImport.update({
+    id: '/_access/vendor-access/onboarding/',
+    path: '/vendor-access/onboarding/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const VendorsBillboardsRequestsSlugIndexRoute =
@@ -325,18 +335,19 @@ const UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminAdminRouteRouteWithChildren
   '/ads': typeof UsersauthAdsRouteRouteWithChildren
   '/users': typeof UsersauthUsersRouteRouteWithChildren
   '/vendors/billboards': typeof VendorsBillboardsRouteRouteWithChildren
   '/email-verification/': typeof AccessEmailVerificationIndexRoute
   '/signin/': typeof AccessSigninIndexRoute
   '/signup/': typeof AccessSignupIndexRoute
+  '/admin/': typeof AdminAdminIndexRoute
   '/ads/': typeof UsersauthAdsIndexRoute
   '/users/': typeof UsersauthUsersIndexRoute
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
-  '/vendors-acess/login/': typeof AccessVendorsAcessLoginIndexRoute
-  '/vendors-acess/onboarding/': typeof AccessVendorsAcessOnboardingIndexRoute
+  '/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
   '/discovery/': typeof PublicDarknavbarDiscoveryIndexRoute
   '/about/': typeof PublicLightnavbarAboutIndexRoute
   '/contact/': typeof PublicLightnavbarContactIndexRoute
@@ -374,12 +385,12 @@ export interface FileRoutesByTo {
   '/email-verification': typeof AccessEmailVerificationIndexRoute
   '/signin': typeof AccessSigninIndexRoute
   '/signup': typeof AccessSignupIndexRoute
+  '/admin': typeof AdminAdminIndexRoute
   '/ads': typeof UsersauthAdsIndexRoute
   '/users': typeof UsersauthUsersIndexRoute
   '/vendors/billboards': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers': typeof VendorsInfluencersIndexRoute
-  '/vendors-acess/login': typeof AccessVendorsAcessLoginIndexRoute
-  '/vendors-acess/onboarding': typeof AccessVendorsAcessOnboardingIndexRoute
+  '/vendor-access/onboarding': typeof AccessVendorAccessOnboardingIndexRoute
   '/discovery': typeof PublicDarknavbarDiscoveryIndexRoute
   '/about': typeof PublicLightnavbarAboutIndexRoute
   '/contact': typeof PublicLightnavbarContactIndexRoute
@@ -415,7 +426,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_admin': typeof AdminRouteRouteWithChildren
   '/_usersauth': typeof UsersauthRouteRouteWithChildren
+  '/_admin/admin': typeof AdminAdminRouteRouteWithChildren
   '/_public/_darknavbar': typeof PublicDarknavbarRouteRouteWithChildren
   '/_public/_lightnavbar': typeof PublicLightnavbarRouteRouteWithChildren
   '/_usersauth/ads': typeof UsersauthAdsRouteRouteWithChildren
@@ -424,12 +437,12 @@ export interface FileRoutesById {
   '/_access/email-verification/': typeof AccessEmailVerificationIndexRoute
   '/_access/signin/': typeof AccessSigninIndexRoute
   '/_access/signup/': typeof AccessSignupIndexRoute
+  '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_usersauth/ads/': typeof UsersauthAdsIndexRoute
   '/_usersauth/users/': typeof UsersauthUsersIndexRoute
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
-  '/_access/vendors-acess/login/': typeof AccessVendorsAcessLoginIndexRoute
-  '/_access/vendors-acess/onboarding/': typeof AccessVendorsAcessOnboardingIndexRoute
+  '/_access/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
   '/_public/_darknavbar/discovery/': typeof PublicDarknavbarDiscoveryIndexRoute
   '/_public/_lightnavbar/about/': typeof PublicLightnavbarAboutIndexRoute
   '/_public/_lightnavbar/contact/': typeof PublicLightnavbarContactIndexRoute
@@ -466,18 +479,19 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/ads'
     | '/users'
     | '/vendors/billboards'
     | '/email-verification/'
     | '/signin/'
     | '/signup/'
+    | '/admin/'
     | '/ads/'
     | '/users/'
     | '/vendors/billboards/'
     | '/vendors/influencers/'
-    | '/vendors-acess/login/'
-    | '/vendors-acess/onboarding/'
+    | '/vendor-access/onboarding/'
     | '/discovery/'
     | '/about/'
     | '/contact/'
@@ -515,12 +529,12 @@ export interface FileRouteTypes {
     | '/email-verification'
     | '/signin'
     | '/signup'
+    | '/admin'
     | '/ads'
     | '/users'
     | '/vendors/billboards'
     | '/vendors/influencers'
-    | '/vendors-acess/login'
-    | '/vendors-acess/onboarding'
+    | '/vendor-access/onboarding'
     | '/discovery'
     | '/about'
     | '/contact'
@@ -555,7 +569,9 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_admin'
     | '/_usersauth'
+    | '/_admin/admin'
     | '/_public/_darknavbar'
     | '/_public/_lightnavbar'
     | '/_usersauth/ads'
@@ -564,12 +580,12 @@ export interface FileRouteTypes {
     | '/_access/email-verification/'
     | '/_access/signin/'
     | '/_access/signup/'
+    | '/_admin/admin/'
     | '/_usersauth/ads/'
     | '/_usersauth/users/'
     | '/vendors/billboards/'
     | '/vendors/influencers/'
-    | '/_access/vendors-acess/login/'
-    | '/_access/vendors-acess/onboarding/'
+    | '/_access/vendor-access/onboarding/'
     | '/_public/_darknavbar/discovery/'
     | '/_public/_lightnavbar/about/'
     | '/_public/_lightnavbar/contact/'
@@ -605,6 +621,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   UsersauthRouteRoute: typeof UsersauthRouteRouteWithChildren
   PublicDarknavbarRouteRoute: typeof PublicDarknavbarRouteRouteWithChildren
   PublicLightnavbarRouteRoute: typeof PublicLightnavbarRouteRouteWithChildren
@@ -613,8 +630,7 @@ export interface RootRouteChildren {
   AccessSigninIndexRoute: typeof AccessSigninIndexRoute
   AccessSignupIndexRoute: typeof AccessSignupIndexRoute
   VendorsInfluencersIndexRoute: typeof VendorsInfluencersIndexRoute
-  AccessVendorsAcessLoginIndexRoute: typeof AccessVendorsAcessLoginIndexRoute
-  AccessVendorsAcessOnboardingIndexRoute: typeof AccessVendorsAcessOnboardingIndexRoute
+  AccessVendorAccessOnboardingIndexRoute: typeof AccessVendorAccessOnboardingIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -624,6 +640,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof UsersauthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -668,6 +691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicDarknavbarRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin/admin': {
+      id: '/_admin/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/vendors/influencers/': {
       id: '/vendors/influencers/'
       path: '/vendors/influencers'
@@ -695,6 +725,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/ads/'
       preLoaderRoute: typeof UsersauthAdsIndexRouteImport
       parentRoute: typeof UsersauthAdsRouteRoute
+    }
+    '/_admin/admin/': {
+      id: '/_admin/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminAdminIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
     }
     '/_access/signup/': {
       id: '/_access/signup/'
@@ -850,18 +887,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicDarknavbarDiscoveryIndexRouteImport
       parentRoute: typeof PublicDarknavbarRouteRoute
     }
-    '/_access/vendors-acess/onboarding/': {
-      id: '/_access/vendors-acess/onboarding/'
-      path: '/vendors-acess/onboarding'
-      fullPath: '/vendors-acess/onboarding/'
-      preLoaderRoute: typeof AccessVendorsAcessOnboardingIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_access/vendors-acess/login/': {
-      id: '/_access/vendors-acess/login/'
-      path: '/vendors-acess/login'
-      fullPath: '/vendors-acess/login/'
-      preLoaderRoute: typeof AccessVendorsAcessLoginIndexRouteImport
+    '/_access/vendor-access/onboarding/': {
+      id: '/_access/vendor-access/onboarding/'
+      path: '/vendor-access/onboarding'
+      fullPath: '/vendor-access/onboarding/'
+      preLoaderRoute: typeof AccessVendorAccessOnboardingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vendors/billboards/requests/$slug/': {
@@ -950,6 +980,30 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AdminAdminRouteRouteChildren {
+  AdminAdminIndexRoute: typeof AdminAdminIndexRoute
+}
+
+const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
+  AdminAdminIndexRoute: AdminAdminIndexRoute,
+}
+
+const AdminAdminRouteRouteWithChildren = AdminAdminRouteRoute._addFileChildren(
+  AdminAdminRouteRouteChildren,
+)
+
+interface AdminRouteRouteChildren {
+  AdminAdminRouteRoute: typeof AdminAdminRouteRouteWithChildren
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminAdminRouteRoute: AdminAdminRouteRouteWithChildren,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface UsersauthAdsRouteRouteChildren {
   UsersauthAdsIndexRoute: typeof UsersauthAdsIndexRoute
@@ -1097,6 +1151,7 @@ const VendorsBillboardsRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   UsersauthRouteRoute: UsersauthRouteRouteWithChildren,
   PublicDarknavbarRouteRoute: PublicDarknavbarRouteRouteWithChildren,
   PublicLightnavbarRouteRoute: PublicLightnavbarRouteRouteWithChildren,
@@ -1105,9 +1160,8 @@ const rootRouteChildren: RootRouteChildren = {
   AccessSigninIndexRoute: AccessSigninIndexRoute,
   AccessSignupIndexRoute: AccessSignupIndexRoute,
   VendorsInfluencersIndexRoute: VendorsInfluencersIndexRoute,
-  AccessVendorsAcessLoginIndexRoute: AccessVendorsAcessLoginIndexRoute,
-  AccessVendorsAcessOnboardingIndexRoute:
-    AccessVendorsAcessOnboardingIndexRoute,
+  AccessVendorAccessOnboardingIndexRoute:
+    AccessVendorAccessOnboardingIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

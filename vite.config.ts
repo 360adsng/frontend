@@ -4,9 +4,18 @@ import netlify from '@netlify/vite-plugin-tanstack-start'
 import viteReact from '@vitejs/plugin-react'
 import path from 'node:path'
 
+// Netlify injects NETLIFY=true during builds. Running the Netlify adapter on every
+// `vite dev` adds work you do not need locally and can make dev feel sluggish.
+const useNetlifyPlugin = process.env.NETLIFY === 'true'
+
 export default defineConfig({
   server: {
     port: 3000,
+    // On Windows + OneDrive/network folders, file watching can miss changes or stall.
+    // If dev is flaky, set VITE_FS_POLLING=1 in .env (uses more CPU).
+    watch: {
+      usePolling: process.env.VITE_FS_POLLING === '1',
+    },
   },
   // Bundle react-icons into SSR output. Netlify's Node ESM loader fails on
   // named imports from react-icons' CJS/ESM entry (see AiOutlineDownload error).
@@ -28,10 +37,11 @@ export default defineConfig({
       router: {
         routesDirectory: 'app',
         generatedRouteTree: 'routeTree.gen.ts',
-        verboseFileRoutes: true,
+        // Extra logging / work; keep off unless debugging route generation.
+        verboseFileRoutes: process.env.VITE_VERBOSE_FILE_ROUTES === '1',
       },
     }),
-    netlify(),
+    ...(useNetlifyPlugin ? [netlify()] : []),
     viteReact(),
   ],
 })

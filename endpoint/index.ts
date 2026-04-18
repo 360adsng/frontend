@@ -22,13 +22,24 @@ export {
   type ResponseInterceptor,
 } from './baseFetch';
 
-export { login, logout, register } from './auth/auth';
-export { useLogin, useLogout, useRegister } from './auth/useAuth';
+export {
+  billboardOwnerSignup,
+  login,
+  logout,
+  register,
+  vendorOnboarding,
+} from './auth/auth';
+export { useLogin, useLogout, useRegister, useVendorOnboarding } from './auth/useAuth';
 export type {
+  BillboardOwnerSignupPayload,
+  BillboardOwnerSignupResponse,
   LoginPayload,
   LoginResponse,
+  PublicBillboardBusiness,
   RegisterPayload,
   RegisterResponse,
+  VendorOnboardingPayload,
+  VendorOnboardingResponse,
 } from './auth/types';
 
 export { changePassword, getMe, updateProfile } from './users/users';

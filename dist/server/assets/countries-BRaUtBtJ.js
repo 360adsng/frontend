@@ -32,6 +32,10 @@ function saveAccountType(accountType) {
 	if (typeof window === "undefined") return;
 	localStorage.setItem(ACCOUNT_TYPE_STORAGE_KEY, accountType);
 }
+function getAccountType() {
+	if (typeof window === "undefined") return null;
+	return localStorage.getItem(ACCOUNT_TYPE_STORAGE_KEY);
+}
 function clearAuthTokens() {
 	if (typeof window === "undefined") return;
 	localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
@@ -273,4 +277,4 @@ var COUNTRIES = [
 	}
 ];
 //#endregion
-export { clearAuthTokens as a, baseFetchJson as i, ACCESS_TOKEN_STORAGE_KEY as n, saveAccountType as o, ApiError as r, saveAuthTokens as s, COUNTRIES as t };
+export { clearAuthTokens as a, saveAuthTokens as c, baseFetchJson as i, ACCESS_TOKEN_STORAGE_KEY as n, getAccountType as o, ApiError as r, saveAccountType as s, COUNTRIES as t };

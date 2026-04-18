@@ -8,7 +8,9 @@ import type { CountryCode } from "libphonenumber-js";
 import { useRegister } from "@endpoint/auth/useAuth";
 import { z } from "zod";
 import { COUNTRIES } from "../../../lib/countries";
+import { getAccountType } from "@endpoint/baseFetch";
 import { hasAccessToken } from "../../../lib/auth";
+import { getDashboardPathForAccountType } from "../../../lib/accountDashboard";
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -803,7 +805,9 @@ export const Route = createFileRoute("/_access/signup/")({
   beforeLoad: () => {
     if (typeof window === "undefined") return;
     if (hasAccessToken()) {
-      throw redirect({ to: "/users" });
+      throw redirect({
+        to: getDashboardPathForAccountType(getAccountType()),
+      });
     }
   },
   component: SignUp,

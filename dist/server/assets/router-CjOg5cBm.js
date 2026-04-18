@@ -1,5 +1,5 @@
-import { a as clearAuthTokens, i as baseFetchJson, n as ACCESS_TOKEN_STORAGE_KEY, o as saveAccountType, r as ApiError, s as saveAuthTokens, t as COUNTRIES$1 } from "./countries-DNj5C3SE.js";
-import React, { useEffect, useRef, useState } from "react";
+import { a as clearAuthTokens, c as saveAuthTokens, i as baseFetchJson, n as ACCESS_TOKEN_STORAGE_KEY, o as getAccountType, r as ApiError, s as saveAccountType, t as COUNTRIES$1 } from "./countries-BRaUtBtJ.js";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { HeadContent, Link, Outlet, Scripts, createFileRoute, createRootRoute, createRouter, lazyRouteComponent, redirect, useNavigate, useParams, useRouter, useRouterState } from "@tanstack/react-router";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { z } from "zod";
@@ -16,7 +16,7 @@ import Calendar from "react-calendar";
 var styles_default = "/assets/styles-DDCWxn3B.css";
 //#endregion
 //#region styles/global.css?url
-var global_default = "/assets/global-CLMe_eIB.css";
+var global_default = "/assets/global-0WjPVnrE.css";
 //#endregion
 //#region node_modules/react-icons/lib/esm/iconContext.js
 var DefaultContext = {
@@ -188,7 +188,7 @@ function NotFoundPage() {
 }
 //#endregion
 //#region app/__root.tsx
-var Route$47 = createRootRoute({
+var Route$49 = createRootRoute({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -238,14 +238,111 @@ function hasAccessToken() {
 	return Boolean(localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY));
 }
 //#endregion
-//#region app/_usersauth/route.tsx
-var Layout$5 = () => {
-	return /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsx(Outlet, {}) });
+//#region lib/accountDashboard.ts
+/** Mirrors backend `AccountType` enum. */
+var ACCOUNT_TYPE = {
+	REGULAR_USER: "regular_user",
+	BUSINESS_USER: "business_user",
+	BILLBOARD_OWNER: "billboard_owner",
+	ADMIN: "admin"
 };
-var Route$46 = createFileRoute("/_usersauth")({
+var USER_DASHBOARD = "/users";
+var BILLBOARD_DASHBOARD = "/vendors/billboards";
+var ADMIN_DASHBOARD = "/admin";
+var SIGN_IN = "/signin";
+/** Where to send a user after login (or when they are already authenticated). */
+function getDashboardPathForAccountType(accountType) {
+	switch (accountType) {
+		case ACCOUNT_TYPE.REGULAR_USER:
+		case ACCOUNT_TYPE.BUSINESS_USER: return USER_DASHBOARD;
+		case ACCOUNT_TYPE.BILLBOARD_OWNER: return BILLBOARD_DASHBOARD;
+		case ACCOUNT_TYPE.ADMIN: return ADMIN_DASHBOARD;
+		default: return SIGN_IN;
+	}
+}
+//#endregion
+//#region components/auth/DashboardGate.tsx
+var MODE_ALLOWED = {
+	users: [ACCOUNT_TYPE.REGULAR_USER, ACCOUNT_TYPE.BUSINESS_USER],
+	billboard: [ACCOUNT_TYPE.BILLBOARD_OWNER],
+	admin: [ACCOUNT_TYPE.ADMIN]
+};
+/**
+* Enforces account type on the client before rendering children. Required because
+* `beforeLoad` skips when `window` is undefined (SSR), so the wrong dashboard could
+* otherwise flash until some interaction re-ran guards.
+*/
+function DashboardGate({ mode, children }) {
+	const router = useRouter();
+	const [allowed, setAllowed] = useState(false);
+	useLayoutEffect(() => {
+		const expected = MODE_ALLOWED[mode];
+		if (!hasAccessToken()) {
+			router.navigate({
+				to: "/signin",
+				replace: true
+			});
+			return;
+		}
+		const at = getAccountType();
+		if (!at) {
+			router.navigate({
+				to: "/signin",
+				replace: true
+			});
+			return;
+		}
+		if (!expected.includes(at)) {
+			router.navigate({
+				to: getDashboardPathForAccountType(at),
+				replace: true
+			});
+			return;
+		}
+		setAllowed(true);
+	}, [mode, router]);
+	if (!allowed) return /* @__PURE__ */ jsx("div", {
+		className: "flex min-h-screen items-center justify-center bg-ads360-hash",
+		"aria-busy": "true",
+		"aria-label": "Checking access",
+		children: /* @__PURE__ */ jsx("p", {
+			className: "text-sm text-gray-600",
+			children: "Loading…"
+		})
+	});
+	return /* @__PURE__ */ jsx(Fragment, { children });
+}
+//#endregion
+//#region app/_usersauth/route.tsx
+var Layout$6 = () => {
+	return /* @__PURE__ */ jsx(DashboardGate, {
+		mode: "users",
+		children: /* @__PURE__ */ jsx(Outlet, {})
+	});
+};
+var Route$48 = createFileRoute("/_usersauth")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (!hasAccessToken()) throw redirect({ to: "/signin" });
+		const at = getAccountType();
+		if (!at) throw redirect({ to: "/signin" });
+		if (at !== ACCOUNT_TYPE.REGULAR_USER && at !== ACCOUNT_TYPE.BUSINESS_USER) throw redirect({ to: getDashboardPathForAccountType(at) });
+	},
+	component: Layout$6
+});
+//#endregion
+//#region app/_admin/route.tsx
+var Layout$5 = () => /* @__PURE__ */ jsx(DashboardGate, {
+	mode: "admin",
+	children: /* @__PURE__ */ jsx(Outlet, {})
+});
+var Route$47 = createFileRoute("/_admin")({
+	beforeLoad: () => {
+		if (typeof window === "undefined") return;
+		if (!hasAccessToken()) throw redirect({ to: "/signin" });
+		const at = getAccountType();
+		if (!at) throw redirect({ to: "/signin" });
+		if (at !== ACCOUNT_TYPE.ADMIN) throw redirect({ to: getDashboardPathForAccountType(at) });
 	},
 	component: Layout$5
 });
@@ -1475,7 +1572,7 @@ function Home() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$45 = createFileRoute("/")({ component: Home });
+var Route$46 = createFileRoute("/")({ component: Home });
 //#endregion
 //#region endpoint/auth/auth.ts
 /** POST /auth/register — public; does not attach session or run refresh on 401. */
@@ -1496,9 +1593,23 @@ async function login(payload) {
 async function logout$6() {
 	await baseFetchJson("/auth/sign-out", { method: "POST" });
 }
+/** POST /auth/vendor-onboarding — public; validates invite token and returns onboarding step. */
+async function vendorOnboarding(payload) {
+	return baseFetchJson("/auth/vendor-onboarding", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
+/** POST /auth/billboard-owner-signup — public; progressive billboard onboarding. */
+async function billboardOwnerSignup(payload) {
+	return baseFetchJson("/auth/billboard-owner-signup", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
 //#endregion
 //#region endpoint/auth/useAuth.ts
-function errorMessage(error) {
+function errorMessage$1(error) {
 	if (error instanceof ApiError) return error.message;
 	if (error instanceof Error) return error.message;
 	return "Something went wrong. Please try again.";
@@ -1510,7 +1621,7 @@ function useRegister() {
 			toast.success("Account created successfully.");
 		},
 		onError: (error) => {
-			toast.error(errorMessage(error));
+			toast.error(errorMessage$1(error));
 		}
 	});
 }
@@ -1526,7 +1637,7 @@ function useLogin() {
 			toast.success("Logged in successfully.");
 		},
 		onError: (error) => {
-			toast.error(errorMessage(error));
+			toast.error(errorMessage$1(error));
 		}
 	});
 }
@@ -1539,7 +1650,7 @@ function useLogout() {
 		},
 		onError: (error) => {
 			clearAuthTokens();
-			toast.error(errorMessage(error));
+			toast.error(errorMessage$1(error));
 		}
 	});
 }
@@ -1604,7 +1715,7 @@ var BillBoardSideNav = () => {
 	}];
 	const handleLogout = () => {
 		logoutVendor(void 0, { onSettled: () => {
-			navigate({ to: "/vendors-acess/login" });
+			navigate({ to: "/signin" });
 		} });
 	};
 	return /* @__PURE__ */ jsxs("aside", {
@@ -1777,7 +1888,7 @@ var BillBoardDrawerContent = ({ toggleDrawer }) => {
 	const handleLogout = () => {
 		logoutVendor(void 0, { onSettled: () => {
 			toggleDrawer();
-			navigate({ to: "/vendors-acess/login" });
+			navigate({ to: "/signin" });
 		} });
 	};
 	const navItem1 = [
@@ -2036,7 +2147,7 @@ var BillBoardNav = () => {
 									if (isLoggingOut) return;
 									logoutVendor(void 0, { onSettled: () => {
 										setDropDown(false);
-										navigate({ to: "/vendors-acess/login" });
+										navigate({ to: "/signin" });
 									} });
 								},
 								children: [/* @__PURE__ */ jsx("img", {
@@ -2067,21 +2178,27 @@ var BillBoardNav = () => {
 //#endregion
 //#region app/vendors/billboards/route.tsx
 function Layout$4() {
-	return /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsxs("main", {
-		className: "md:flex",
-		children: [/* @__PURE__ */ jsx("section", {
-			className: "group hidden transistion duration-300 md:block basis-[6%] hover:basis-[18.2%] xl:hover:basis-[15.8%] ",
-			children: /* @__PURE__ */ jsx(BillBoardSideNav, {})
-		}), /* @__PURE__ */ jsxs("section", {
-			className: "md:basis-[100%]",
-			children: [/* @__PURE__ */ jsx(BillBoardNav, {}), /* @__PURE__ */ jsx(Outlet, {})]
-		})]
-	}) });
+	return /* @__PURE__ */ jsx(DashboardGate, {
+		mode: "billboard",
+		children: /* @__PURE__ */ jsxs("main", {
+			className: "md:flex",
+			children: [/* @__PURE__ */ jsx("section", {
+				className: "group hidden transistion duration-300 md:block basis-[6%] hover:basis-[18.2%] xl:hover:basis-[15.8%] ",
+				children: /* @__PURE__ */ jsx(BillBoardSideNav, {})
+			}), /* @__PURE__ */ jsxs("section", {
+				className: "md:basis-[100%]",
+				children: [/* @__PURE__ */ jsx(BillBoardNav, {}), /* @__PURE__ */ jsx(Outlet, {})]
+			})]
+		})
+	});
 }
-var Route$44 = createFileRoute("/vendors/billboards")({
+var Route$45 = createFileRoute("/vendors/billboards")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
-		if (!hasAccessToken()) throw redirect({ to: "/vendors-acess/login" });
+		if (!hasAccessToken()) throw redirect({ to: "/signin" });
+		const at = getAccountType();
+		if (!at) throw redirect({ to: "/signin" });
+		if (at !== ACCOUNT_TYPE.BILLBOARD_OWNER) throw redirect({ to: getDashboardPathForAccountType(at) });
 	},
 	component: Layout$4
 });
@@ -2550,13 +2667,7 @@ function Layout$3() {
 		})]
 	}) });
 }
-var Route$43 = createFileRoute("/_usersauth/users")({
-	beforeLoad: () => {
-		if (typeof window === "undefined") return;
-		if (!hasAccessToken()) throw redirect({ to: "/signin" });
-	},
-	component: Layout$3
-});
+var Route$44 = createFileRoute("/_usersauth/users")({ component: Layout$3 });
 //#endregion
 //#region app/_usersauth/ads/route.tsx
 function Layout$2() {
@@ -2568,13 +2679,7 @@ function Layout$2() {
 		children: /* @__PURE__ */ jsx(Outlet, {})
 	})] });
 }
-var Route$42 = createFileRoute("/_usersauth/ads")({
-	beforeLoad: () => {
-		if (typeof window === "undefined") return;
-		if (!hasAccessToken()) throw redirect({ to: "/signin" });
-	},
-	component: Layout$2
-});
+var Route$43 = createFileRoute("/_usersauth/ads")({ component: Layout$2 });
 //#endregion
 //#region app/_public/_lightnavbar/route.tsx
 function Layout$1() {
@@ -2584,7 +2689,7 @@ function Layout$1() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$41 = createFileRoute("/_public/_lightnavbar")({ component: Layout$1 });
+var Route$42 = createFileRoute("/_public/_lightnavbar")({ component: Layout$1 });
 //#endregion
 //#region components/navs/public/DarkNavbar.tsx
 var MobileMenu = "/icons/menu.svg";
@@ -2672,7 +2777,47 @@ function Layout() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$40 = createFileRoute("/_public/_darknavbar")({ component: Layout });
+var Route$41 = createFileRoute("/_public/_darknavbar")({ component: Layout });
+//#endregion
+//#region app/_admin/admin/route.tsx
+function AdminShell() {
+	const router = useRouter();
+	const { mutate: logout, isPending } = useLogout();
+	return /* @__PURE__ */ jsxs("div", {
+		className: "min-h-screen bg-ads360-hash",
+		children: [/* @__PURE__ */ jsx("header", {
+			className: "border-b border-ads360yellow-100/30 bg-white/90 backdrop-blur",
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-3",
+				children: [/* @__PURE__ */ jsxs(Link, {
+					to: "/admin",
+					className: "flex items-center gap-2",
+					children: [/* @__PURE__ */ jsx(BlackLogo, {}), /* @__PURE__ */ jsx("span", {
+						className: "text-sm font-semibold text-gray-800",
+						children: "Admin"
+					})]
+				}), /* @__PURE__ */ jsxs("nav", {
+					className: "flex items-center gap-4 text-sm",
+					children: [/* @__PURE__ */ jsx(Link, {
+						to: "/",
+						className: "text-gray-600 hover:text-gray-900",
+						children: "Marketing site"
+					}), /* @__PURE__ */ jsx("button", {
+						type: "button",
+						disabled: isPending,
+						className: "rounded border border-gray-300 px-3 py-1.5 text-gray-800 hover:bg-gray-50 disabled:opacity-50",
+						onClick: () => logout(void 0, { onSuccess: () => router.navigate({ to: "/signin" }) }),
+						children: isPending ? "Signing out…" : "Sign out"
+					})]
+				})]
+			})
+		}), /* @__PURE__ */ jsx("main", {
+			className: "mx-auto max-w-5xl px-4 py-10",
+			children: /* @__PURE__ */ jsx(Outlet, {})
+		})]
+	});
+}
+var Route$40 = createFileRoute("/_admin/admin")({ component: AdminShell });
 //#endregion
 //#region app/vendors/influencers/index.tsx
 var page = () => {
@@ -3476,6 +3621,44 @@ function Ads() {
 }
 var Route$36 = createFileRoute("/_usersauth/ads/")({ component: Ads });
 //#endregion
+//#region app/_admin/admin/index.tsx
+function AdminHome() {
+	return /* @__PURE__ */ jsxs("div", {
+		className: "rounded-10 border border-ads360yellow-100 bg-white p-8 shadow-sm",
+		children: [
+			/* @__PURE__ */ jsx("h1", {
+				className: "text-2xl font-semibold text-gray-900",
+				children: "Admin dashboard"
+			}),
+			/* @__PURE__ */ jsx("p", {
+				className: "mt-2 text-gray-600",
+				children: "This is a placeholder home for administrators. Connect admin tools (invites, billboard verification, etc.) here as you build them."
+			}),
+			/* @__PURE__ */ jsxs("ul", {
+				className: "mt-6 list-disc space-y-2 pl-5 text-sm text-gray-700",
+				children: [
+					/* @__PURE__ */ jsx("li", { children: "Use the API to create invites and verify billboard owners." }),
+					/* @__PURE__ */ jsx("li", { children: "Regular and business users use the main app at /users." }),
+					/* @__PURE__ */ jsx("li", { children: "Billboard owners use /vendors/billboards." })
+				]
+			}),
+			/* @__PURE__ */ jsxs("p", {
+				className: "mt-8 text-sm text-gray-500",
+				children: [
+					"Tip: sign in with an account that has ",
+					/* @__PURE__ */ jsx("code", {
+						className: "rounded bg-gray-100 px-1",
+						children: "admin"
+					}),
+					" ",
+					"as account type to access this area."
+				]
+			})
+		]
+	});
+}
+var Route$35 = createFileRoute("/_admin/admin/")({ component: AdminHome });
+//#endregion
 //#region app/_access/signup/index.tsx
 var MIN_PASSWORD_LENGTH = 8;
 var PHONE_NUMBER_HINT = "Enter phone number without the leading 0.";
@@ -4204,10 +4387,10 @@ var SignUp = () => {
 		]
 	}) });
 };
-var Route$35 = createFileRoute("/_access/signup/")({
+var Route$34 = createFileRoute("/_access/signup/")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
-		if (hasAccessToken()) throw redirect({ to: "/users" });
+		if (hasAccessToken()) throw redirect({ to: getDashboardPathForAccountType(getAccountType()) });
 	},
 	component: SignUp
 });
@@ -4251,8 +4434,8 @@ var SignIn = () => {
 			setErrors(next);
 			return;
 		}
-		login(parsed.data, { onSuccess: () => {
-			router.navigate({ to: "/users" });
+		login(parsed.data, { onSuccess: (data) => {
+			router.navigate({ to: getDashboardPathForAccountType(data.accountType) });
 		} });
 	};
 	const onSubmit = (e) => {
@@ -4393,10 +4576,10 @@ var SignIn = () => {
 		})]
 	});
 };
-var Route$34 = createFileRoute("/_access/signin/")({
+var Route$33 = createFileRoute("/_access/signin/")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
-		if (hasAccessToken()) throw redirect({ to: "/users" });
+		if (hasAccessToken()) throw redirect({ to: getDashboardPathForAccountType(getAccountType()) });
 	},
 	component: SignIn
 });
@@ -4494,7 +4677,7 @@ var EmailVerification = () => {
 		})]
 	});
 };
-var Route$33 = createFileRoute("/_access/email-verification/")({ component: EmailVerification });
+var Route$32 = createFileRoute("/_access/email-verification/")({ component: EmailVerification });
 //#endregion
 //#region node_modules/react-icons/gr/index.esm.js
 function GrTooltip(props) {
@@ -4678,7 +4861,7 @@ var WalletSection$1 = () => {
 		})
 	});
 };
-var Route$32 = createFileRoute("/vendors/billboards/wallet/")({ component: WalletSection$1 });
+var Route$31 = createFileRoute("/vendors/billboards/wallet/")({ component: WalletSection$1 });
 //#endregion
 //#region app/vendors/billboards/settings/index.tsx
 var avatar = "/icons/user.png";
@@ -4946,7 +5129,7 @@ var EditBillboardComponent = () => {
 		})
 	})] });
 };
-var Route$31 = createFileRoute("/vendors/billboards/settings/")({ component: EditBillboardComponent });
+var Route$30 = createFileRoute("/vendors/billboards/settings/")({ component: EditBillboardComponent });
 //#endregion
 //#region app/vendors/billboards/requests/index.tsx
 var search$1 = "/icons/search.svg";
@@ -5138,7 +5321,7 @@ var Requests = () => {
 		]
 	}) });
 };
-var Route$30 = createFileRoute("/vendors/billboards/requests/")({ component: Requests });
+var Route$29 = createFileRoute("/vendors/billboards/requests/")({ component: Requests });
 //#endregion
 //#region components/ui/BillboardSorter.tsx
 var cancel$6 = "/icons/usericon/modalCancelBotton.svg";
@@ -5474,7 +5657,7 @@ function Billboards$1() {
 		})
 	})] });
 }
-var Route$29 = createFileRoute("/vendors/billboards/listing/")({ component: Billboards$1 });
+var Route$28 = createFileRoute("/vendors/billboards/listing/")({ component: Billboards$1 });
 //#endregion
 //#region components/inputs/FilesInput.tsx
 var FilesInput = ({ handleChange, warning, accept, previewName }) => {
@@ -5688,7 +5871,7 @@ var Add = () => {
 		})
 	})] });
 };
-var Route$28 = createFileRoute("/vendors/billboards/add-billboard/")({ component: Add });
+var Route$27 = createFileRoute("/vendors/billboards/add-billboard/")({ component: Add });
 //#endregion
 //#region app/_usersauth/users/wallet/index.tsx
 var naira$1 = "/icons/naira.svg";
@@ -5841,11 +6024,11 @@ var WalletSection = () => {
 		})
 	});
 };
-var Route$27 = createFileRoute("/_usersauth/users/wallet/")({ component: WalletSection });
+var Route$26 = createFileRoute("/_usersauth/users/wallet/")({ component: WalletSection });
 //#endregion
 //#region app/_usersauth/users/settings/index.tsx
-var $$splitComponentImporter = () => import("./settings-BjApf04W.js");
-var Route$26 = createFileRoute("/_usersauth/users/settings/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
+var $$splitComponentImporter = () => import("./settings-Bx8hHtA1.js");
+var Route$25 = createFileRoute("/_usersauth/users/settings/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
 //#endregion
 //#region components/ui/Table.tsx
 var search = "/icons/search.svg";
@@ -6112,19 +6295,19 @@ var Campaign = () => {
 		]
 	})] });
 };
-var Route$25 = createFileRoute("/_usersauth/users/campaign/")({ component: Campaign });
+var Route$24 = createFileRoute("/_usersauth/users/campaign/")({ component: Campaign });
 //#endregion
 //#region app/_usersauth/users/analysis/index.tsx
 var Analysis = () => {
 	return /* @__PURE__ */ jsx("div", { children: "Analysis" });
 };
-var Route$24 = createFileRoute("/_usersauth/users/analysis/")({ component: Analysis });
+var Route$23 = createFileRoute("/_usersauth/users/analysis/")({ component: Analysis });
 //#endregion
 //#region app/_usersauth/ads/whatsapp/index.tsx
 function Whatsapp() {
 	return /* @__PURE__ */ jsx("div", { children: "Coming Soon" });
 }
-var Route$23 = createFileRoute("/_usersauth/ads/whatsapp/")({ component: Whatsapp });
+var Route$22 = createFileRoute("/_usersauth/ads/whatsapp/")({ component: Whatsapp });
 //#endregion
 //#region components/inputs/Tick.tsx
 var tick2 = "/icons/tick2.svg";
@@ -8065,7 +8248,7 @@ function Sms() {
 		]
 	});
 }
-var Route$22 = createFileRoute("/_usersauth/ads/sms/")({ component: Sms });
+var Route$21 = createFileRoute("/_usersauth/ads/sms/")({ component: Sms });
 //#endregion
 //#region node_modules/react-icons/bs/index.esm.js
 function BsSuitHeartFill(props) {
@@ -8365,13 +8548,13 @@ function Influencer() {
 		})
 	})] });
 }
-var Route$21 = createFileRoute("/_usersauth/ads/influencer/")({ component: Influencer });
+var Route$20 = createFileRoute("/_usersauth/ads/influencer/")({ component: Influencer });
 //#endregion
 //#region app/_usersauth/ads/digital/index.tsx
 function Digital() {
 	return /* @__PURE__ */ jsx("div", { children: "Coming Soon" });
 }
-var Route$20 = createFileRoute("/_usersauth/ads/digital/")({ component: Digital });
+var Route$19 = createFileRoute("/_usersauth/ads/digital/")({ component: Digital });
 //#endregion
 //#region app/_usersauth/ads/billboard/index.tsx
 var billboardImage1 = "/del/billboard1.png";
@@ -8638,7 +8821,7 @@ function Billboards() {
 		})
 	})] });
 }
-var Route$19 = createFileRoute("/_usersauth/ads/billboard/")({ component: Billboards });
+var Route$18 = createFileRoute("/_usersauth/ads/billboard/")({ component: Billboards });
 //#endregion
 //#region app/_usersauth/ads/$transaction_id/index.tsx
 var card$3 = "/icons/usericon/card.svg";
@@ -8883,7 +9066,7 @@ var Payment$1 = () => {
 		}) : null
 	})] });
 };
-var Route$18 = createFileRoute("/_usersauth/ads/$transaction_id/")({ component: Payment$1 });
+var Route$17 = createFileRoute("/_usersauth/ads/$transaction_id/")({ component: Payment$1 });
 //#endregion
 //#region node_modules/react-icons/fa/index.esm.js
 function FaAngleDown(props) {
@@ -8982,7 +9165,7 @@ var Faq = () => {
 		})
 	}), /* @__PURE__ */ jsx(Faqs, {})] });
 };
-var Route$17 = createFileRoute("/_public/_lightnavbar/faqs/")({ component: Faq });
+var Route$16 = createFileRoute("/_public/_lightnavbar/faqs/")({ component: Faq });
 //#endregion
 //#region app/_public/_lightnavbar/contact/index.tsx
 var phone = "/icons/phone.svg";
@@ -9137,7 +9320,7 @@ var Contact = () => {
 		})
 	] });
 };
-var Route$16 = createFileRoute("/_public/_lightnavbar/contact/")({ component: Contact });
+var Route$15 = createFileRoute("/_public/_lightnavbar/contact/")({ component: Contact });
 //#endregion
 //#region components/buttons/BlackButtonsLong.tsx
 var BlackButtonsLong = ({ text }) => {
@@ -9198,7 +9381,7 @@ var About = () => {
 		})
 	] });
 };
-var Route$15 = createFileRoute("/_public/_lightnavbar/about/")({ component: About });
+var Route$14 = createFileRoute("/_public/_lightnavbar/about/")({ component: About });
 //#endregion
 //#region components/slides/InViewX.tsx
 var SectionX = ({ children, val }) => {
@@ -9572,233 +9755,738 @@ var Service = () => {
 		/* @__PURE__ */ jsx(NewsLetter, { img: manads2 })
 	] });
 };
-var Route$14 = createFileRoute("/_public/_darknavbar/discovery/")({ component: Service });
+var Route$13 = createFileRoute("/_public/_darknavbar/discovery/")({ component: Service });
 //#endregion
-//#region app/_access/vendors-acess/onboarding/index.tsx
-var VendorsOnboarding = () => {
+//#region lib/nigeriaStatesLgas.ts
+var NIGERIA_STATES_LGAS = [
+	{
+		id: "lagos",
+		name: "Lagos",
+		lgas: [
+			"Ikeja",
+			"Surulere",
+			"Eti-Osa",
+			"Kosofe"
+		]
+	},
+	{
+		id: "abuja",
+		name: "FCT Abuja",
+		lgas: [
+			"Abaji",
+			"Bwari",
+			"Gwagwalada",
+			"Municipal"
+		]
+	},
+	{
+		id: "rivers",
+		name: "Rivers",
+		lgas: [
+			"Port Harcourt",
+			"Obio-Akpor",
+			"Eleme"
+		]
+	}
+];
+function getStateById(id) {
+	return NIGERIA_STATES_LGAS.find((s) => s.id === id);
+}
+//#endregion
+//#region app/_access/vendor-access/onboarding/index.tsx
+var inputBase = "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded min-h-[38px] md:min-h-[45px]";
+function extractToken() {
+	if (typeof window === "undefined") return null;
+	const token = new URLSearchParams(window.location.search).get("token");
+	return token?.trim() ? token.trim() : null;
+}
+function errorMessage(error) {
+	if (error instanceof ApiError) return error.message;
+	if (error instanceof Error) return error.message;
+	return "Something went wrong. Please try again.";
+}
+function fileToDataUrl(file) {
+	return new Promise((resolve, reject) => {
+		const fr = new FileReader();
+		fr.onload = () => resolve(fr.result);
+		fr.onerror = () => reject(fr.error);
+		fr.readAsDataURL(file);
+	});
+}
+function isBillboardVendor(accountType) {
+	return accountType === "billboard_owner" || accountType === "billboard";
+}
+function initialWizardStepFromBackend(backendStep) {
+	if (backendStep === "account") return 1;
+	if (backendStep === "business") return 2;
+	if (backendStep === "contact") return 3;
+	if (backendStep === "fix") return 2;
+	return 1;
+}
+function BillboardOnboardingWizard({ inviteToken, backendStep, inviteEmail, savedUser, savedBusiness, onAfterSave }) {
+	const [wizardStep, setWizardStep] = useState(() => initialWizardStepFromBackend(backendStep));
+	const [submitting, setSubmitting] = useState(false);
+	const [formError, setFormError] = useState(null);
+	const [email] = useState(inviteEmail);
+	const [phone, setPhone] = useState("");
+	const [password, setPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [showPw, setShowPw] = useState(false);
+	const [showPw2, setShowPw2] = useState(false);
+	const [businessName, setBusinessName] = useState("");
+	const [businessAddress, setBusinessAddress] = useState("");
+	const [cacPreview, setCacPreview] = useState(null);
+	const [cacFile, setCacFile] = useState(null);
+	const [cacServerUrl, setCacServerUrl] = useState(null);
+	const [logoPreview, setLogoPreview] = useState(null);
+	const [logoFile, setLogoFile] = useState(null);
+	const [logoServerUrl, setLogoServerUrl] = useState(null);
+	const [website, setWebsite] = useState("");
+	const [coverageRows, setCoverageRows] = useState([{
+		state: "",
+		lga: []
+	}]);
+	const [contactName, setContactName] = useState("");
+	const [contactPhone, setContactPhone] = useState("");
+	const [contactEmail, setContactEmail] = useState("");
+	const [contactPosition, setContactPosition] = useState("");
+	useEffect(() => {
+		if (savedUser?.phone) setPhone(savedUser.phone);
+	}, [savedUser]);
+	useEffect(() => {
+		if (!savedBusiness) return;
+		setBusinessName(savedBusiness.businessName ?? "");
+		setBusinessAddress(savedBusiness.businessAddress ?? "");
+		setWebsite(savedBusiness.businessWebsite ?? "");
+		if (savedBusiness.cac) {
+			setCacServerUrl(savedBusiness.cac);
+			setCacPreview(savedBusiness.cac);
+		}
+		if (savedBusiness.businessLogo) {
+			setLogoServerUrl(savedBusiness.businessLogo);
+			setLogoPreview(savedBusiness.businessLogo);
+		}
+		if (savedBusiness.billboardCoverage?.length) setCoverageRows(savedBusiness.billboardCoverage.map((c) => ({
+			state: c.state,
+			lga: c.lga ?? []
+		})));
+		setContactName(savedBusiness.contactPersonName ?? "");
+		setContactPhone(savedBusiness.contactPersonPhone ?? "");
+		setContactEmail(savedBusiness.contactPersonEmail ?? "");
+		setContactPosition(savedBusiness.contactPersonPosition ?? "");
+	}, [savedBusiness]);
+	const setRowState = (index, stateId) => {
+		setCoverageRows((rows) => rows.map((r, i) => i === index ? {
+			state: stateId,
+			lga: []
+		} : r));
+	};
+	const addCoverageRow = () => {
+		setCoverageRows((rows) => [...rows, {
+			state: "",
+			lga: []
+		}]);
+	};
+	const removeCoverageRow = (index) => {
+		setCoverageRows((rows) => rows.filter((_, i) => i !== index));
+	};
+	const toggleLga = (rowIndex, lgaName) => {
+		setCoverageRows((rows) => rows.map((r, i) => {
+			if (i !== rowIndex) return r;
+			const next = new Set(r.lga);
+			if (next.has(lgaName)) next.delete(lgaName);
+			else next.add(lgaName);
+			return {
+				...r,
+				lga: Array.from(next)
+			};
+		}));
+	};
+	const hasCacOrServer = Boolean(cacFile) || Boolean(cacServerUrl) || Boolean(cacPreview && !cacPreview.startsWith("blob:"));
+	const canGoNext = wizardStep === 1 ? Boolean(phone.trim() && password && password === confirmPassword) : wizardStep === 2 ? Boolean(businessName.trim() && businessAddress.trim() && hasCacOrServer && coverageRows.some((r) => r.state && r.lga.length > 0)) : Boolean(contactName.trim() && contactPhone.trim() && contactEmail.trim() && contactPosition.trim());
+	const handleContinueStep1 = async () => {
+		if (!canGoNext || wizardStep !== 1) return;
+		setFormError(null);
+		setSubmitting(true);
+		try {
+			await billboardOwnerSignup({
+				inviteToken,
+				step: 1,
+				phoneNumber: phone.trim(),
+				password
+			});
+			await onAfterSave();
+			setWizardStep(2);
+		} catch (e) {
+			setFormError(errorMessage(e));
+		} finally {
+			setSubmitting(false);
+		}
+	};
+	const handleContinueStep2 = async () => {
+		if (!canGoNext || wizardStep !== 2) return;
+		setFormError(null);
+		setSubmitting(true);
+		try {
+			const coverage = coverageRows.filter((r) => r.state && r.lga.length).map((r) => ({
+				state: r.state,
+				lga: r.lga
+			}));
+			const payload = {
+				inviteToken,
+				step: 2,
+				businessName: businessName.trim(),
+				address: businessAddress.trim(),
+				billboardCoverage: coverage,
+				website: website.trim() || void 0
+			};
+			if (cacFile) payload.cacDataUrl = await fileToDataUrl(cacFile);
+			else if (cacServerUrl) payload.cacUrl = cacServerUrl;
+			if (logoFile) payload.logoDataUrl = await fileToDataUrl(logoFile);
+			else if (logoServerUrl) payload.logoUrl = logoServerUrl;
+			await billboardOwnerSignup(payload);
+			await onAfterSave();
+			setWizardStep(3);
+		} catch (e) {
+			setFormError(errorMessage(e));
+		} finally {
+			setSubmitting(false);
+		}
+	};
+	const handleSubmitStep3 = async () => {
+		if (!canGoNext || wizardStep !== 3) return;
+		setFormError(null);
+		setSubmitting(true);
+		try {
+			await billboardOwnerSignup({
+				inviteToken,
+				step: 3,
+				contactName: contactName.trim(),
+				contactPhone: contactPhone.trim(),
+				contactEmail: contactEmail.trim(),
+				contactPosition: contactPosition.trim()
+			});
+			await onAfterSave();
+		} catch (e) {
+			setFormError(errorMessage(e));
+		} finally {
+			setSubmitting(false);
+		}
+	};
+	return /* @__PURE__ */ jsxs("div", {
+		className: "mt-4",
+		children: [
+			formError && /* @__PURE__ */ jsx("p", {
+				className: "text-red-600 text-sm mb-3",
+				role: "alert",
+				children: formError
+			}),
+			/* @__PURE__ */ jsx("div", {
+				className: "flex justify-center gap-2 text-sm mb-6",
+				children: [
+					1,
+					2,
+					3
+				].map((n) => /* @__PURE__ */ jsxs("span", {
+					className: `rounded-full px-3 py-1 ${wizardStep === n ? "bg-ads360yellow-100 text-black font-medium" : "bg-[#E4E4E4] text-gray-700"}`,
+					children: [
+						n,
+						". ",
+						n === 1 ? "Account" : n === 2 ? "Business" : "Contact"
+					]
+				}, n))
+			}),
+			wizardStep === 1 && /* @__PURE__ */ jsxs("div", { children: [
+				/* @__PURE__ */ jsx("h3", {
+					className: "text-xl font-semibold mb-4",
+					children: "Step 1 — Your account"
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Email" }), /* @__PURE__ */ jsx("input", {
+						value: email,
+						disabled: true,
+						className: `${inputBase} opacity-70`
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [
+						/* @__PURE__ */ jsx("label", { children: "Phone number" }),
+						/* @__PURE__ */ jsx("input", {
+							className: inputBase,
+							value: phone,
+							onChange: (e) => setPhone(e.target.value),
+							placeholder: "+2348012345678"
+						}),
+						/* @__PURE__ */ jsx("p", {
+							className: "text-xs text-gray-600 mt-1",
+							children: "International format (E.164)."
+						})
+					]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Password" }), /* @__PURE__ */ jsxs("div", {
+						className: "relative",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: showPw ? "text" : "password",
+							className: inputBase,
+							value: password,
+							onChange: (e) => setPassword(e.target.value)
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							className: "absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-700",
+							onClick: () => setShowPw((s) => !s),
+							children: showPw ? "Hide" : "Show"
+						})]
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Confirm password" }), /* @__PURE__ */ jsxs("div", {
+						className: "relative",
+						children: [/* @__PURE__ */ jsx("input", {
+							type: showPw2 ? "text" : "password",
+							className: inputBase,
+							value: confirmPassword,
+							onChange: (e) => setConfirmPassword(e.target.value)
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							className: "absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-700",
+							onClick: () => setShowPw2((s) => !s),
+							children: showPw2 ? "Hide" : "Show"
+						})]
+					})]
+				})
+			] }),
+			wizardStep === 2 && /* @__PURE__ */ jsxs("div", { children: [
+				/* @__PURE__ */ jsx("h3", {
+					className: "text-xl font-semibold mb-4",
+					children: "Step 2 — Business details"
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Business name" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: businessName,
+						onChange: (e) => setBusinessName(e.target.value)
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Business address" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: businessAddress,
+						onChange: (e) => setBusinessAddress(e.target.value)
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "CAC (image)" }), /* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-3 flex-wrap",
+						children: [
+							/* @__PURE__ */ jsx("label", {
+								htmlFor: "cacFile",
+								className: "inline-flex items-center justify-center rounded bg-ads360yellow-100 px-3 py-2 cursor-pointer text-sm",
+								children: "Upload CAC"
+							}),
+							/* @__PURE__ */ jsx("input", {
+								id: "cacFile",
+								type: "file",
+								accept: "image/*",
+								className: "hidden",
+								onChange: (e) => {
+									const f = e.target.files?.[0];
+									if (!f) return;
+									setCacFile(f);
+									setCacPreview(URL.createObjectURL(f));
+								}
+							}),
+							cacPreview && /* @__PURE__ */ jsx("img", {
+								alt: "CAC",
+								src: cacPreview,
+								className: "h-14 w-14 rounded object-cover bg-white"
+							})
+						]
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Business website (optional)" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: website,
+						onChange: (e) => setWebsite(e.target.value),
+						placeholder: "https://"
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Business logo (optional)" }), /* @__PURE__ */ jsxs("div", {
+						className: "flex items-center gap-3 flex-wrap",
+						children: [
+							/* @__PURE__ */ jsx("label", {
+								htmlFor: "logoFile",
+								className: "inline-flex items-center justify-center rounded border border-gray-400 px-3 py-2 cursor-pointer text-sm",
+								children: "Upload logo"
+							}),
+							/* @__PURE__ */ jsx("input", {
+								id: "logoFile",
+								type: "file",
+								accept: "image/*",
+								className: "hidden",
+								onChange: (e) => {
+									const f = e.target.files?.[0];
+									if (!f) return;
+									setLogoFile(f);
+									setLogoPreview(URL.createObjectURL(f));
+								}
+							}),
+							logoPreview && /* @__PURE__ */ jsx("img", {
+								alt: "Logo",
+								src: logoPreview,
+								className: "h-14 w-14 rounded object-cover bg-white"
+							})
+						]
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-4",
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center justify-between mb-2",
+							children: [/* @__PURE__ */ jsx("span", {
+								className: "font-medium",
+								children: "Billboard coverage"
+							}), /* @__PURE__ */ jsx("button", {
+								type: "button",
+								className: "text-sm text-ads360yellow-100",
+								onClick: addCoverageRow,
+								children: "+ Add state"
+							})]
+						}),
+						/* @__PURE__ */ jsxs("p", {
+							className: "text-xs text-gray-600 mb-3",
+							children: [
+								"For each state, tap the circle next to an LGA to include it. Output shape:",
+								" ",
+								/* @__PURE__ */ jsx("code", {
+									className: "text-[11px]",
+									children: "[{ state, lga: [] }]"
+								})
+							]
+						}),
+						coverageRows.map((row, idx) => {
+							const stateDef = row.state ? getStateById(row.state) : void 0;
+							return /* @__PURE__ */ jsxs("div", {
+								className: "mb-4 rounded border border-gray-200 p-3 bg-[#fafafa]",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "flex justify-between items-center mb-2",
+										children: [/* @__PURE__ */ jsxs("span", {
+											className: "text-sm font-medium",
+											children: ["State ", idx + 1]
+										}), coverageRows.length > 1 && /* @__PURE__ */ jsx("button", {
+											type: "button",
+											className: "text-xs text-red-600",
+											onClick: () => removeCoverageRow(idx),
+											children: "Remove"
+										})]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "my-2",
+										children: [/* @__PURE__ */ jsx("label", {
+											className: "text-sm",
+											children: "State"
+										}), /* @__PURE__ */ jsxs("select", {
+											className: inputBase,
+											value: row.state,
+											onChange: (e) => setRowState(idx, e.target.value),
+											children: [/* @__PURE__ */ jsx("option", {
+												value: "",
+												children: "Select state"
+											}), NIGERIA_STATES_LGAS.map((s) => /* @__PURE__ */ jsx("option", {
+												value: s.id,
+												children: s.name
+											}, s.id))]
+										})]
+									}),
+									stateDef && /* @__PURE__ */ jsxs("div", {
+										className: "my-2",
+										children: [/* @__PURE__ */ jsx("label", {
+											className: "text-sm block mb-2",
+											children: "LGAs"
+										}), /* @__PURE__ */ jsx("div", {
+											className: "flex flex-col gap-2 max-h-[min(280px,50vh)] overflow-y-auto pr-1",
+											children: stateDef.lgas.map((lga) => {
+												const selected = row.lga.includes(lga);
+												return /* @__PURE__ */ jsxs("button", {
+													type: "button",
+													role: "checkbox",
+													"aria-checked": selected,
+													onClick: () => toggleLga(idx, lga),
+													className: `flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${selected ? "border-ads360yellow-100 bg-ads360yellow-100/15" : "border-gray-200 bg-white hover:bg-gray-50"}`,
+													children: [/* @__PURE__ */ jsx("span", {
+														className: `flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${selected ? "border-ads360yellow-100 bg-ads360yellow-100 text-black" : "border-gray-400 bg-white"}`,
+														"aria-hidden": true,
+														children: selected ? /* @__PURE__ */ jsx("svg", {
+															className: "h-3.5 w-3.5",
+															viewBox: "0 0 12 12",
+															fill: "none",
+															xmlns: "http://www.w3.org/2000/svg",
+															children: /* @__PURE__ */ jsx("path", {
+																d: "M2 6l3 3 5-5",
+																stroke: "currentColor",
+																strokeWidth: "2",
+																strokeLinecap: "round",
+																strokeLinejoin: "round"
+															})
+														}) : null
+													}), /* @__PURE__ */ jsx("span", {
+														className: "flex-1",
+														children: lga
+													})]
+												}, lga);
+											})
+										})]
+									})
+								]
+							}, idx);
+						})
+					]
+				})
+			] }),
+			wizardStep === 3 && /* @__PURE__ */ jsxs("div", { children: [
+				/* @__PURE__ */ jsx("h3", {
+					className: "text-xl font-semibold mb-4",
+					children: "Step 3 — Contact person"
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Contact name" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: contactName,
+						onChange: (e) => setContactName(e.target.value)
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Contact phone" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: contactPhone,
+						onChange: (e) => setContactPhone(e.target.value),
+						placeholder: "+234..."
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Contact email" }), /* @__PURE__ */ jsx("input", {
+						type: "email",
+						className: inputBase,
+						value: contactEmail,
+						onChange: (e) => setContactEmail(e.target.value)
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "my-3",
+					children: [/* @__PURE__ */ jsx("label", { children: "Position / role" }), /* @__PURE__ */ jsx("input", {
+						className: inputBase,
+						value: contactPosition,
+						onChange: (e) => setContactPosition(e.target.value)
+					})]
+				})
+			] }),
+			/* @__PURE__ */ jsxs("div", {
+				className: "flex flex-wrap justify-between gap-3 mt-8",
+				children: [
+					wizardStep > 1 && /* @__PURE__ */ jsx("button", {
+						type: "button",
+						disabled: submitting,
+						className: "rounded border px-4 py-2 text-sm disabled:opacity-50",
+						onClick: () => setWizardStep((s) => s > 1 ? s - 1 : s),
+						children: "Back"
+					}),
+					/* @__PURE__ */ jsx("div", { className: "flex-1" }),
+					wizardStep < 3 ? /* @__PURE__ */ jsx("button", {
+						type: "button",
+						disabled: !canGoNext || submitting,
+						className: "rounded bg-ads360yellow-100 px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed",
+						onClick: () => {
+							if (wizardStep === 1) handleContinueStep1();
+							else if (wizardStep === 2) handleContinueStep2();
+						},
+						children: submitting ? "Saving…" : "Continue"
+					}) : /* @__PURE__ */ jsx(BlackButtons, {
+						text: submitting ? "Submitting…" : "Submit application",
+						isPending: submitting,
+						handleClick: () => void handleSubmitStep3()
+					})
+				]
+			})
+		]
+	});
+}
+var VendorAccessOnboarding = () => {
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [data, setData] = useState(null);
+	const token = useMemo(() => extractToken(), []);
+	const loadOnboarding = useCallback(async () => {
+		if (!token) return;
+		setData(await vendorOnboarding({ inviteToken: token }));
+	}, [token]);
+	useEffect(() => {
+		let alive = true;
+		(async () => {
+			if (!token) {
+				setError("Missing invite token.");
+				setLoading(false);
+				return;
+			}
+			try {
+				await loadOnboarding();
+			} catch (e) {
+				if (!alive) return;
+				setError(errorMessage(e));
+			} finally {
+				if (alive) setLoading(false);
+			}
+		})();
+		return () => {
+			alive = false;
+		};
+	}, [token, loadOnboarding]);
+	const email = data && "email" in data ? data.email : "";
+	const accountType = data && "accountType" in data ? data.accountType : void 0;
+	const backendStep = data && "step" in data ? data.step : null;
+	const savedUser = data && "user" in data && data.user && typeof data.user === "object" && "id" in data.user ? data.user : null;
+	const savedBusiness = data && "business" in data && data.business && typeof data.business === "object" && "id" in data.business ? data.business : null;
+	const rejectionReason = backendStep === "fix" ? savedBusiness?.verificationRejectionReason : void 0;
 	return /* @__PURE__ */ jsxs("section", {
 		className: "min-h-screen bg-ads360-hash",
 		children: [/* @__PURE__ */ jsx("div", {
 			className: "p-10",
 			children: /* @__PURE__ */ jsx(BlackLogo, {})
 		}), /* @__PURE__ */ jsxs("div", {
-			className: "mx-auto w-11/12 md:w-6/12 py-12",
+			className: "mx-auto w-11/12 md:w-7/12 lg:w-6/12 py-12",
 			children: [
 				/* @__PURE__ */ jsx("h2", {
 					className: "text-center text-4xl",
-					children: "Apply as a vendor"
+					children: "Vendor onboarding"
 				}),
 				/* @__PURE__ */ jsx("p", {
 					className: "text-center text-ads360yellow-100 font-light my-3",
-					children: "Please complete to create your account."
+					children: "Validating your invite link…"
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "",
-					children: [/* @__PURE__ */ jsxs("form", { children: [
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
-							className: "lg:basis-1/2 lg:pr-2",
+					className: "border border-ads360yellow-100 bg-white rounded-10 my-5 p-4 md:p-6",
+					children: [
+						loading && /* @__PURE__ */ jsx("p", {
+							className: "text-center",
+							children: "Validating token..."
+						}),
+						!loading && error && /* @__PURE__ */ jsxs("div", {
+							className: "text-center",
 							children: [
-								/* @__PURE__ */ jsx("label", {
-									htmlFor: "firstname",
-									children: "Name"
+								/* @__PURE__ */ jsx("p", {
+									className: "text-red-600 font-medium",
+									children: error
 								}),
-								/* @__PURE__ */ jsx("br", {}),
-								/* @__PURE__ */ jsx("input", {
-									type: "text",
-									id: "firstname",
-									className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
+								/* @__PURE__ */ jsx("p", {
+									className: "text-sm text-gray-600 mt-2",
+									children: "If you believe this is a mistake, request a new invite link."
+								}),
+								/* @__PURE__ */ jsx("div", {
+									className: "mt-5",
+									children: /* @__PURE__ */ jsx(Link, {
+										to: "/signin",
+										className: "text-ads360yellow-100",
+										children: "Go to sign in"
+									})
 								})
 							]
-						}), /* @__PURE__ */ jsxs("div", {
-							className: "my-3",
+						}),
+						!loading && !error && data && "status" in data && /* @__PURE__ */ jsxs("div", {
+							className: "text-center",
 							children: [
-								/* @__PURE__ */ jsx("label", {
-									htmlFor: "email",
-									children: "Email"
+								/* @__PURE__ */ jsx("h3", {
+									className: "text-xl font-semibold",
+									children: "Application submitted"
 								}),
-								/* @__PURE__ */ jsx("br", {}),
-								/* @__PURE__ */ jsx("input", {
-									type: "text",
-									id: "email",
-									className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
-								})
-							]
-						})] }),
-						/* @__PURE__ */ jsxs("div", { children: [
-							/* @__PURE__ */ jsxs("div", {
-								className: "lg:flex my-3",
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "basis-1/2 my-3 lg:my-0 lg:pr-2",
+								/* @__PURE__ */ jsx("p", {
+									className: "text-sm text-gray-700 mt-2",
+									children: "We already received your onboarding details."
+								}),
+								/* @__PURE__ */ jsxs("p", {
+									className: "text-sm text-gray-600 mt-2",
 									children: [
-										/* @__PURE__ */ jsx("label", {
-											htmlFor: "password",
-											children: "Password"
-										}),
-										/* @__PURE__ */ jsx("br", {}),
-										/* @__PURE__ */ jsx("input", {
-											type: "password",
-											id: "password",
-											className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
+										"Status:",
+										" ",
+										/* @__PURE__ */ jsx("span", {
+											className: "font-medium",
+											children: data.businessStatus ?? "pending"
 										})
 									]
-								}), /* @__PURE__ */ jsxs("div", {
-									className: "basis-1/2 my-3 lg:my-0 lg:pl-2",
+								})
+							]
+						}),
+						!loading && !error && data && "step" in data && /* @__PURE__ */ jsxs("div", { children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "rounded bg-ads360-hash p-3 text-sm text-gray-700 mb-2",
+								children: [/* @__PURE__ */ jsxs("div", { children: ["Invite email: ", /* @__PURE__ */ jsx("span", {
+									className: "font-medium",
+									children: email
+								})] }), /* @__PURE__ */ jsxs("div", {
+									className: "mt-1",
 									children: [
-										/* @__PURE__ */ jsx("label", {
-											htmlFor: "confirmPassword",
-											children: "Confirm Password"
-										}),
-										/* @__PURE__ */ jsx("br", {}),
-										/* @__PURE__ */ jsx("input", {
-											type: "password",
-											id: "confirmPassword",
-											className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
+										"Vendor type:",
+										" ",
+										/* @__PURE__ */ jsx("span", {
+											className: "font-medium",
+											children: accountType ?? "—"
 										})
 									]
 								})]
 							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "my-3",
+							backendStep && token && isBillboardVendor(accountType) && (backendStep === "account" || backendStep === "business" || backendStep === "contact" || backendStep === "fix") && /* @__PURE__ */ jsxs("div", { children: [(backendStep === "business" || backendStep === "fix") && /* @__PURE__ */ jsx("div", {
+								className: "rounded bg-amber-50 border border-amber-200 p-3 text-sm text-gray-800 mb-4",
+								children: backendStep === "fix" ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+									className: "font-medium text-amber-900",
+									children: "Your application needs updates before we can approve it."
+								}), rejectionReason ? /* @__PURE__ */ jsxs("p", {
+									className: "mt-2 text-gray-800",
+									children: [/* @__PURE__ */ jsx("span", {
+										className: "font-medium",
+										children: "Reason: "
+									}), rejectionReason]
+								}) : /* @__PURE__ */ jsx("p", {
+									className: "mt-2 text-gray-700",
+									children: "Update your details below and resubmit."
+								})] }) : "Complete your business and contact information."
+							}), /* @__PURE__ */ jsx(BillboardOnboardingWizard, {
+								inviteToken: token,
+								backendStep,
+								inviteEmail: email,
+								savedUser,
+								savedBusiness,
+								onAfterSave: loadOnboarding
+							})] }),
+							backendStep && accountType && !isBillboardVendor(accountType) && /* @__PURE__ */ jsxs("p", {
+								className: "text-center text-gray-700 mt-6",
 								children: [
-									/* @__PURE__ */ jsx("label", {
-										htmlFor: "email",
-										children: "Phone Number"
-									}),
-									/* @__PURE__ */ jsx("br", {}),
-									/* @__PURE__ */ jsx("input", {
-										type: "text",
-										className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
-									})
-								]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "my-3",
-								children: [
-									/* @__PURE__ */ jsx("label", {
-										htmlFor: "phoneNumber",
-										children: "Vendor type"
-									}),
-									/* @__PURE__ */ jsx("br", {}),
-									/* @__PURE__ */ jsxs("select", {
-										className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]",
-										children: [
-											/* @__PURE__ */ jsx("option", { children: "select" }),
-											/* @__PURE__ */ jsx("option", { children: "Billboard" }),
-											/* @__PURE__ */ jsx("option", { children: "Influencer" })
-										]
-									})
+									"Onboarding for this vendor type (",
+									String(accountType),
+									") is not available yet."
 								]
 							})
-						] }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "text-center my-5",
-							children: [/* @__PURE__ */ jsx("input", {
-								type: "checkbox",
-								value: "I agree with terms and conditions"
-							}), /* @__PURE__ */ jsxs("span", { children: [" I agree with ", /* @__PURE__ */ jsx(Link, {
-								to: "",
-								className: "text-ads360yellow-100",
-								children: "terms and conditions"
-							})] })]
-						}),
-						/* @__PURE__ */ jsx("div", {
-							className: "flex justify-center my-5",
-							children: /* @__PURE__ */ jsx(BlackButtons, { text: "Register" })
-						})
-					] }), /* @__PURE__ */ jsxs("p", {
-						className: "text-center my-5",
-						children: ["Already have an account? ", /* @__PURE__ */ jsx(Link, {
-							to: "/vendors/login",
-							className: "text-ads360yellow-100",
-							children: " Sign In"
-						})]
-					})]
+						] })
+					]
 				})
 			]
 		})]
 	});
 };
-var Route$13 = createFileRoute("/_access/vendors-acess/onboarding/")({ component: VendorsOnboarding });
-//#endregion
-//#region app/_access/vendors-acess/login/index.tsx
-var VendorsLogin = () => {
-	return /* @__PURE__ */ jsxs("section", {
-		className: "min-h-screen bg-ads360-hash",
-		children: [/* @__PURE__ */ jsx("div", {
-			className: "p-10",
-			children: /* @__PURE__ */ jsx(BlackLogo, {})
-		}), /* @__PURE__ */ jsxs("div", {
-			className: "mx-auto w-11/12 md:w-6/12 lg:w-5/12 py-12",
-			children: [
-				/* @__PURE__ */ jsx("h2", {
-					className: "text-center text-4xl",
-					children: "Welcome back"
-				}),
-				/* @__PURE__ */ jsx("p", {
-					className: "text-center text-ads360yellow-100 font-light my-3",
-					children: "Lets get right to it! Log into your account."
-				}),
-				/* @__PURE__ */ jsxs("div", {
-					className: "",
-					children: [/* @__PURE__ */ jsxs("form", { children: [
-						/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", {
-							className: "my-3",
-							children: [
-								/* @__PURE__ */ jsx("label", {
-									htmlFor: "email",
-									children: "Email"
-								}),
-								/* @__PURE__ */ jsx("br", {}),
-								/* @__PURE__ */ jsx("input", {
-									type: "text",
-									id: "email",
-									className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
-								})
-							]
-						}) }),
-						/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", {
-							className: "my-3",
-							children: [
-								/* @__PURE__ */ jsx("label", {
-									htmlFor: "email",
-									children: "Phone Number"
-								}),
-								/* @__PURE__ */ jsx("br", {}),
-								/* @__PURE__ */ jsx("input", {
-									type: "text",
-									className: "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px]"
-								})
-							]
-						}) }),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex justify-between my-5",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("input", {
-								type: "checkbox",
-								value: "Remember me"
-							}), /* @__PURE__ */ jsx("span", { children: " Remember me " })] }), /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx(Link, {
-								to: "",
-								className: "text-ads360yellow-100",
-								children: "Forget Password"
-							}) })]
-						}),
-						/* @__PURE__ */ jsx("div", {
-							className: "flex justify-center my-5",
-							children: /* @__PURE__ */ jsx(BlackButtons, { text: "Login" })
-						})
-					] }), /* @__PURE__ */ jsxs("p", {
-						className: "text-center my-5",
-						children: ["Dont have an account yet? ", /* @__PURE__ */ jsx(Link, {
-							to: "/vendors/login",
-							className: "text-ads360yellow-100",
-							children: " Sign Up"
-						})]
-					})]
-				})
-			]
-		})]
-	});
-};
-var Route$12 = createFileRoute("/_access/vendors-acess/login/")({ component: VendorsLogin });
+var Route$12 = createFileRoute("/_access/vendor-access/onboarding/")({ component: VendorAccessOnboarding });
 //#endregion
 //#region node_modules/react-icons/ai/index.esm.js
 function AiOutlineDownload(props) {
@@ -12443,42 +13131,51 @@ var Checkout = () => {
 var Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/checkout/")({ component: Checkout });
 //#endregion
 //#region routeTree.gen.ts
-var UsersauthRouteRoute = Route$46.update({
+var UsersauthRouteRoute = Route$48.update({
 	id: "/_usersauth",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var IndexRoute = Route$45.update({
+var AdminRouteRoute = Route$47.update({
+	id: "/_admin",
+	getParentRoute: () => Route$49
+});
+var IndexRoute = Route$46.update({
 	id: "/",
 	path: "/",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var VendorsBillboardsRouteRoute = Route$44.update({
+var VendorsBillboardsRouteRoute = Route$45.update({
 	id: "/vendors/billboards",
 	path: "/vendors/billboards",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var UsersauthUsersRouteRoute = Route$43.update({
+var UsersauthUsersRouteRoute = Route$44.update({
 	id: "/users",
 	path: "/users",
 	getParentRoute: () => UsersauthRouteRoute
 });
-var UsersauthAdsRouteRoute = Route$42.update({
+var UsersauthAdsRouteRoute = Route$43.update({
 	id: "/ads",
 	path: "/ads",
 	getParentRoute: () => UsersauthRouteRoute
 });
-var PublicLightnavbarRouteRoute = Route$41.update({
+var PublicLightnavbarRouteRoute = Route$42.update({
 	id: "/_public/_lightnavbar",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var PublicDarknavbarRouteRoute = Route$40.update({
+var PublicDarknavbarRouteRoute = Route$41.update({
 	id: "/_public/_darknavbar",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
+});
+var AdminAdminRouteRoute = Route$40.update({
+	id: "/admin",
+	path: "/admin",
+	getParentRoute: () => AdminRouteRoute
 });
 var VendorsInfluencersIndexRoute = Route$39.update({
 	id: "/vendors/influencers/",
 	path: "/vendors/influencers/",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
 var VendorsBillboardsIndexRoute = Route$38.update({
 	id: "/",
@@ -12495,125 +13192,125 @@ var UsersauthAdsIndexRoute = Route$36.update({
 	path: "/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var AccessSignupIndexRoute = Route$35.update({
+var AdminAdminIndexRoute = Route$35.update({
+	id: "/",
+	path: "/",
+	getParentRoute: () => AdminAdminRouteRoute
+});
+var AccessSignupIndexRoute = Route$34.update({
 	id: "/_access/signup/",
 	path: "/signup/",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var AccessSigninIndexRoute = Route$34.update({
+var AccessSigninIndexRoute = Route$33.update({
 	id: "/_access/signin/",
 	path: "/signin/",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var AccessEmailVerificationIndexRoute = Route$33.update({
+var AccessEmailVerificationIndexRoute = Route$32.update({
 	id: "/_access/email-verification/",
 	path: "/email-verification/",
-	getParentRoute: () => Route$47
+	getParentRoute: () => Route$49
 });
-var VendorsBillboardsWalletIndexRoute = Route$32.update({
+var VendorsBillboardsWalletIndexRoute = Route$31.update({
 	id: "/wallet/",
 	path: "/wallet/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsSettingsIndexRoute = Route$31.update({
+var VendorsBillboardsSettingsIndexRoute = Route$30.update({
 	id: "/settings/",
 	path: "/settings/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsRequestsIndexRoute = Route$30.update({
+var VendorsBillboardsRequestsIndexRoute = Route$29.update({
 	id: "/requests/",
 	path: "/requests/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsListingIndexRoute = Route$29.update({
+var VendorsBillboardsListingIndexRoute = Route$28.update({
 	id: "/listing/",
 	path: "/listing/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsAddBillboardIndexRoute = Route$28.update({
+var VendorsBillboardsAddBillboardIndexRoute = Route$27.update({
 	id: "/add-billboard/",
 	path: "/add-billboard/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var UsersauthUsersWalletIndexRoute = Route$27.update({
+var UsersauthUsersWalletIndexRoute = Route$26.update({
 	id: "/wallet/",
 	path: "/wallet/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersSettingsIndexRoute = Route$26.update({
+var UsersauthUsersSettingsIndexRoute = Route$25.update({
 	id: "/settings/",
 	path: "/settings/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersCampaignIndexRoute = Route$25.update({
+var UsersauthUsersCampaignIndexRoute = Route$24.update({
 	id: "/campaign/",
 	path: "/campaign/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersAnalysisIndexRoute = Route$24.update({
+var UsersauthUsersAnalysisIndexRoute = Route$23.update({
 	id: "/analysis/",
 	path: "/analysis/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthAdsWhatsappIndexRoute = Route$23.update({
+var UsersauthAdsWhatsappIndexRoute = Route$22.update({
 	id: "/whatsapp/",
 	path: "/whatsapp/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsSmsIndexRoute = Route$22.update({
+var UsersauthAdsSmsIndexRoute = Route$21.update({
 	id: "/sms/",
 	path: "/sms/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsInfluencerIndexRoute = Route$21.update({
+var UsersauthAdsInfluencerIndexRoute = Route$20.update({
 	id: "/influencer/",
 	path: "/influencer/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsDigitalIndexRoute = Route$20.update({
+var UsersauthAdsDigitalIndexRoute = Route$19.update({
 	id: "/digital/",
 	path: "/digital/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsBillboardIndexRoute = Route$19.update({
+var UsersauthAdsBillboardIndexRoute = Route$18.update({
 	id: "/billboard/",
 	path: "/billboard/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsTransaction_idIndexRoute = Route$18.update({
+var UsersauthAdsTransaction_idIndexRoute = Route$17.update({
 	id: "/$transaction_id/",
 	path: "/$transaction_id/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var PublicLightnavbarFaqsIndexRoute = Route$17.update({
+var PublicLightnavbarFaqsIndexRoute = Route$16.update({
 	id: "/faqs/",
 	path: "/faqs/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicLightnavbarContactIndexRoute = Route$16.update({
+var PublicLightnavbarContactIndexRoute = Route$15.update({
 	id: "/contact/",
 	path: "/contact/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicLightnavbarAboutIndexRoute = Route$15.update({
+var PublicLightnavbarAboutIndexRoute = Route$14.update({
 	id: "/about/",
 	path: "/about/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicDarknavbarDiscoveryIndexRoute = Route$14.update({
+var PublicDarknavbarDiscoveryIndexRoute = Route$13.update({
 	id: "/discovery/",
 	path: "/discovery/",
 	getParentRoute: () => PublicDarknavbarRouteRoute
 });
-var AccessVendorsAcessOnboardingIndexRoute = Route$13.update({
-	id: "/_access/vendors-acess/onboarding/",
-	path: "/vendors-acess/onboarding/",
-	getParentRoute: () => Route$47
-});
-var AccessVendorsAcessLoginIndexRoute = Route$12.update({
-	id: "/_access/vendors-acess/login/",
-	path: "/vendors-acess/login/",
-	getParentRoute: () => Route$47
+var AccessVendorAccessOnboardingIndexRoute = Route$12.update({
+	id: "/_access/vendor-access/onboarding/",
+	path: "/vendor-access/onboarding/",
+	getParentRoute: () => Route$49
 });
 var VendorsBillboardsRequestsSlugIndexRoute = Route$11.update({
 	id: "/requests/$slug/",
@@ -12670,6 +13367,14 @@ var UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute = Route$1.update({
 	path: "/influencer/$slug/onboarding/checkout/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
+var UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute = Route.update({
+	id: "/billboard/$slug/onboard/checkout/",
+	path: "/billboard/$slug/onboard/checkout/",
+	getParentRoute: () => UsersauthAdsRouteRoute
+});
+var AdminAdminRouteRouteChildren = { AdminAdminIndexRoute };
+var AdminRouteRouteChildren = { AdminAdminRouteRoute: AdminAdminRouteRoute._addFileChildren(AdminAdminRouteRouteChildren) };
+var AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(AdminRouteRouteChildren);
 var UsersauthAdsRouteRouteChildren = {
 	UsersauthAdsIndexRoute,
 	UsersauthAdsTransaction_idIndexRoute,
@@ -12683,11 +13388,7 @@ var UsersauthAdsRouteRouteChildren = {
 	UsersauthAdsSmsCheckoutIndexRoute,
 	UsersauthAdsBillboardSlugOnboardIndexRoute,
 	UsersauthAdsInfluencerSlugOnboardingIndexRoute,
-	UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute: Route.update({
-		id: "/billboard/$slug/onboard/checkout/",
-		path: "/billboard/$slug/onboard/checkout/",
-		getParentRoute: () => UsersauthAdsRouteRoute
-	}),
+	UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute,
 	UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute
 };
 var UsersauthAdsRouteRouteWithChildren = UsersauthAdsRouteRoute._addFileChildren(UsersauthAdsRouteRouteChildren);
@@ -12726,6 +13427,7 @@ var VendorsBillboardsRouteRouteChildren = {
 };
 var rootRouteChildren = {
 	IndexRoute,
+	AdminRouteRoute: AdminRouteRouteWithChildren,
 	UsersauthRouteRoute: UsersauthRouteRouteWithChildren,
 	PublicDarknavbarRouteRoute: PublicDarknavbarRouteRouteWithChildren,
 	PublicLightnavbarRouteRoute: PublicLightnavbarRouteRouteWithChildren,
@@ -12734,10 +13436,9 @@ var rootRouteChildren = {
 	AccessSigninIndexRoute,
 	AccessSignupIndexRoute,
 	VendorsInfluencersIndexRoute,
-	AccessVendorsAcessLoginIndexRoute,
-	AccessVendorsAcessOnboardingIndexRoute
+	AccessVendorAccessOnboardingIndexRoute
 };
-var routeTree = Route$47._addFileChildren(rootRouteChildren)._addFileTypes();
+var routeTree = Route$49._addFileChildren(rootRouteChildren)._addFileTypes();
 //#endregion
 //#region router.tsx
 function getRouter() {

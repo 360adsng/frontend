@@ -30,7 +30,7 @@ const BillBoardDrawerContent : React.FC<Props> = ({toggleDrawer}) => {
         logoutVendor(undefined, {
             onSettled: () => {
                 toggleDrawer()
-                navigate({ to: '/vendors-acess/login' })
+                navigate({ to: '/signin' })
             }
         })
     }
