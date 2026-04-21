@@ -24,16 +24,16 @@ var tsrStartManifest = () => ({
 					type: "text/css"
 				}
 			}],
-			preloads: ["/assets/index-CnrfLe3h.js", "/assets/countries-CKzeLIC8.js"]
+			preloads: ["/assets/index-CzGblYHY.js", "/assets/countries-DhBMr7_I.js"]
 		},
 		"/_usersauth/users/settings/": {
 			filePath: "C:/Users/user/OneDrive/Desktop/360/360frontend/app/_usersauth/users/settings/index.tsx",
 			children: void 0,
 			assets: void 0,
-			preloads: ["/assets/settings-C76IYWmy.js"]
+			preloads: ["/assets/settings-BN9vFfC9.js"]
 		}
 	},
-	clientEntry: "/assets/index-CnrfLe3h.js"
+	clientEntry: "/assets/index-CzGblYHY.js"
 });
 //#endregion
 export { tsrStartManifest };

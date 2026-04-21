@@ -1,93 +1,76 @@
 "use client"
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 const dash = '/icons/dash.svg'
 import { useState } from 'react'
-import Table from "@components/ui/Table"
+import { useMyBillboardBookings } from '@endpoint/billboard/useBillboard'
+import { BookingsTable } from '@components/ui/BookingsTable'
 
 const Campaign = () => {
   
   const [view, setView] = useState('Billboard')
+  const { data, isLoading, isError } = useMyBillboardBookings()
  
 
   return (
     <>
-    <section className="bg-[#E9E9E9] px-4 md:px-10 pt-14">
-
+    <section className="bg-[#E9E9E9] px-4 md:px-10 py-2">
         <h3 className='text-2xl'>Campaigns</h3>
-
-        
-      
-        <p className="text-stone-400 mb-5 mt-3">
+        <p className="text-stone-400 mt-3">
           Check all ads campaign history
         </p>
-
-        <div className="overflow-x-auto py-1">
-          <div className="w-[600px]  md:w-full flex justify-between md:justify-start md:space-x-3">
-              <button className="relative" onClick={()=>setView('Billboard')}>
-                Billboard
-                {view === 'Billboard' && 
-                  <img alt="Billboard Overview selected"
-                    src={dash}
-                    className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-                  />
-                }
-              </button> 
-
-              <button className="relative" onClick={()=>setView('Influencer')}>
-                Influencer
-                {view === 'Influencer' && 
-                  <img alt="Billboard Overview selected"
-                    src={dash}
-                    className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-
-                  />
-                }
-              </button>
-
-              <button className="relative" onClick={()=>setView('sms')}>
-                Smart sms
-                {view === 'sms' && 
-                  <img alt="Billboard Overview selected"
-                    src={dash}
-                    className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-
-                  />
-                }
-              </button>
-
-
-              <button className="relative" onClick={()=>setView('Whatsapp')}>
-                Whatsapp
-                {view === 'Whatsapp' && 
-                  <img alt="Billboard Overview selected"
-                    src={dash}
-                    className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-
-                  />
-                }
-              </button>
-
-              <button className="relative" onClick={()=>setView('Digital')}>
-                Digital Ads
-                {view === 'Digital' && 
-                  <img alt="Billboard Overview selected"
-                    src={dash}
-                    className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-
-                  />
-                }
-              </button>
-
-          </div>
-
-        </div>
-
-
-      </section>
+    </section>
       <section className='min-h-screen bg-ads360-hash px-4 md:px-10 py-14'>
+
+        
+    <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center">
+              <button className="bg-ads360yellow-100 text-white px-4 py-2 rounded-md">
+                <Link to="/users/campaign/create">Create Campaign</Link>
+              </button>
+            </div>
+
+            <div className="">
+              <select 
+              onChange={(e) => setView(e.target.value)} 
+              className="bg-white text-black border-2 border-ads360yellow-100 px-4 py-2 rounded-md">
+                <option value="Billboard">Billboard</option>
+                <option value="Influencer">Influencer</option>
+                <option value="Whatsapp">Whatsapp</option>
+                <option value="sms">SMS</option>
+                <option value="Digital">Digital</option>
+              </select>
+            </div>
+    </div>
+
+
         {
           view === 'Billboard' &&
-          <Table/>
+          <>
+            <BookingsTable
+              rows={(data ?? []).map((r) => ({
+                id: r.id,
+                listing: r.listingName ?? "-",
+                createdAt: r.createdAt as unknown as string,
+                amount: r.negotiatedAmount ?? r.quotedTotal,
+                status: r.status,
+                paymentStatus: r.paymentStatus ?? "unpaid",
+                actionHref: `/users/campaign/${r.id}`,
+                actionLabel: "View",
+              }))}
+              isLoading={isLoading}
+              isError={isError}
+              emptyText="No campaigns found"
+              statusFilterLabel="Filter by status"
+              statusOptions={[
+                { value: "all", label: "All" },
+                { value: "pending", label: "Pending" },
+                { value: "active", label: "Active" },
+                { value: "rejected", label: "Rejected" },
+                { value: "completed", label: "Completed" },
+              ]}
+              pageSize={10}
+            />
+          </>
         }
         {
           view === 'Influencer' &&

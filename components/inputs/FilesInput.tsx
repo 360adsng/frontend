@@ -15,6 +15,7 @@ const FilesInput = ({ handleChange, warning, accept, previewName }: FileInputPro
                 : previewName}
         </div>
         <button
+          type="button"
           className="p-2 rounded-r-10 bg-ads360gray-100"
           onClick={() => input.current?.click()}
         >

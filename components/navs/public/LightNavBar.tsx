@@ -6,11 +6,15 @@ import Drawer from '@components/modal/Drawer'
 import { useState } from 'react';
 import BlackLogo from '@components/logo/BlackLogo'
 import DrawerContent from './DrawerContent';
+import { hasAccessToken } from "@endpoint/baseFetch";
+
 
 
 
 const LightNavbar = () => {
     const [isOpen, setIsOpen] = useState(false)
+   //check if user is logged in
+   const isLoggedIn = hasAccessToken()
 
     const handleToggleDrawer = () => {
         if(isOpen){
@@ -49,9 +53,16 @@ const LightNavbar = () => {
 
                 </ul>
                 <div className="hidden md:block text-center">
-                    <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
-                        <Link to="/signup">Get Stated</Link>
-                    </button>
+                    {isLoggedIn ? (
+                        <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
+                            <Link to="/users">Dashboard</Link>
+                        </button>
+                    ) : (
+                        <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
+                            <Link to="/signup">Get Stated</Link>
+                        </button>
+                    )}
+                    
                 </div>
                 <div className="md:hidden" onClick={handleToggleDrawer}>
                     <img 

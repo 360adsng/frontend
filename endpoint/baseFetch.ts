@@ -1,4 +1,5 @@
 /**
+ * 
  * HTTP client for 360backend (Nest). Set `VITE_API_BASE_URL` in `.env` (e.g. http://localhost:3000).
  */
 
@@ -8,6 +9,12 @@ const DEFAULT_BASE_URL = "https://backend-934c.onrender.com";
 export const ACCESS_TOKEN_STORAGE_KEY = "access_token";
 export const REFRESH_TOKEN_STORAGE_KEY = "refresh_token";
 export const ACCOUNT_TYPE_STORAGE_KEY = "account_type";
+
+export function hasAccessToken(): boolean {
+  if (typeof window === "undefined") return false;
+  const t = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+  return typeof t === "string" && t.trim().length > 0;
+}
 
 export type AuthTokensPayload = {
   accessToken: string;
@@ -219,12 +226,17 @@ async function refreshSessionTokens(): Promise<boolean> {
         return false;
       }
 
-      const data = (await res.json()) as Partial<AuthTokensPayload>;
+      const data = (await res.json()) as Partial<AuthTokensPayload> & {
+        accountType?: string;
+      };
       if (data.accessToken && data.refreshToken) {
         saveAuthTokens({
           accessToken: data.accessToken,
           refreshToken: data.refreshToken,
         });
+        if (typeof data.accountType === "string" && data.accountType.length > 0) {
+          saveAccountType(data.accountType);
+        }
         return true;
       }
 

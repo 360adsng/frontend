@@ -9,19 +9,15 @@ const wallet = '/icons/usericon/whitewallet.svg'
 const onwallet = '/icons/usericon/onwallet.svg'
 const analysis = '/icons/usericon/whiteanalysis.svg'
 const onanalysis = '/icons/usericon/onanalysis.svg'
-const logout = '/icons/usericon/whitelogout.svg'
-const onlogout = '/icons/usericon/onlogout.svg'
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
-import { useState } from 'react'
-import { useLogout } from "@endpoint/auth/useAuth"
-
+const negotiations = '/icons/usericon/offnegotiation.svg'
+const onnegotiations = '/icons/usericon/onnegotiation.svg'
+import { Link, useRouterState } from "@tanstack/react-router"
 // import cluster from '@public/icons/usericon/whitecluster.svg'
 
 
 function UserSideNav() {
     const pathname = useRouterState({ select: (s) => s.location.pathname })
-    const navigate = useNavigate()
-    const { mutate: logoutUser, isPending: isLoggingOut } = useLogout()
+
 
     const navItem1 = [
         {
@@ -45,6 +41,13 @@ function UserSideNav() {
             on:onwallet
 
         },
+        {
+            link:'/users/negotiations',
+            name:'Negotiations',
+            off:negotiations,
+            on:onnegotiations
+
+        },
         // {
         //     link:'/users/analysis',
         //     name:'Analysis',
@@ -64,13 +67,6 @@ function UserSideNav() {
         }
     ]
 
-    const handleLogout = () =>{
-        logoutUser(undefined, {
-            onSettled: () => {
-                navigate({ to: '/signin' })
-            }
-        })
-    }
 
   return (
     <aside className="group bg-[#292728] w-[5.7%] pt-5 hover:w-[18.5%] xl:hover:w-[14.5%] transistion duration-300 fixed overflow-hidden h-full text-white">
@@ -140,29 +136,6 @@ function UserSideNav() {
                     </li>
                 ))
             }
-
-                    <li>
-                        {isLoggingOut ?
-
-                        <button type='button' onClick={handleLogout} className='border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
-                            <img src={onlogout}
-                                alt='logout'
-                            />
-                            <span className='hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
-                                Logging out...
-                            </span>
-                        </button>
-                        :
-                        <button type='button' onClick={handleLogout} className='py-2 px-4 flex'>
-                            <img src={logout}
-                                alt='logout'
-                            />
-                            <span className='hidden group-hover:block px-2 xl:px-4 hover:font-bold'>
-                                Logout
-                            </span>
-                        </button>
-                        }
-                    </li>
         </ul>
     </aside>
   )

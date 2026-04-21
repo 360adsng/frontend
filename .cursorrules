@@ -5,3 +5,11 @@
 - do not change a code unless ask to
 - take security serious
 - the backend of this project is 360backend, check it if you need reference
+- ensure you follow my pattern, page structure, folders and files.
+
+CODE STYLE RULES:
+- Prefer simple functions over abstractions
+- No design patterns unless necessary
+- No extra layers unless solving real duplication
+- Optimize for readability over extensibility
+- Keep logic close to where it is used

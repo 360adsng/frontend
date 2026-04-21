@@ -1,85 +1,8 @@
-import { i as baseFetchJson, r as ApiError, t as COUNTRIES } from "./countries-BRaUtBtJ.js";
+import { a as useUploadProfilePhoto, i as useUpdateProfile, n as useChangePassword, r as useMe, t as COUNTRIES } from "./countries-BHYilOdD.js";
 import { useEffect, useMemo, useState } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-//#region endpoint/users/users.ts
-function getMe() {
-	return baseFetchJson("/users/me", { method: "GET" });
-}
-function updateProfile(payload) {
-	return baseFetchJson("/users/profile", {
-		method: "PATCH",
-		body: payload
-	});
-}
-function changePassword(payload) {
-	return baseFetchJson("/users/password", {
-		method: "PATCH",
-		body: payload
-	});
-}
-async function uploadProfilePhoto(file) {
-	const form = new FormData();
-	form.append("file", file);
-	return baseFetchJson("/users/profile/photo", {
-		method: "POST",
-		body: form
-	});
-}
-//#endregion
-//#region endpoint/users/useUsers.ts
-function errorMessage(error) {
-	if (error instanceof ApiError) return error.message;
-	if (error instanceof Error) return error.message;
-	return "Something went wrong. Please try again.";
-}
-function useMe() {
-	return useQuery({
-		queryKey: ["me"],
-		queryFn: getMe
-	});
-}
-function useUpdateProfile() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: updateProfile,
-		onSuccess: async (data) => {
-			toast.success(data?.message ?? "Profile updated.");
-			await qc.invalidateQueries({ queryKey: ["me"] });
-		},
-		onError: (error) => {
-			toast.error(errorMessage(error));
-		}
-	});
-}
-function useChangePassword() {
-	return useMutation({
-		mutationFn: changePassword,
-		onSuccess: (data) => {
-			toast.success(data?.message ?? "Password changed.");
-		},
-		onError: (error) => {
-			toast.error(errorMessage(error));
-		}
-	});
-}
-function useUploadProfilePhoto() {
-	const qc = useQueryClient();
-	return useMutation({
-		mutationFn: uploadProfilePhoto,
-		onSuccess: async (data) => {
-			toast.success(data?.message ?? "Photo uploaded.");
-			await qc.invalidateQueries({ queryKey: ["me"] });
-		},
-		onError: (error) => {
-			toast.error(errorMessage(error));
-		}
-	});
-}
-//#endregion
 //#region app/_usersauth/users/settings/index.tsx?tsr-split=component
 var dash = "/icons/dash.svg";
 var avatarFallback = "/icons/user.png";

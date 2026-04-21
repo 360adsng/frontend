@@ -13,13 +13,16 @@ import Drawer from "@components/modal/Drawer";
 import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useLogout } from "@endpoint/auth/useAuth";
+import { useMe } from "@endpoint/users/useUsers";
 
 const BillBoardNav = () => {
   const [dropDown, setDropDown] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const navigate = useNavigate();
   const { mutate: logoutVendor, isPending: isLoggingOut } = useLogout();
+  const me = useMe();
   const pathname = useRouterState({
     select: (s) => s.location.pathname,
   });
@@ -58,16 +61,65 @@ const BillBoardNav = () => {
               </span>
               <img src={bell} alt="bell" />
             </li>
-            <li>
-              <Link to='/vendors/billboards/settings'>
-              <img
-                className="border-4 rounded-[50%]"
-                width={45}
-                height={45}
-                src={avatar}
-                alt="avatar"
-              />
-              </Link>
+            <li className="relative">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((p) => !p)}
+              >
+                <img
+                  className="border-4 rounded-[50%]"
+                  width={45}
+                  height={45}
+                  src={avatar}
+                  alt="avatar"
+                />
+              </button>
+              {profileOpen && (
+                <div className="absolute right-0 top-12 bg-ads360light-100 z-[100000] w-[220px] rounded-10 p-3 shadow">
+                  <div className="px-2 py-2 border-b text-sm">
+                    <div className="font-bold">
+                      {me.data?.accountType === "billboard_owner"
+                        ? me.data.businessName ?? `${me.data.firstName} ${me.data.lastName}`.trim()
+                        : me.data?.accountType === "business_user"
+                          ? me.data.businessName
+                          : me.data?.accountType === "regular_user"
+                            ? `${me.data.firstName} ${me.data.lastName}`.trim()
+                            : "Account"}
+                    </div>
+                    <div className="text-stone-500 text-xs">{me.data?.email ?? ""}</div>
+                  </div>
+
+                  <Link
+                    to="/vendors/billboards/settings"
+                    className="flex items-center justify-center my-3 w-full hover:opacity-90"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <span className="px-3">Profile</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    disabled={isLoggingOut}
+                    className={`flex items-center justify-center my-3 w-full ${
+                      isLoggingOut ? "opacity-70 cursor-not-allowed" : "cursor-pointer"
+                    }`}
+                    onClick={() => {
+                      if (isLoggingOut) return;
+                      logoutVendor(undefined, {
+                        onSettled: () => {
+                          setProfileOpen(false);
+                          navigate({ to: "/signin" });
+                        },
+                      });
+                    }}
+                  >
+                    <img src={logout} alt="logout" />
+                    <span className="px-3">
+                      {isLoggingOut ? "Logging out..." : "Logout"}
+                    </span>
+                  </button>
+                </div>
+              )}
             </li>
           </ul>
         </div>

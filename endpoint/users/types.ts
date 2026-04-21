@@ -47,3 +47,14 @@ export type ChangePasswordPayload = {
 };
 
 export type SimpleMessageResponse = { message: string };
+
+export type UserDashboardData = {
+  walletBalance: number;
+  activeBookingsCount: number;
+  whatsAppCluster: number;
+};
+
+export type UserDashboardResponse = {
+  message: string;
+  data: UserDashboardData;
+};

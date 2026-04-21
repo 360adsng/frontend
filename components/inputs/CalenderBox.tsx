@@ -9,14 +9,17 @@ const CalenderBox = ({addDate, selectedDate, removeDate}:CalenderBoxProps) => {
         new Date()
       );
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
   return (
     <div className="flex w-full">
     <Calendar
       onChange={(value) => {
-        onChange;
+        onChange(value);
         addDate(value);
       }}
+      minDate={today}
       className={`shadow-lg rounded-l-10 basis-[67%] md:basis-[70%]`}
       value={value}
     />

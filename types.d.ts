@@ -41,7 +41,7 @@ declare type CalenderBoxProps={
 
 declare type PreviewProps = {
     previewImage:Preview, 
-    previewVideo:Preview,
+    previewVideo?:Preview,
     attachmentType:string, 
     platform:string[],
     needPlatform:boolean
@@ -49,6 +49,8 @@ declare type PreviewProps = {
     writeup:string, 
     plan:string, 
     selectedDate:valuePiece[]
+    durationText?: string
+    externalVideoUrl?: string
 }
 
 declare type Duration = {

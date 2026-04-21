@@ -4,10 +4,17 @@ import type {
   MeResponse,
   SimpleMessageResponse,
   UpdateProfilePayload,
+  UserDashboardResponse,
 } from "./types";
 
 export function getMe(): Promise<MeResponse> {
   return baseFetchJson<MeResponse>("/users/me", { method: "GET" });
+}
+
+export function getUserDashboard(): Promise<UserDashboardResponse> {
+  return baseFetchJson<UserDashboardResponse>("/users/dashboard", {
+    method: "GET",
+  });
 }
 
 export function updateProfile(

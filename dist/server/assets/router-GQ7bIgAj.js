@@ -1,10 +1,10 @@
-import { a as clearAuthTokens, c as saveAuthTokens, i as baseFetchJson, n as ACCESS_TOKEN_STORAGE_KEY, o as getAccountType, r as ApiError, s as saveAccountType, t as COUNTRIES$1 } from "./countries-BRaUtBtJ.js";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { HeadContent, Link, Outlet, Scripts, createFileRoute, createRootRoute, createRouter, lazyRouteComponent, redirect, useNavigate, useParams, useRouter, useRouterState } from "@tanstack/react-router";
+import { c as baseFetchJson, d as hasAccessToken$1, f as saveAccountType, l as clearAuthTokens, o as ACCESS_TOKEN_STORAGE_KEY, p as saveAuthTokens, r as useMe, s as ApiError, t as COUNTRIES$1, u as getAccountType } from "./countries-BHYilOdD.js";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { HeadContent, Link, Outlet, Scripts, createFileRoute, createRootRoute, createRouter, lazyRouteComponent, redirect, useNavigate, useParams, useRouter, useRouterState, useSearch } from "@tanstack/react-router";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import { z } from "zod";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
-import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Toaster, toast } from "sonner";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper";
@@ -16,7 +16,7 @@ import Calendar from "react-calendar";
 var styles_default = "/assets/styles-DDCWxn3B.css";
 //#endregion
 //#region styles/global.css?url
-var global_default = "/assets/global-0WjPVnrE.css";
+var global_default = "/assets/global-DT2UeY7D.css";
 //#endregion
 //#region node_modules/react-icons/lib/esm/iconContext.js
 var DefaultContext = {
@@ -188,7 +188,7 @@ function NotFoundPage() {
 }
 //#endregion
 //#region app/__root.tsx
-var Route$49 = createRootRoute({
+var Route$54 = createRootRoute({
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -275,7 +275,7 @@ var MODE_ALLOWED = {
 function DashboardGate({ mode, children }) {
 	const router = useRouter();
 	const [allowed, setAllowed] = useState(false);
-	useLayoutEffect(() => {
+	useEffect(() => {
 		const expected = MODE_ALLOWED[mode];
 		if (!hasAccessToken()) {
 			router.navigate({
@@ -320,7 +320,7 @@ var Layout$6 = () => {
 		children: /* @__PURE__ */ jsx(Outlet, {})
 	});
 };
-var Route$48 = createFileRoute("/_usersauth")({
+var Route$53 = createFileRoute("/_usersauth")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (!hasAccessToken()) throw redirect({ to: "/signin" });
@@ -336,7 +336,7 @@ var Layout$5 = () => /* @__PURE__ */ jsx(DashboardGate, {
 	mode: "admin",
 	children: /* @__PURE__ */ jsx(Outlet, {})
 });
-var Route$47 = createFileRoute("/_admin")({
+var Route$52 = createFileRoute("/_admin")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (!hasAccessToken()) throw redirect({ to: "/signin" });
@@ -1034,6 +1034,7 @@ var DrawerContent = ({ toggleDrawer }) => {
 var MobileMenu$1 = "/icons/menu.svg";
 var LightNavbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const isLoggedIn = hasAccessToken$1();
 	const handleToggleDrawer = () => {
 		if (isOpen) setIsOpen(false);
 		else setIsOpen(true);
@@ -1084,7 +1085,13 @@ var LightNavbar = () => {
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "hidden md:block text-center",
-				children: /* @__PURE__ */ jsx("button", {
+				children: isLoggedIn ? /* @__PURE__ */ jsx("button", {
+					className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12",
+					children: /* @__PURE__ */ jsx(Link, {
+						to: "/users",
+						children: "Dashboard"
+					})
+				}) : /* @__PURE__ */ jsx("button", {
 					className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12",
 					children: /* @__PURE__ */ jsx(Link, {
 						to: "/signup",
@@ -1572,88 +1579,7 @@ function Home() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$46 = createFileRoute("/")({ component: Home });
-//#endregion
-//#region endpoint/auth/auth.ts
-/** POST /auth/register — public; does not attach session or run refresh on 401. */
-async function register(payload) {
-	return baseFetchJson("/auth/register", {
-		method: "POST",
-		body: payload
-	}, { skipAuthRefresh: true });
-}
-/** POST /auth/login — public; returns { id, accessToken, refreshToken }. */
-async function login(payload) {
-	return baseFetchJson("/auth/login", {
-		method: "POST",
-		body: payload
-	}, { skipAuthRefresh: true });
-}
-/** POST /auth/sign-out — clears refresh token on backend (requires access token). */
-async function logout$6() {
-	await baseFetchJson("/auth/sign-out", { method: "POST" });
-}
-/** POST /auth/vendor-onboarding — public; validates invite token and returns onboarding step. */
-async function vendorOnboarding(payload) {
-	return baseFetchJson("/auth/vendor-onboarding", {
-		method: "POST",
-		body: payload
-	}, { skipAuthRefresh: true });
-}
-/** POST /auth/billboard-owner-signup — public; progressive billboard onboarding. */
-async function billboardOwnerSignup(payload) {
-	return baseFetchJson("/auth/billboard-owner-signup", {
-		method: "POST",
-		body: payload
-	}, { skipAuthRefresh: true });
-}
-//#endregion
-//#region endpoint/auth/useAuth.ts
-function errorMessage$1(error) {
-	if (error instanceof ApiError) return error.message;
-	if (error instanceof Error) return error.message;
-	return "Something went wrong. Please try again.";
-}
-function useRegister() {
-	return useMutation({
-		mutationFn: register,
-		onSuccess: () => {
-			toast.success("Account created successfully.");
-		},
-		onError: (error) => {
-			toast.error(errorMessage$1(error));
-		}
-	});
-}
-function useLogin() {
-	return useMutation({
-		mutationFn: login,
-		onSuccess: (data) => {
-			saveAuthTokens({
-				accessToken: data.accessToken,
-				refreshToken: data.refreshToken
-			});
-			saveAccountType(data.accountType);
-			toast.success("Logged in successfully.");
-		},
-		onError: (error) => {
-			toast.error(errorMessage$1(error));
-		}
-	});
-}
-function useLogout() {
-	return useMutation({
-		mutationFn: logout$6,
-		onSuccess: () => {
-			clearAuthTokens();
-			toast.success("Logged out.");
-		},
-		onError: (error) => {
-			clearAuthTokens();
-			toast.error(errorMessage$1(error));
-		}
-	});
-}
+var Route$51 = createFileRoute("/")({ component: Home });
 //#endregion
 //#region components/navs/Vendors/billboard/BillBoardSideNav.tsx
 var ads360white$1 = "/logo/360white.svg";
@@ -1663,18 +1589,16 @@ var dashboard$3 = "/icons/usericon/whitedashboard.svg";
 var ondashboard$3 = "/icons/usericon/ondashboard.svg";
 var campaign$3 = "/icons/usericon/whitecampaign.svg";
 var oncampaign$3 = "/icons/usericon/oncampaign.svg";
+var negotiations$3 = "/icons/usericon/offnegotiation.svg";
+var onnegotiations$3 = "/icons/usericon/onnegotiation.svg";
 var add$1 = "/icons/usericon/add.svg";
 var list$1 = "/icons/usericon/list.svg";
 var onlist$1 = "/icons/usericon/yellowlist.svg";
 var onAdd$1 = "/icons/usericon/addyellow.svg";
 var wallet$5 = "/icons/usericon/whitewallet.svg";
 var onwallet$3 = "/icons/usericon/onwallet.svg";
-var logout$5 = "/icons/usericon/whitelogout.svg";
-var onlogout$3 = "/icons/usericon/onlogout.svg";
 var BillBoardSideNav = () => {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const navigate = useNavigate();
-	const { mutate: logoutVendor, isPending: isLoggingOut } = useLogout();
 	const navItem1 = [
 		{
 			link: "/vendors/billboards",
@@ -1687,6 +1611,12 @@ var BillBoardSideNav = () => {
 			name: "Requests",
 			off: campaign$3,
 			on: oncampaign$3
+		},
+		{
+			link: "/vendors/billboards/negotiations",
+			name: "Negotiations",
+			off: negotiations$3,
+			on: onnegotiations$3
 		},
 		{
 			link: "/vendors/billboards/listing",
@@ -1713,11 +1643,6 @@ var BillBoardSideNav = () => {
 		off: settings$3,
 		on: onsettings$3
 	}];
-	const handleLogout = () => {
-		logoutVendor(void 0, { onSettled: () => {
-			navigate({ to: "/signin" });
-		} });
-	};
 	return /* @__PURE__ */ jsxs("aside", {
 		className: "group bg-[#292728] w-[5.7%] pt-5 hover:w-[18.5%] xl:hover:w-[14.5%] transistion duration-300 fixed overflow-hidden h-full text-white",
 		children: [
@@ -1755,9 +1680,9 @@ var BillBoardSideNav = () => {
 					})]
 				}) }, i))
 			}),
-			/* @__PURE__ */ jsxs("ul", {
+			/* @__PURE__ */ jsx("ul", {
 				className: "space-y-4 my-14",
-				children: [navItem2.map((items, i) => /* @__PURE__ */ jsx("li", { children: pathname === items.link ? /* @__PURE__ */ jsxs(Link, {
+				children: navItem2.map((items, i) => /* @__PURE__ */ jsx("li", { children: pathname === items.link ? /* @__PURE__ */ jsxs(Link, {
 					to: items.link,
 					className: "border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex",
 					children: [/* @__PURE__ */ jsx("img", {
@@ -1777,30 +1702,7 @@ var BillBoardSideNav = () => {
 						className: "hidden group-hover:block px-2 xl:px-4 hover:font-bold",
 						children: items.name
 					})]
-				}) }, i)), /* @__PURE__ */ jsx("li", {
-					onClick: handleLogout,
-					children: isLoggingOut ? /* @__PURE__ */ jsxs(Link, {
-						to: "#",
-						className: "border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex",
-						children: [/* @__PURE__ */ jsx("img", {
-							src: onlogout$3,
-							alt: "logout"
-						}), /* @__PURE__ */ jsx("span", {
-							className: "hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold",
-							children: "Logging out..."
-						})]
-					}) : /* @__PURE__ */ jsxs(Link, {
-						to: "#",
-						className: "py-2 px-4 flex",
-						children: [/* @__PURE__ */ jsx("img", {
-							src: logout$5,
-							alt: "logout"
-						}), /* @__PURE__ */ jsx("span", {
-							className: "hidden group-hover:block px-2 xl:px-4 hover:font-bold",
-							children: "Logout"
-						})]
-					})
-				})]
+				}) }, i))
 			})
 		]
 	});
@@ -1809,29 +1711,37 @@ var BillBoardSideNav = () => {
 //#region components/modal/Notification.tsx
 var cancel$8 = "/icons/usericon/modalCancelBotton.svg";
 var Notification = ({ isOpen, children, handleNotification }) => {
-	return /* @__PURE__ */ jsx(AnimatePresence, { children: isOpen && /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx(motion.div, {
-		className: "fixed z-[10000000] top-0 w-full bg-black/50 h-full",
-		initial: { right: 0 },
-		animate: {
-			right: 1,
-			transition: {
-				ease: "easeOut",
-				duration: 1
-			}
-		},
-		exit: {
-			right: 0,
-			transition: {
-				ease: "easeIn",
-				duration: .5
-			}
-		},
-		children: /* @__PURE__ */ jsxs("div", {
-			className: "bg-[#F7F8F8] fixed right-0 w-10/12 md:w-6/12 lg:w-4/12 h-full",
+	return /* @__PURE__ */ jsx(AnimatePresence, { children: isOpen && /* @__PURE__ */ jsxs(motion.div, {
+		className: "fixed z-[10000000] inset-0",
+		initial: { opacity: 0 },
+		animate: { opacity: 1 },
+		exit: { opacity: 0 },
+		children: [/* @__PURE__ */ jsx("button", {
+			type: "button",
+			"aria-label": "Close notifications",
+			className: "absolute inset-0 bg-black/50",
+			onClick: handleNotification
+		}), /* @__PURE__ */ jsxs(motion.div, {
+			className: "bg-[#F7F8F8] fixed right-0 top-0 w-10/12 md:w-6/12 lg:w-4/12 h-full",
+			initial: { x: "100%" },
+			animate: {
+				x: 0,
+				transition: {
+					ease: "easeOut",
+					duration: .25
+				}
+			},
+			exit: {
+				x: "100%",
+				transition: {
+					ease: "easeIn",
+					duration: .2
+				}
+			},
 			children: [/* @__PURE__ */ jsxs("div", {
 				className: "bg-ads360black-100 text-ads360light-100 p-5 flex justify-between",
 				children: [/* @__PURE__ */ jsx("p", { children: "Notifications" }), /* @__PURE__ */ jsx("button", {
-					className: "",
+					type: "button",
 					onClick: handleNotification,
 					children: /* @__PURE__ */ jsx("img", {
 						src: cancel$8,
@@ -1840,8 +1750,8 @@ var Notification = ({ isOpen, children, handleNotification }) => {
 					})
 				})]
 			}), children]
-		})
-	}) }) });
+		})]
+	}) });
 };
 //#endregion
 //#region components/navs/Vendors/billboard/BillboardNotification.tsx
@@ -1866,6 +1776,87 @@ var BillboardNotification = () => {
 	}) });
 };
 //#endregion
+//#region endpoint/auth/auth.ts
+/** POST /auth/register — public; does not attach session or run refresh on 401. */
+async function register(payload) {
+	return baseFetchJson("/auth/register", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
+/** POST /auth/login — public; returns { id, accessToken, refreshToken }. */
+async function login(payload) {
+	return baseFetchJson("/auth/login", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
+/** POST /auth/sign-out — clears refresh token on backend (requires access token). */
+async function logout$4() {
+	await baseFetchJson("/auth/sign-out", { method: "POST" });
+}
+/** POST /auth/vendor-onboarding — public; validates invite token and returns onboarding step. */
+async function vendorOnboarding(payload) {
+	return baseFetchJson("/auth/vendor-onboarding", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
+/** POST /auth/billboard-owner-signup — public; progressive billboard onboarding. */
+async function billboardOwnerSignup(payload) {
+	return baseFetchJson("/auth/billboard-owner-signup", {
+		method: "POST",
+		body: payload
+	}, { skipAuthRefresh: true });
+}
+//#endregion
+//#region endpoint/auth/useAuth.ts
+function errorMessage$2(error) {
+	if (error instanceof ApiError) return error.message;
+	if (error instanceof Error) return error.message;
+	return "Something went wrong. Please try again.";
+}
+function useRegister() {
+	return useMutation({
+		mutationFn: register,
+		onSuccess: () => {
+			toast.success("Account created successfully.");
+		},
+		onError: (error) => {
+			toast.error(errorMessage$2(error));
+		}
+	});
+}
+function useLogin() {
+	return useMutation({
+		mutationFn: login,
+		onSuccess: (data) => {
+			saveAuthTokens({
+				accessToken: data.accessToken,
+				refreshToken: data.refreshToken
+			});
+			saveAccountType(data.accountType);
+			toast.success("Logged in successfully.");
+		},
+		onError: (error) => {
+			toast.error(errorMessage$2(error));
+		}
+	});
+}
+function useLogout() {
+	return useMutation({
+		mutationFn: logout$4,
+		onSuccess: () => {
+			clearAuthTokens();
+			toast.success("Logged out.");
+		},
+		onError: (error) => {
+			clearAuthTokens();
+			toast.error(errorMessage$2(error));
+		}
+	});
+}
+//#endregion
 //#region components/navs/Vendors/billboard/BillBoardDrawerContent.tsx
 var settings$2 = "/icons/usericon/whitesettings.svg";
 var onsettings$2 = "/icons/usericon/onsettings.svg";
@@ -1875,12 +1866,14 @@ var campaign$2 = "/icons/usericon/whitecampaign.svg";
 var oncampaign$2 = "/icons/usericon/oncampaign.svg";
 var wallet$4 = "/icons/usericon/whitewallet.svg";
 var onwallet$2 = "/icons/usericon/onwallet.svg";
-var logout$4 = "/icons/usericon/whitelogout.svg";
-var onlogout$2 = "/icons/usericon/onlogout.svg";
+var logout$3 = "/icons/usericon/whitelogout.svg";
+var onlogout$1 = "/icons/usericon/onlogout.svg";
 var add = "/icons/usericon/add.svg";
 var list = "/icons/usericon/list.svg";
 var onlist = "/icons/usericon/yellowlist.svg";
 var onAdd = "/icons/usericon/addyellow.svg";
+var negotiations$2 = "/icons/usericon/whitecampaign.svg";
+var onnegotiations$2 = "/icons/usericon/oncampaign.svg";
 var BillBoardDrawerContent = ({ toggleDrawer }) => {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
@@ -1903,6 +1896,12 @@ var BillBoardDrawerContent = ({ toggleDrawer }) => {
 			name: "Requests",
 			off: campaign$2,
 			on: oncampaign$2
+		},
+		{
+			link: "/vendors/billboards/negotiations",
+			name: "Negotiations",
+			off: negotiations$2,
+			on: onnegotiations$2
 		},
 		{
 			link: "/vendors/billboards/listing",
@@ -1989,7 +1988,7 @@ var BillBoardDrawerContent = ({ toggleDrawer }) => {
 				to: "#",
 				className: "border-l-2 items-center border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex",
 				children: [/* @__PURE__ */ jsx("img", {
-					src: onlogout$2,
+					src: onlogout$1,
 					alt: "logout",
 					className: "w-8 h-8"
 				}), /* @__PURE__ */ jsx("span", {
@@ -2001,7 +2000,7 @@ var BillBoardDrawerContent = ({ toggleDrawer }) => {
 				to: "#",
 				className: "py-2 items-center px-4 flex",
 				children: [/* @__PURE__ */ jsx("img", {
-					src: logout$4,
+					src: logout$3,
 					alt: "logout",
 					className: "w-8 h-8"
 				}), /* @__PURE__ */ jsx("span", {
@@ -2017,13 +2016,15 @@ var BillBoardDrawerContent = ({ toggleDrawer }) => {
 var wallet$3 = "/icons/wallet.svg";
 var bell$1 = "/icons/bell.svg";
 var avatar$2 = "/icons/user.png";
-var logout$3 = "/icons/usericon/onlogout.svg";
+var logout$2 = "/icons/usericon/onlogout.svg";
 var BillBoardNav = () => {
 	const [dropDown, setDropDown] = useState(false);
+	const [profileOpen, setProfileOpen] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const navigate = useNavigate();
 	const { mutate: logoutVendor, isPending: isLoggingOut } = useLogout();
+	const me = useMe();
 	useRouterState({ select: (s) => s.location.pathname });
 	const handleToggleDrawer = () => {
 		if (isDrawerOpen) setIsDrawerOpen(false);
@@ -2057,16 +2058,62 @@ var BillBoardNav = () => {
 							alt: "bell"
 						})]
 					}),
-					/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
-						to: "/vendors/billboards/settings",
-						children: /* @__PURE__ */ jsx("img", {
-							className: "border-4 rounded-[50%]",
-							width: 45,
-							height: 45,
-							src: avatar$2,
-							alt: "avatar"
-						})
-					}) })
+					/* @__PURE__ */ jsxs("li", {
+						className: "relative",
+						children: [/* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => setProfileOpen((p) => !p),
+							children: /* @__PURE__ */ jsx("img", {
+								className: "border-4 rounded-[50%]",
+								width: 45,
+								height: 45,
+								src: avatar$2,
+								alt: "avatar"
+							})
+						}), profileOpen && /* @__PURE__ */ jsxs("div", {
+							className: "absolute right-0 top-12 bg-ads360light-100 z-[100000] w-[220px] rounded-10 p-3 shadow",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "px-2 py-2 border-b text-sm",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "font-bold",
+										children: me.data?.accountType === "billboard_owner" ? me.data.businessName ?? `${me.data.firstName} ${me.data.lastName}`.trim() : me.data?.accountType === "business_user" ? me.data.businessName : me.data?.accountType === "regular_user" ? `${me.data.firstName} ${me.data.lastName}`.trim() : "Account"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "text-stone-500 text-xs",
+										children: me.data?.email ?? ""
+									})]
+								}),
+								/* @__PURE__ */ jsx(Link, {
+									to: "/vendors/billboards/settings",
+									className: "flex items-center justify-center my-3 w-full hover:opacity-90",
+									onClick: () => setProfileOpen(false),
+									children: /* @__PURE__ */ jsx("span", {
+										className: "px-3",
+										children: "Profile"
+									})
+								}),
+								/* @__PURE__ */ jsxs("button", {
+									type: "button",
+									disabled: isLoggingOut,
+									className: `flex items-center justify-center my-3 w-full ${isLoggingOut ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`,
+									onClick: () => {
+										if (isLoggingOut) return;
+										logoutVendor(void 0, { onSettled: () => {
+											setProfileOpen(false);
+											navigate({ to: "/signin" });
+										} });
+									},
+									children: [/* @__PURE__ */ jsx("img", {
+										src: logout$2,
+										alt: "logout"
+									}), /* @__PURE__ */ jsx("span", {
+										className: "px-3",
+										children: isLoggingOut ? "Logging out..." : "Logout"
+									})]
+								})
+							]
+						})]
+					})
 				]
 			}) })]
 		}),
@@ -2151,7 +2198,7 @@ var BillBoardNav = () => {
 									} });
 								},
 								children: [/* @__PURE__ */ jsx("img", {
-									src: logout$3,
+									src: logout$2,
 									alt: "logout"
 								}), /* @__PURE__ */ jsx("span", {
 									className: "px-3",
@@ -2192,7 +2239,7 @@ function Layout$4() {
 		})
 	});
 }
-var Route$45 = createFileRoute("/vendors/billboards")({
+var Route$50 = createFileRoute("/vendors/billboards")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (!hasAccessToken()) throw redirect({ to: "/signin" });
@@ -2213,12 +2260,10 @@ var campaign$1 = "/icons/usericon/whitecampaign.svg";
 var oncampaign$1 = "/icons/usericon/oncampaign.svg";
 var wallet$2 = "/icons/usericon/whitewallet.svg";
 var onwallet$1 = "/icons/usericon/onwallet.svg";
-var logout$2 = "/icons/usericon/whitelogout.svg";
-var onlogout$1 = "/icons/usericon/onlogout.svg";
+var negotiations$1 = "/icons/usericon/offnegotiation.svg";
+var onnegotiations$1 = "/icons/usericon/onnegotiation.svg";
 function UserSideNav() {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
-	const navigate = useNavigate();
-	const { mutate: logoutUser, isPending: isLoggingOut } = useLogout();
 	const navItem1 = [
 		{
 			link: "/users",
@@ -2237,6 +2282,12 @@ function UserSideNav() {
 			name: "Wallet",
 			off: wallet$2,
 			on: onwallet$1
+		},
+		{
+			link: "/users/negotiations",
+			name: "Negotiations",
+			off: negotiations$1,
+			on: onnegotiations$1
 		}
 	];
 	const navItem2 = [{
@@ -2245,11 +2296,6 @@ function UserSideNav() {
 		off: settings$1,
 		on: onsettings$1
 	}];
-	const handleLogout = () => {
-		logoutUser(void 0, { onSettled: () => {
-			navigate({ to: "/signin" });
-		} });
-	};
 	return /* @__PURE__ */ jsxs("aside", {
 		className: "group bg-[#292728] w-[5.7%] pt-5 hover:w-[18.5%] xl:hover:w-[14.5%] transistion duration-300 fixed overflow-hidden h-full text-white",
 		children: [
@@ -2287,9 +2333,9 @@ function UserSideNav() {
 					})]
 				}) }, i))
 			}),
-			/* @__PURE__ */ jsxs("ul", {
+			/* @__PURE__ */ jsx("ul", {
 				className: "space-y-4 my-14",
-				children: [navItem2.map((items, i) => /* @__PURE__ */ jsx("li", { children: pathname === items.link ? /* @__PURE__ */ jsxs(Link, {
+				children: navItem2.map((items, i) => /* @__PURE__ */ jsx("li", { children: pathname === items.link ? /* @__PURE__ */ jsxs(Link, {
 					to: items.link,
 					className: "border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex",
 					children: [/* @__PURE__ */ jsx("img", {
@@ -2309,29 +2355,7 @@ function UserSideNav() {
 						className: "hidden group-hover:block px-2 xl:px-4 hover:font-bold",
 						children: items.name
 					})]
-				}) }, i)), /* @__PURE__ */ jsx("li", { children: isLoggingOut ? /* @__PURE__ */ jsxs("button", {
-					type: "button",
-					onClick: handleLogout,
-					className: "border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex",
-					children: [/* @__PURE__ */ jsx("img", {
-						src: onlogout$1,
-						alt: "logout"
-					}), /* @__PURE__ */ jsx("span", {
-						className: "hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold",
-						children: "Logging out..."
-					})]
-				}) : /* @__PURE__ */ jsxs("button", {
-					type: "button",
-					onClick: handleLogout,
-					className: "py-2 px-4 flex",
-					children: [/* @__PURE__ */ jsx("img", {
-						src: logout$2,
-						alt: "logout"
-					}), /* @__PURE__ */ jsx("span", {
-						className: "hidden group-hover:block px-2 xl:px-4 hover:font-bold",
-						children: "Logout"
-					})]
-				}) })]
+				}) }, i))
 			})
 		]
 	});
@@ -2348,6 +2372,8 @@ var wallet$1 = "/icons/usericon/whitewallet.svg";
 var onwallet = "/icons/usericon/onwallet.svg";
 var logout$1 = "/icons/usericon/whitelogout.svg";
 var onlogout = "/icons/usericon/onlogout.svg";
+var negotiations = "/icons/usericon/offnegotiation.svg";
+var onnegotiations = "/icons/usericon/onnegotiation.svg";
 var UserDrawerContent = ({ toggleDrawer }) => {
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const navigate = useNavigate();
@@ -2376,6 +2402,12 @@ var UserDrawerContent = ({ toggleDrawer }) => {
 			name: "Wallet",
 			off: wallet$1,
 			on: onwallet
+		},
+		{
+			link: "/users/negotiations",
+			name: "Negotiations",
+			off: negotiations,
+			on: onnegotiations
 		}
 	];
 	const navItem2 = [{
@@ -2494,10 +2526,12 @@ var avatar$1 = "/icons/user.png";
 var logout = "/icons/usericon/onlogout.svg";
 function UsersNav() {
 	const [dropDown, setDropDown] = useState(false);
+	const [profileOpen, setProfileOpen] = useState(false);
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 	const navigate = useNavigate();
 	const { mutate: logoutUser, isPending: isLoggingOut } = useLogout();
+	const me = useMe();
 	const pathname = useRouterState({ select: (s) => s.location.pathname });
 	const handleToggleDrawer = () => {
 		if (isDrawerOpen) setIsDrawerOpen(false);
@@ -2534,16 +2568,50 @@ function UsersNav() {
 								alt: "bell"
 							})]
 						}),
-						/* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsx(Link, {
-							to: "/users/settings",
-							children: /* @__PURE__ */ jsx("img", {
-								className: "border-4 rounded-[50%]",
-								width: 45,
-								height: 45,
-								src: avatar$1,
-								alt: "avatar"
-							})
-						}) })
+						/* @__PURE__ */ jsxs("li", {
+							className: "relative",
+							children: [/* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => setProfileOpen((p) => !p),
+								children: /* @__PURE__ */ jsx("img", {
+									className: "border-4 rounded-[50%]",
+									width: 45,
+									height: 45,
+									src: avatar$1,
+									alt: "avatar"
+								})
+							}), profileOpen && /* @__PURE__ */ jsxs("div", {
+								className: "absolute right-0 top-12 bg-ads360light-100 z-[100000] w-[220px] rounded-10 p-3 shadow",
+								children: [/* @__PURE__ */ jsxs("div", {
+									className: "px-2 py-2 border-b text-sm",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "font-bold",
+										children: me.data?.accountType === "business_user" ? me.data.businessName : me.data?.accountType === "regular_user" ? `${me.data.firstName} ${me.data.lastName}`.trim() : "Account"
+									}), /* @__PURE__ */ jsx("div", {
+										className: "text-stone-500 text-xs",
+										children: me.data?.email ?? ""
+									})]
+								}), /* @__PURE__ */ jsxs("button", {
+									type: "button",
+									disabled: isLoggingOut,
+									className: `flex items-center justify-center my-3 w-full ${isLoggingOut ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`,
+									onClick: () => {
+										if (isLoggingOut) return;
+										logoutUser(void 0, { onSettled: () => {
+											setProfileOpen(false);
+											navigate({ to: "/signin" });
+										} });
+									},
+									children: [/* @__PURE__ */ jsx("img", {
+										src: logout,
+										alt: "logout"
+									}), /* @__PURE__ */ jsx("span", {
+										className: "px-3",
+										children: isLoggingOut ? "Logging out..." : "Logout"
+									})]
+								})]
+							})]
+						})
 					]
 				}) })
 			]
@@ -2667,7 +2735,7 @@ function Layout$3() {
 		})]
 	}) });
 }
-var Route$44 = createFileRoute("/_usersauth/users")({ component: Layout$3 });
+var Route$49 = createFileRoute("/_usersauth/users")({ component: Layout$3 });
 //#endregion
 //#region app/_usersauth/ads/route.tsx
 function Layout$2() {
@@ -2679,7 +2747,7 @@ function Layout$2() {
 		children: /* @__PURE__ */ jsx(Outlet, {})
 	})] });
 }
-var Route$43 = createFileRoute("/_usersauth/ads")({ component: Layout$2 });
+var Route$48 = createFileRoute("/_usersauth/ads")({ component: Layout$2 });
 //#endregion
 //#region app/_public/_lightnavbar/route.tsx
 function Layout$1() {
@@ -2689,12 +2757,13 @@ function Layout$1() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$42 = createFileRoute("/_public/_lightnavbar")({ component: Layout$1 });
+var Route$47 = createFileRoute("/_public/_lightnavbar")({ component: Layout$1 });
 //#endregion
 //#region components/navs/public/DarkNavbar.tsx
 var MobileMenu = "/icons/menu.svg";
 var DarkNavbar = () => {
 	const [isOpen, setIsOpen] = useState(false);
+	const isLoggedIn = hasAccessToken$1();
 	const handleToggleDrawer = () => {
 		if (isOpen) setIsOpen(false);
 		else setIsOpen(true);
@@ -2743,14 +2812,17 @@ var DarkNavbar = () => {
 					})
 				]
 			}),
-			/* @__PURE__ */ jsx("div", {
-				className: "hidden md:block text-center",
-				children: /* @__PURE__ */ jsx("button", {
-					className: "group rounded-10 hover:animate-changeColor2 hover:text-ads360light-100 text-ads360black-100 bg-ads360light-100 w-123 h-12",
-					children: /* @__PURE__ */ jsx(Link, {
-						to: "/signup",
-						children: "Get Stated"
-					})
+			isLoggedIn ? /* @__PURE__ */ jsx("button", {
+				className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12",
+				children: /* @__PURE__ */ jsx(Link, {
+					to: "/users",
+					children: "Dashboard"
+				})
+			}) : /* @__PURE__ */ jsx("button", {
+				className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12",
+				children: /* @__PURE__ */ jsx(Link, {
+					to: "/signup",
+					children: "Get Stated"
 				})
 			}),
 			/* @__PURE__ */ jsx("div", {
@@ -2777,7 +2849,7 @@ function Layout() {
 		/* @__PURE__ */ jsx(Footer, {})
 	] });
 }
-var Route$41 = createFileRoute("/_public/_darknavbar")({ component: Layout });
+var Route$46 = createFileRoute("/_public/_darknavbar")({ component: Layout });
 //#endregion
 //#region app/_admin/admin/route.tsx
 function AdminShell() {
@@ -2817,13 +2889,13 @@ function AdminShell() {
 		})]
 	});
 }
-var Route$40 = createFileRoute("/_admin/admin")({ component: AdminShell });
+var Route$45 = createFileRoute("/_admin/admin")({ component: AdminShell });
 //#endregion
 //#region app/vendors/influencers/index.tsx
 var page = () => {
 	return /* @__PURE__ */ jsx("div", { children: "page" });
 };
-var Route$39 = createFileRoute("/vendors/influencers/")({ component: page });
+var Route$44 = createFileRoute("/vendors/influencers/")({ component: page });
 //#endregion
 //#region components/ui/LineCharts.tsx
 var LineCharts = () => {
@@ -2914,17 +2986,102 @@ var PieCharts = () => {
 	});
 };
 //#endregion
+//#region endpoint/wallet/wallet.ts
+function getWallet() {
+	return baseFetchJson("/wallet", { method: "GET" });
+}
+function getWalletTransactions(limit = 100) {
+	return baseFetchJson(`/wallet/transactions${limit ? `?limit=${limit}` : ""}`, { method: "GET" });
+}
+function getSavedPaymentCards() {
+	return baseFetchJson("/wallet/cards", { method: "GET" });
+}
+function postWalletDeposit(body) {
+	return baseFetchJson("/wallet/deposit", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body)
+	});
+}
+function postPayNow(body) {
+	return baseFetchJson("/wallet/PayNow", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body)
+	});
+}
+//#endregion
+//#region endpoint/wallet/useWallet.ts
+function depositErrorMessage(error) {
+	if (error instanceof ApiError) return error.message;
+	if (error instanceof Error) return error.message;
+	return "Payment could not be started.";
+}
+function useWallet() {
+	return useQuery({
+		queryKey: ["wallet"],
+		queryFn: getWallet
+	});
+}
+function useWalletTransactions(limit = 100) {
+	return useQuery({
+		queryKey: [
+			"wallet",
+			"transactions",
+			limit
+		],
+		queryFn: () => getWalletTransactions(limit)
+	});
+}
+function useSavedPaymentCards(enabled) {
+	return useQuery({
+		queryKey: ["wallet", "cards"],
+		queryFn: getSavedPaymentCards,
+		enabled
+	});
+}
+function useWalletDeposit() {
+	return useMutation({
+		mutationFn: (body) => postWalletDeposit(body),
+		onError: (error) => {
+			toast.error(depositErrorMessage(error));
+		}
+	});
+}
+function usePayNow() {
+	return useMutation({
+		mutationFn: (body) => postPayNow(body),
+		onError: (error) => {
+			toast.error(depositErrorMessage(error));
+		}
+	});
+}
+function useInvalidateWalletQueries() {
+	const qc = useQueryClient();
+	return async () => {
+		await qc.invalidateQueries({ queryKey: ["wallet"] });
+		await qc.invalidateQueries({ queryKey: ["wallet", "transactions"] });
+		await qc.invalidateQueries({ queryKey: ["wallet", "cards"] });
+	};
+}
+//#endregion
 //#region app/vendors/billboards/index.tsx
 var naira$5 = "/icons/usericon/naira.svg";
 var billboard$2 = "/icons/led2.svg";
 var bluecampaign$1 = "/icons/usericon/bluecampiagn.svg";
 var BillBoardDashboard = () => {
+	const me = useMe();
+	const wallet = useWallet();
 	return /* @__PURE__ */ jsxs("section", {
 		className: "bg-ads360-hash min-h-screen px-4 md:px-10 py-14",
 		children: [
-			/* @__PURE__ */ jsx("h3", {
+			/* @__PURE__ */ jsxs("h3", {
 				className: "text-2xl",
-				children: "Hello Aliyu, what would you like to do?"
+				children: [
+					"Hello ",
+					me.data?.accountType === "billboard_owner" ? me.data.businessName ?? `${me.data.firstName} ${me.data.lastName}`.trim() : me.data?.accountType === "business_user" ? me.data.businessName : me.data?.accountType === "regular_user" ? `${me.data.firstName} ${me.data.lastName}`.trim() : "there",
+					", what would you like to do?"
+				]
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "shadow border-ads360yellow-100 bg-white rounded-10 border my-10 overflow-x-auto",
@@ -2940,10 +3097,14 @@ var BillBoardDashboard = () => {
 								alt: "naira sign"
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "text-sm px-2",
-								children: ["₦2900.00", /* @__PURE__ */ jsx("p", {
-									className: "text-stone-400 text-xs",
-									children: "Available Balance"
-								})]
+								children: [
+									"₦",
+									Number(wallet.data?.balance ?? 0).toFixed(2),
+									/* @__PURE__ */ jsx("p", {
+										className: "text-stone-400 text-xs",
+										children: "Available Balance"
+									})
+								]
 							})]
 						}),
 						/* @__PURE__ */ jsxs("div", {
@@ -3156,7 +3317,109 @@ var BillBoardDashboard = () => {
 		]
 	});
 };
-var Route$38 = createFileRoute("/vendors/billboards/")({ component: BillBoardDashboard });
+var Route$43 = createFileRoute("/vendors/billboards/")({ component: BillBoardDashboard });
+//#endregion
+//#region app/_usersauth/wallet/index.tsx
+function normalizeSearch(raw) {
+	const pick = (k) => {
+		const v = raw[k];
+		if (typeof v === "string" && v.trim()) return v.trim();
+		if (Array.isArray(v) && typeof v[0] === "string" && v[0].trim()) return v[0].trim();
+	};
+	return {
+		status: pick("status"),
+		tx_ref: pick("tx_ref"),
+		transaction_id: pick("transaction_id")
+	};
+}
+function isPaidStatus(status) {
+	if (!status) return false;
+	const s = status.toLowerCase();
+	return s === "successful" || s === "success" || s === "completed" || s === "succeeded";
+}
+function isFailedLikeStatus(status) {
+	if (!status) return false;
+	const s = status.toLowerCase();
+	return s === "failed" || s === "error" || s === "cancelled" || s === "canceled" || s === "aborted";
+}
+function WalletPaymentReturnPage() {
+	const { status, tx_ref, transaction_id } = Route$42.useSearch();
+	const queryClient = useQueryClient();
+	useEffect(() => {
+		if (!isPaidStatus(status)) return;
+		queryClient.invalidateQueries({ queryKey: ["wallet"] });
+		queryClient.invalidateQueries({ queryKey: ["wallet", "transactions"] });
+		queryClient.invalidateQueries({ queryKey: ["wallet", "cards"] });
+	}, [status, queryClient]);
+	const paid = isPaidStatus(status);
+	const failed = isFailedLikeStatus(status);
+	return /* @__PURE__ */ jsx("section", {
+		className: "min-h-screen bg-ads360-hash px-4 md:px-10 py-14",
+		children: /* @__PURE__ */ jsx("div", {
+			className: "container mx-auto max-w-lg",
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "rounded-10 border border-ads360yellow-100 bg-white p-6 shadow-md",
+				children: [
+					/* @__PURE__ */ jsx("h1", {
+						className: "text-xl font-semibold text-stone-900",
+						children: "Wallet payment"
+					}),
+					/* @__PURE__ */ jsx("p", {
+						className: "mt-2 text-sm text-stone-500",
+						children: "You were redirected here after paying with Flutterwave. Your bank may take a moment; the webhook updates your balance shortly after success."
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "mt-6 rounded-lg border border-stone-200 bg-stone-50 p-4",
+						children: [paid ? /* @__PURE__ */ jsx("p", {
+							className: "text-sm font-medium text-green-700",
+							children: "Payment reported as successful."
+						}) : failed ? /* @__PURE__ */ jsx("p", {
+							className: "text-sm font-medium text-red-700",
+							children: "Payment was not completed."
+						}) : status != null && status !== "" && !paid && !failed ? /* @__PURE__ */ jsxs("p", {
+							className: "text-sm font-medium text-amber-800",
+							children: ["Status: ", status]
+						}) : /* @__PURE__ */ jsx("p", {
+							className: "text-sm text-stone-600",
+							children: "No status was returned in the URL. Check your transaction in the wallet history."
+						}), /* @__PURE__ */ jsxs("dl", {
+							className: "mt-4 space-y-2 text-xs text-stone-600",
+							children: [tx_ref ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("dt", {
+								className: "text-stone-400",
+								children: "Reference (tx_ref)"
+							}), /* @__PURE__ */ jsx("dd", {
+								className: "font-mono break-all",
+								children: tx_ref
+							})] }) : null, transaction_id ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("dt", {
+								className: "text-stone-400",
+								children: "Transaction ID"
+							}), /* @__PURE__ */ jsx("dd", {
+								className: "font-mono break-all",
+								children: transaction_id
+							})] }) : null]
+						})]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						className: "mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end",
+						children: [/* @__PURE__ */ jsx(Link, {
+							to: "/users/wallet",
+							className: "inline-flex justify-center rounded border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-800 hover:bg-stone-50",
+							children: "View wallet and history"
+						}), /* @__PURE__ */ jsx(Link, {
+							to: "/users",
+							className: "inline-flex justify-center rounded border border-transparent bg-ads360black-100/95 px-4 py-2.5 text-sm font-medium text-ads360light-100 hover:bg-ads360black-100",
+							children: "Back to dashboard"
+						})]
+					})
+				]
+			})
+		})
+	});
+}
+var Route$42 = createFileRoute("/_usersauth/wallet/")({
+	validateSearch: (raw) => normalizeSearch(raw),
+	component: WalletPaymentReturnPage
+});
 //#endregion
 //#region app/_usersauth/users/index.tsx
 var naira$4 = "/icons/usericon/naira.svg";
@@ -3166,12 +3429,17 @@ var createcampiagn = "/images/Createacampaign.png";
 var allcampiagn = "/images/allcampaign.png";
 var wishlist = "/images/wishlist.png";
 function Dashboard() {
+	const me = useMe();
 	return /* @__PURE__ */ jsxs("section", {
 		className: "bg-ads360-hash min-h-screen px-4 md:px-10 py-14",
 		children: [
-			/* @__PURE__ */ jsx("h3", {
+			/* @__PURE__ */ jsxs("h3", {
 				className: "text-2xl",
-				children: "Hello Aliyu, what would you like to do?"
+				children: [
+					"Hello ",
+					(me.data?.accountType === "business_user" ? me.data.businessName : me.data?.accountType === "regular_user" ? `${me.data.firstName} ${me.data.lastName}`.trim() : "") || "there",
+					", what would you like to do?"
+				]
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "shadow border-ads360yellow-100 bg-white rounded-10 border my-10 overflow-x-auto",
@@ -3330,7 +3598,7 @@ function Dashboard() {
 		]
 	});
 }
-var Route$37 = createFileRoute("/_usersauth/users/")({ component: Dashboard });
+var Route$41 = createFileRoute("/_usersauth/users/")({ component: Dashboard });
 //#endregion
 //#region components/buttons/BackBtn.tsx
 var Arrowleft$1 = "/icons/Arrowleft.svg";
@@ -3619,7 +3887,7 @@ function Ads() {
 		]
 	});
 }
-var Route$36 = createFileRoute("/_usersauth/ads/")({ component: Ads });
+var Route$40 = createFileRoute("/_usersauth/ads/")({ component: Ads });
 //#endregion
 //#region app/_admin/admin/index.tsx
 function AdminHome() {
@@ -3657,7 +3925,7 @@ function AdminHome() {
 		]
 	});
 }
-var Route$35 = createFileRoute("/_admin/admin/")({ component: AdminHome });
+var Route$39 = createFileRoute("/_admin/admin/")({ component: AdminHome });
 //#endregion
 //#region app/_access/signup/index.tsx
 var MIN_PASSWORD_LENGTH = 8;
@@ -3706,7 +3974,7 @@ function collectZodErrors(issues) {
 	return out;
 }
 var baseInputClass$1 = "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px] border";
-function inputClass$1(hasError) {
+function inputClass$2(hasError) {
 	return `${baseInputClass$1} ${hasError ? "border-red-500" : "border-transparent"}`;
 }
 function FieldError$1({ message }) {
@@ -3935,7 +4203,7 @@ var SignUp = () => {
 												...p,
 												businessName: e.target.value
 											})),
-											className: inputClass$1(!!businessErrors.businessName)
+											className: inputClass$2(!!businessErrors.businessName)
 										}),
 										/* @__PURE__ */ jsx(FieldError$1, { message: businessErrors.businessName })
 									]
@@ -3955,7 +4223,7 @@ var SignUp = () => {
 												...p,
 												email: e.target.value
 											})),
-											className: inputClass$1(!!businessErrors.email)
+											className: inputClass$2(!!businessErrors.email)
 										}),
 										/* @__PURE__ */ jsx(FieldError$1, { message: businessErrors.email })
 									]
@@ -3982,7 +4250,7 @@ var SignUp = () => {
 															password: e.target.value
 														})),
 														autoComplete: "new-password",
-														className: inputClass$1(!!businessErrors.password)
+														className: inputClass$2(!!businessErrors.password)
 													}), /* @__PURE__ */ jsx("button", {
 														type: "button",
 														className: "absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700",
@@ -4011,7 +4279,7 @@ var SignUp = () => {
 															confirmPassword: e.target.value
 														})),
 														autoComplete: "new-password",
-														className: inputClass$1(!!businessErrors.confirmPassword)
+														className: inputClass$2(!!businessErrors.confirmPassword)
 													}), /* @__PURE__ */ jsx("button", {
 														type: "button",
 														className: "absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700",
@@ -4034,7 +4302,7 @@ var SignUp = () => {
 											/* @__PURE__ */ jsx("input", {
 												type: "text",
 												id: "email",
-												className: inputClass$1(!!businessErrors.contactName),
+												className: inputClass$2(!!businessErrors.contactName),
 												value: business.contactName,
 												onChange: (e) => setBusiness((p) => ({
 													...p,
@@ -4068,7 +4336,7 @@ var SignUp = () => {
 																countryIso2: e.target.value
 															}
 														})),
-														className: inputClass$1(!!businessErrors["phone.countryIso2"]),
+														className: inputClass$2(!!businessErrors["phone.countryIso2"]),
 														children: COUNTRIES$1.map((c) => /* @__PURE__ */ jsxs("option", {
 															value: c.iso2,
 															children: [
@@ -4086,7 +4354,7 @@ var SignUp = () => {
 														id: "phoneNumber-business",
 														placeholder: "8012345678",
 														autoComplete: "tel-national",
-														className: inputClass$1(!!businessErrors["phone.nationalNumber"]),
+														className: inputClass$2(!!businessErrors["phone.nationalNumber"]),
 														value: business.phone.nationalNumber,
 														onChange: (e) => setBusiness((p) => ({
 															...p,
@@ -4173,7 +4441,7 @@ var SignUp = () => {
 													...p,
 													firstName: e.target.value
 												})),
-												className: inputClass$1(!!individualErrors.firstName)
+												className: inputClass$2(!!individualErrors.firstName)
 											}),
 											/* @__PURE__ */ jsx(FieldError$1, { message: individualErrors.firstName })
 										]
@@ -4193,7 +4461,7 @@ var SignUp = () => {
 													...p,
 													lastName: e.target.value
 												})),
-												className: inputClass$1(!!individualErrors.lastName)
+												className: inputClass$2(!!individualErrors.lastName)
 											}),
 											/* @__PURE__ */ jsx(FieldError$1, { message: individualErrors.lastName })
 										]
@@ -4214,7 +4482,7 @@ var SignUp = () => {
 												...p,
 												email: e.target.value
 											})),
-											className: inputClass$1(!!individualErrors.email)
+											className: inputClass$2(!!individualErrors.email)
 										}),
 										/* @__PURE__ */ jsx(FieldError$1, { message: individualErrors.email })
 									]
@@ -4240,7 +4508,7 @@ var SignUp = () => {
 														password: e.target.value
 													})),
 													autoComplete: "new-password",
-													className: inputClass$1(!!individualErrors.password)
+													className: inputClass$2(!!individualErrors.password)
 												}), /* @__PURE__ */ jsx("button", {
 													type: "button",
 													className: "absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700",
@@ -4269,7 +4537,7 @@ var SignUp = () => {
 														confirmPassword: e.target.value
 													})),
 													autoComplete: "new-password",
-													className: inputClass$1(!!individualErrors.confirmPassword)
+													className: inputClass$2(!!individualErrors.confirmPassword)
 												}), /* @__PURE__ */ jsx("button", {
 													type: "button",
 													className: "absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700",
@@ -4304,7 +4572,7 @@ var SignUp = () => {
 															countryIso2: e.target.value
 														}
 													})),
-													className: inputClass$1(!!individualErrors["phone.countryIso2"]),
+													className: inputClass$2(!!individualErrors["phone.countryIso2"]),
 													children: COUNTRIES$1.map((c) => /* @__PURE__ */ jsxs("option", {
 														value: c.iso2,
 														children: [
@@ -4330,7 +4598,7 @@ var SignUp = () => {
 															nationalNumber: e.target.value
 														}
 													})),
-													className: inputClass$1(!!individualErrors["phone.nationalNumber"])
+													className: inputClass$2(!!individualErrors["phone.nationalNumber"])
 												}), /* @__PURE__ */ jsx(FieldError$1, { message: individualErrors["phone.nationalNumber"] })]
 											})]
 										})
@@ -4387,7 +4655,7 @@ var SignUp = () => {
 		]
 	}) });
 };
-var Route$34 = createFileRoute("/_access/signup/")({
+var Route$38 = createFileRoute("/_access/signup/")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (hasAccessToken()) throw redirect({ to: getDashboardPathForAccountType(getAccountType()) });
@@ -4410,7 +4678,7 @@ function FieldError({ message }) {
 	});
 }
 var baseInputClass = "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px] border";
-function inputClass(hasError) {
+function inputClass$1(hasError) {
 	return `${baseInputClass} ${hasError ? "border-red-500" : "border-transparent"}`;
 }
 var SignIn = () => {
@@ -4498,7 +4766,7 @@ var SignIn = () => {
 												...p,
 												email: e.target.value
 											})),
-											className: inputClass(!!errors.email)
+											className: inputClass$1(!!errors.email)
 										}),
 										/* @__PURE__ */ jsx(FieldError, { message: errors.email })
 									]
@@ -4521,7 +4789,7 @@ var SignIn = () => {
 													...p,
 													password: e.target.value
 												})),
-												className: inputClass(!!errors.password),
+												className: inputClass$1(!!errors.password),
 												autoComplete: "current-password"
 											}), /* @__PURE__ */ jsx("button", {
 												type: "button",
@@ -4576,7 +4844,7 @@ var SignIn = () => {
 		})]
 	});
 };
-var Route$33 = createFileRoute("/_access/signin/")({
+var Route$37 = createFileRoute("/_access/signin/")({
 	beforeLoad: () => {
 		if (typeof window === "undefined") return;
 		if (hasAccessToken()) throw redirect({ to: getDashboardPathForAccountType(getAccountType()) });
@@ -4677,7 +4945,7 @@ var EmailVerification = () => {
 		})]
 	});
 };
-var Route$32 = createFileRoute("/_access/email-verification/")({ component: EmailVerification });
+var Route$36 = createFileRoute("/_access/email-verification/")({ component: EmailVerification });
 //#endregion
 //#region node_modules/react-icons/gr/index.esm.js
 function GrTooltip(props) {
@@ -4707,7 +4975,20 @@ var Tooltip = ({ info }) => {
 var naira$3 = "/icons/naira.svg";
 var filter$1 = "/icons/filter.svg";
 var makepayment$1 = "/icons/makepayment.svg";
+function money(n) {
+	const v = Number(n ?? 0);
+	if (!Number.isFinite(v)) return "0.00";
+	return v.toFixed(2);
+}
+function dateOnly(s) {
+	if (!s) return "-";
+	return String(s).slice(0, 10);
+}
 var WalletSection$1 = () => {
+	const me = useMe();
+	const wallet = useWallet();
+	const txns = useWalletTransactions(20);
+	me.data?.accountType === "billboard_owner" ? me.data.businessName ?? `${me.data.firstName} ${me.data.lastName}`.trim() : me.data?.accountType === "business_user" ? me.data.businessName : me.data?.accountType === "regular_user" && `${me.data.firstName} ${me.data.lastName}`.trim();
 	return /* @__PURE__ */ jsx("section", {
 		className: "min-h-screen bg-ads360-hash px-4 md:px-10 py-14",
 		children: /* @__PURE__ */ jsxs("div", {
@@ -4724,46 +5005,66 @@ var WalletSection$1 = () => {
 				/* @__PURE__ */ jsxs("div", {
 					className: "md:flex my-10 justify-around bg-white p-5 shadow-md rounded-10 border border-ads360yellow-100",
 					children: [
-						/* @__PURE__ */ jsxs("div", { children: [
-							/* @__PURE__ */ jsx("h3", { children: "Account Name" }),
-							/* @__PURE__ */ jsx("p", {
-								className: "text-stone-400 text-xl my-4",
-								children: "Ayomike Charles"
-							}),
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
-								className: "my-3 flex items-center space-x-1",
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "relative group",
-									children: [/* @__PURE__ */ jsx(GrTooltip, {}), /* @__PURE__ */ jsx("div", {
-										className: "hidden group-hover:inline",
-										children: /* @__PURE__ */ jsx(Tooltip, { info: "this is your real balance but you cannot widthdraw from it" })
-									})]
-								}), /* @__PURE__ */ jsx("p", { children: "Fixed Balance" })]
-							}), /* @__PURE__ */ jsxs("div", {
-								className: "flex",
-								children: [/* @__PURE__ */ jsx("img", {
-									alt: "naira",
-									src: naira$3,
-									className: "w-14 h-14"
-								}), /* @__PURE__ */ jsxs("div", {
-									className: "px-3",
-									children: [/* @__PURE__ */ jsx("p", {
-										className: "text-2xl",
-										children: "₦1000000.00"
-									}), /* @__PURE__ */ jsx("h3", {
-										className: "text-stone-400 text-sm",
-										children: "Available Balance"
-									})]
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+							className: "my-3 flex items-center space-x-1",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "relative group",
+								children: [/* @__PURE__ */ jsx(GrTooltip, {}), /* @__PURE__ */ jsx("div", {
+									className: "hidden group-hover:inline",
+									children: /* @__PURE__ */ jsx(Tooltip, { info: "this is your incoming balance that you receive from bookings" })
 								})]
-							})] })
-						] }),
-						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
-							className: "mt-5 md:my-0",
-							children: "360ads Wallet ID"
-						}), /* @__PURE__ */ jsx("p", {
-							className: "text-xl text-ads360yellow-100 my-4",
-							children: "3211711562"
+							}), /* @__PURE__ */ jsx("p", { children: "Incoming Balance" })]
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex",
+							children: [/* @__PURE__ */ jsx("img", {
+								alt: "naira",
+								src: naira$3,
+								className: "w-14 h-14"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "px-3",
+								children: [/* @__PURE__ */ jsxs("p", {
+									className: "text-2xl",
+									children: [
+										wallet.data?.currency,
+										" ",
+										money(wallet.data?.incomingBalance)
+									]
+								}), /* @__PURE__ */ jsx("h3", {
+									className: "text-stone-400 text-sm",
+									children: "Available Balance"
+								})]
+							})]
 						})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+							className: "my-3 flex items-center space-x-1",
+							children: [/* @__PURE__ */ jsxs("div", {
+								className: "relative group",
+								children: [/* @__PURE__ */ jsx(GrTooltip, {}), /* @__PURE__ */ jsx("div", {
+									className: "hidden group-hover:inline",
+									children: /* @__PURE__ */ jsx(Tooltip, { info: "this is your outgoing balance that you request to widthdraw" })
+								})]
+							}), /* @__PURE__ */ jsx("p", { children: "Outgoing Balance" })]
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex",
+							children: [/* @__PURE__ */ jsx("img", {
+								alt: "naira",
+								src: naira$3,
+								className: "w-14 h-14"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "px-3",
+								children: [/* @__PURE__ */ jsxs("p", {
+									className: "text-2xl",
+									children: [
+										wallet.data?.currency,
+										" ",
+										money(wallet.data?.outgoingBalance)
+									]
+								}), /* @__PURE__ */ jsx("h3", {
+									className: "text-stone-400 text-sm",
+									children: "Available Balance"
+								})]
+							})]
+						})] })] }),
+						/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 							className: "my-3 flex space-x-1 items-center",
 							children: [/* @__PURE__ */ jsxs("div", {
 								className: "relative group",
@@ -4780,15 +5081,19 @@ var WalletSection$1 = () => {
 								className: "w-14 h-14"
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "px-3",
-								children: [/* @__PURE__ */ jsx("p", {
+								children: [/* @__PURE__ */ jsxs("p", {
 									className: "text-2xl",
-									children: "₦1000000.00"
+									children: [
+										wallet.data?.currency,
+										" ",
+										money(wallet.data?.balance)
+									]
 								}), /* @__PURE__ */ jsx("h3", {
 									className: "text-stone-400 text-sm",
 									children: "Available Balance"
 								})]
 							})]
-						})] })] }),
+						})] }) }),
 						/* @__PURE__ */ jsx("div", {
 							className: "",
 							children: /* @__PURE__ */ jsxs(Link, {
@@ -4824,44 +5129,35 @@ var WalletSection$1 = () => {
 					children: [/* @__PURE__ */ jsx("h3", {
 						className: "text-lg mb-2",
 						children: "Transaction History"
-					}), /* @__PURE__ */ jsxs("ul", { children: [
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "credit wallet"
-							}), /* @__PURE__ */ jsx("p", { children: "June 1, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-green-500",
-								children: "+₦5000.00"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "widthdraw"
-							}), /* @__PURE__ */ jsx("p", { children: "June 6, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-red-500",
-								children: "+₦3000.00"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "credit wallet"
-							}), /* @__PURE__ */ jsx("p", { children: "June 8, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-green-500",
-								children: "+₦8000.00"
-							})]
-						})
-					] })]
+					}), txns.isLoading ? /* @__PURE__ */ jsx("div", {
+						className: "text-stone-500",
+						children: "Loading..."
+					}) : txns.isError ? /* @__PURE__ */ jsx("div", {
+						className: "text-stone-500",
+						children: "Unable to load transactions"
+					}) : /* @__PURE__ */ jsx("ul", { children: (txns.data ?? []).length === 0 ? /* @__PURE__ */ jsx("li", {
+						className: "text-stone-500 py-4",
+						children: "No transactions yet"
+					}) : (txns.data ?? []).map((t) => /* @__PURE__ */ jsxs("li", {
+						className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
+						children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+							className: "font-bold",
+							children: t.description || t.type
+						}), /* @__PURE__ */ jsx("p", { children: dateOnly(t.createdAt) })] }), /* @__PURE__ */ jsxs("div", {
+							className: t.amount >= 0 ? "text-green-600" : "text-red-600",
+							children: [
+								t.amount >= 0 ? "+" : "-",
+								"₦",
+								money(Math.abs(t.amount))
+							]
+						})]
+					}, t.id)) })]
 				})
 			]
 		})
 	});
 };
-var Route$31 = createFileRoute("/vendors/billboards/wallet/")({ component: WalletSection$1 });
+var Route$35 = createFileRoute("/vendors/billboards/wallet/")({ component: WalletSection$1 });
 //#endregion
 //#region app/vendors/billboards/settings/index.tsx
 var avatar = "/icons/user.png";
@@ -5129,300 +5425,925 @@ var EditBillboardComponent = () => {
 		})
 	})] });
 };
-var Route$30 = createFileRoute("/vendors/billboards/settings/")({ component: EditBillboardComponent });
+var Route$34 = createFileRoute("/vendors/billboards/settings/")({ component: EditBillboardComponent });
+//#endregion
+//#region endpoint/billboard/billboard.ts
+function billboardListQueryString(params) {
+	const usp = new URLSearchParams();
+	if (params.page != null) usp.set("page", String(params.page));
+	if (params.limit != null) usp.set("limit", String(params.limit));
+	if (params.boardType) usp.set("boardType", params.boardType);
+	if (params.location?.trim()) usp.set("location", params.location.trim());
+	if (params.minPrice != null) usp.set("minPrice", String(params.minPrice));
+	if (params.maxPrice != null) usp.set("maxPrice", String(params.maxPrice));
+	if (params.negotiable !== void 0) usp.set("negotiable", String(params.negotiable));
+	const q = usp.toString();
+	return q ? `?${q}` : "";
+}
+function getMyBillboardListings(params = {}) {
+	return baseFetchJson(`/billboard/listings/mine${billboardListQueryString(params)}`, { method: "GET" });
+}
+function getBrowseBillboardListings(params = {}) {
+	return baseFetchJson(`/billboard/listings${billboardListQueryString(params)}`, { method: "GET" });
+}
+function getBillboardListingById(id) {
+	return baseFetchJson(`/billboard/listings/${id}`, { method: "GET" });
+}
+function getMyBillboardListingById(id) {
+	return baseFetchJson(`/billboard/listings/mine/${id}`, { method: "GET" });
+}
+function createBillboardListing(payload, imageFile) {
+	const form = new FormData();
+	form.append("payload", JSON.stringify(payload));
+	form.append("file", imageFile);
+	return baseFetchJson("/billboard/listings", {
+		method: "POST",
+		body: form
+	});
+}
+function createBillboardBooking(listingId, payload, imageFile) {
+	const form = new FormData();
+	form.append("payload", JSON.stringify(payload));
+	if (imageFile) form.append("file", imageFile);
+	return baseFetchJson(`/billboard/listings/${listingId}/bookings`, {
+		method: "POST",
+		body: form
+	});
+}
+function getBillboardBookingById(id) {
+	return baseFetchJson(`/billboard/bookings/${id}`, { method: "GET" });
+}
+function negotiateBillboardBooking(id, negotiatedAmount) {
+	return baseFetchJson(`/billboard/bookings/${id}/negotiate`, {
+		method: "POST",
+		body: { negotiatedAmount }
+	});
+}
+function getMyBillboardBookings(params = {}) {
+	const usp = new URLSearchParams();
+	if (params.status?.trim()) usp.set("status", params.status.trim());
+	const q = usp.toString();
+	return baseFetchJson(`/billboard/bookings${q ? `?${q}` : ""}`, { method: "GET" });
+}
+function getMyVendorBillboardBookings(params = {}) {
+	const usp = new URLSearchParams();
+	if (params.status?.trim()) usp.set("status", params.status.trim());
+	const q = usp.toString();
+	return baseFetchJson(`/billboard/vendor/bookings${q ? `?${q}` : ""}`, { method: "GET" });
+}
+function getVendorBillboardBookingById(id) {
+	return baseFetchJson(`/billboard/vendor/bookings/${id}`, { method: "GET" });
+}
+function markVendorBookingActive(bookingId, proofImage) {
+	const form = new FormData();
+	form.append("file", proofImage);
+	return baseFetchJson(`/billboard/vendor/bookings/${bookingId}/active`, {
+		method: "POST",
+		body: form
+	});
+}
+function completeBillboardBooking(bookingId) {
+	return baseFetchJson(`/billboard/bookings/${bookingId}/complete`, { method: "POST" });
+}
+function rejectVendorBillboardBooking(bookingId, body) {
+	return baseFetchJson(`/billboard/vendor/bookings/${bookingId}/reject`, {
+		method: "POST",
+		body: body?.reason != null && body.reason.trim() !== "" ? { reason: body.reason.trim() } : {}
+	});
+}
+//#endregion
+//#region endpoint/billboard/useBillboard.ts
+function errorMessage$1(error) {
+	if (error instanceof ApiError) return error.message;
+	if (error instanceof Error) return error.message;
+	return "Something went wrong. Please try again.";
+}
+function useMyBillboardListings(params = {}) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"listings",
+			"mine",
+			params
+		],
+		queryFn: () => getMyBillboardListings(params)
+	});
+}
+function useBrowseBillboardListings(params = {}) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"listings",
+			"browse",
+			params
+		],
+		queryFn: () => getBrowseBillboardListings(params)
+	});
+}
+function useBillboardListing(id) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"listing",
+			id
+		],
+		queryFn: () => getBillboardListingById(id),
+		enabled: typeof id === "number" && id > 0
+	});
+}
+function useMyBillboardListing(id) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"listing",
+			"mine",
+			id
+		],
+		queryFn: () => getMyBillboardListingById(id),
+		enabled: typeof id === "number" && id > 0
+	});
+}
+function useCreateBillboardListing() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: ({ payload, imageFile }) => createBillboardListing(payload, imageFile),
+		onSuccess: async (data) => {
+			toast.success(data?.message ?? "Billboard listing created.");
+			await qc.invalidateQueries({ queryKey: ["billboard", "listings"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+function useCreateBillboardBooking() {
+	return useMutation({
+		mutationFn: ({ listingId, payload, imageFile }) => createBillboardBooking(listingId, payload, imageFile),
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+function useBillboardBooking(id) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"booking",
+			id
+		],
+		queryFn: () => getBillboardBookingById(id),
+		enabled: typeof id === "number" && id > 0
+	});
+}
+function useNegotiateBillboardBooking() {
+	return useMutation({
+		mutationFn: (vars) => negotiateBillboardBooking(vars.id, vars.negotiatedAmount),
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+function useMyBillboardBookings(params = {}) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"bookings",
+			"mine",
+			params
+		],
+		queryFn: () => getMyBillboardBookings(params)
+	});
+}
+function useMyNegotiatingBillboardBookings() {
+	return useMyBillboardBookings({ status: "negotiating" });
+}
+function useMyPaidBillboardBookings() {
+	return useMyBillboardBookings({ status: "paid" });
+}
+function useMyVendorBillboardBookings(params = {}) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"bookings",
+			"vendor",
+			params
+		],
+		queryFn: () => getMyVendorBillboardBookings(params)
+	});
+}
+function useMyVendorNegotiatingBillboardBookings() {
+	return useMyVendorBillboardBookings({ status: "negotiating" });
+}
+function useVendorBillboardBooking(id) {
+	return useQuery({
+		queryKey: [
+			"billboard",
+			"booking",
+			"vendor",
+			id
+		],
+		queryFn: () => getVendorBillboardBookingById(id),
+		enabled: typeof id === "number" && id > 0
+	});
+}
+function useMarkVendorBookingActive() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (vars) => markVendorBookingActive(vars.bookingId, vars.proofImage),
+		onSuccess: async () => {
+			toast.success("Campaign accepted and marked active");
+			await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
+			await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+function useCompleteBillboardBooking() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (bookingId) => completeBillboardBooking(bookingId),
+		onSuccess: async () => {
+			toast.success("Campaign completed");
+			await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
+			await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+function useRejectVendorBillboardBooking() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: (vars) => rejectVendorBillboardBooking(vars.bookingId, { reason: vars.reason }),
+		onSuccess: async () => {
+			toast.success("Campaign rejected; refund processed where applicable");
+			await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
+			await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage$1(error));
+		}
+	});
+}
+//#endregion
+//#region components/ui/BookingsTable.tsx
+function formatDate(v) {
+	if (!v) return "-";
+	const d = typeof v === "string" ? new Date(v) : v;
+	if (!Number.isFinite(d.getTime())) return String(v).slice(0, 10);
+	return d.toISOString().slice(0, 10);
+}
+function formatNaira$1(v) {
+	if (v == null) return "-";
+	const n = typeof v === "string" ? Number(v) : v;
+	if (!Number.isFinite(n)) return String(v);
+	return `₦${n.toLocaleString()}`;
+}
+function StatusPill({ status }) {
+	const s = status.trim().toLowerCase();
+	const styles = s === "completed" ? "bg-green-100 text-green-700 border-green-200" : s === "active" ? "bg-blue-100 text-blue-700 border-blue-200" : s === "rejected" ? "bg-red-100 text-red-700 border-red-200" : s === "pending" ? "bg-yellow-100 text-yellow-800 border-yellow-200" : s === "negotiating" ? "bg-amber-100 text-amber-800 border-amber-200" : "bg-stone-100 text-stone-700 border-stone-200";
+	const label = s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";
+	return /* @__PURE__ */ jsx("span", {
+		className: `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${styles}`,
+		children: label
+	});
+}
+function PaymentPill({ paymentStatus }) {
+	const s = paymentStatus.trim().toLowerCase();
+	const styles = s === "paid" ? "bg-emerald-100 text-emerald-800 border-emerald-200" : s === "refunded" ? "bg-violet-100 text-violet-800 border-violet-200" : s === "unpaid" ? "bg-amber-100 text-amber-900 border-amber-200" : "bg-stone-100 text-stone-700 border-stone-200";
+	const label = s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";
+	return /* @__PURE__ */ jsx("span", {
+		className: `inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${styles}`,
+		children: label
+	});
+}
+function Pagination({ page, pageCount, onChange }) {
+	if (pageCount <= 1) return null;
+	return /* @__PURE__ */ jsxs("div", {
+		className: "flex items-center justify-end gap-2 mt-4",
+		children: [
+			/* @__PURE__ */ jsx("button", {
+				type: "button",
+				disabled: !(page > 1),
+				onClick: () => onChange(page - 1),
+				className: "rounded-10 border border-stone-200 bg-white px-3 py-2 text-sm disabled:opacity-50",
+				children: "Previous"
+			}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "text-sm text-stone-600",
+				children: [
+					"Page ",
+					page,
+					" of ",
+					pageCount
+				]
+			}),
+			/* @__PURE__ */ jsx("button", {
+				type: "button",
+				disabled: !(page < pageCount),
+				onClick: () => onChange(page + 1),
+				className: "rounded-10 border border-stone-200 bg-white px-3 py-2 text-sm disabled:opacity-50",
+				children: "Next"
+			})
+		]
+	});
+}
+function BookingsTable({ rows, isLoading, isError, emptyText = "No records found", statusOptions, statusFilterLabel = "Filter by status", defaultStatus = "all", pageSize = 10, showPaymentStatus = true }) {
+	const [status, setStatus] = useState(defaultStatus);
+	const [page, setPage] = useState(1);
+	const colSpan = showPaymentStatus ? 7 : 6;
+	const filtered = useMemo(() => {
+		const raw = rows ?? [];
+		const st = status.trim();
+		if (st === "abandoned") {
+			const fourDaysMs = 5760 * 60 * 1e3;
+			return raw.filter((r) => {
+				if (String(r.status ?? "").toLowerCase() !== "pending") return false;
+				const t = new Date(String(r.createdAt ?? "")).getTime();
+				if (!Number.isFinite(t)) return false;
+				return Date.now() - t >= fourDaysMs;
+			});
+		}
+		if (!st || st === "all") return raw;
+		return raw.filter((r) => String(r.status ?? "").toLowerCase() === st);
+	}, [rows, status]);
+	const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize));
+	const safePage = Math.min(page, pageCount);
+	const start = (safePage - 1) * pageSize;
+	const paged = filtered.slice(start, start + pageSize);
+	return /* @__PURE__ */ jsxs("div", { children: [
+		/* @__PURE__ */ jsxs("div", {
+			className: "flex items-center justify-end gap-2",
+			children: [/* @__PURE__ */ jsx("div", {
+				className: "text-sm text-stone-600",
+				children: statusFilterLabel
+			}), /* @__PURE__ */ jsx("select", {
+				value: status,
+				onChange: (e) => {
+					setStatus(e.target.value);
+					setPage(1);
+				},
+				className: "rounded-10 border border-ads360yellow-100 bg-white px-3 py-2 text-sm",
+				children: (statusOptions ?? [
+					{
+						value: "all",
+						label: "All"
+					},
+					{
+						value: "pending",
+						label: "Pending"
+					},
+					{
+						value: "active",
+						label: "Active"
+					},
+					{
+						value: "rejected",
+						label: "Rejected"
+					},
+					{
+						value: "completed",
+						label: "Completed"
+					}
+				]).map((o) => /* @__PURE__ */ jsx("option", {
+					value: o.value,
+					children: o.label
+				}, o.value))
+			})]
+		}),
+		/* @__PURE__ */ jsx("div", {
+			className: "w-full overflow-x-auto mt-4 rounded-10 border border-[#D0B301]/30 bg-white",
+			children: /* @__PURE__ */ jsxs("table", {
+				className: "min-w-full",
+				children: [/* @__PURE__ */ jsx("thead", {
+					className: "bg-[#D0B301]/15",
+					children: /* @__PURE__ */ jsxs("tr", {
+						className: "text-left text-xs font-semibold text-stone-700",
+						children: [
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "ID"
+							}),
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "LISTING"
+							}),
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "DATE CREATED"
+							}),
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "AMOUNT"
+							}),
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "STATUS"
+							}),
+							showPaymentStatus ? /* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "PAYMENT"
+							}) : null,
+							/* @__PURE__ */ jsx("th", {
+								className: "py-4 px-4 border-b border-[#D0B301]/25",
+								children: "ACTION"
+							})
+						]
+					})
+				}), /* @__PURE__ */ jsx("tbody", {
+					className: "text-sm",
+					children: isLoading ? /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+						colSpan,
+						className: "py-10 px-4 text-center text-stone-500",
+						children: "Loading..."
+					}) }) : isError ? /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+						colSpan,
+						className: "py-10 px-4 text-center text-stone-500",
+						children: "Unable to load records"
+					}) }) : paged.length === 0 ? /* @__PURE__ */ jsx("tr", { children: /* @__PURE__ */ jsx("td", {
+						colSpan,
+						className: "py-10 px-4 text-center text-stone-500",
+						children: emptyText
+					}) }) : paged.map((r) => /* @__PURE__ */ jsxs("tr", {
+						className: "border-b last:border-b-0",
+						children: [
+							/* @__PURE__ */ jsxs("td", {
+								className: "py-5 px-4 text-stone-800",
+								children: ["NG#", r.id]
+							}),
+							/* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4 text-stone-800",
+								children: r.listing ?? "-"
+							}),
+							/* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4 text-stone-700",
+								children: formatDate(r.createdAt)
+							}),
+							/* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4 text-stone-800",
+								children: formatNaira$1(r.amount)
+							}),
+							/* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4",
+								children: /* @__PURE__ */ jsx(StatusPill, { status: String(r.status ?? "unknown") })
+							}),
+							showPaymentStatus ? /* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4",
+								children: /* @__PURE__ */ jsx(PaymentPill, { paymentStatus: String(r.paymentStatus ?? "unpaid") })
+							}) : null,
+							/* @__PURE__ */ jsx("td", {
+								className: "py-5 px-4",
+								children: /* @__PURE__ */ jsx(Link, {
+									to: r.actionHref,
+									className: "inline-flex items-center rounded-10 border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50",
+									children: r.actionLabel ?? "View"
+								})
+							})
+						]
+					}, String(r.id)))
+				})]
+			})
+		}),
+		/* @__PURE__ */ jsx(Pagination, {
+			page: safePage,
+			pageCount,
+			onChange: (n) => setPage(n)
+		})
+	] });
+}
 //#endregion
 //#region app/vendors/billboards/requests/index.tsx
 var search$1 = "/icons/search.svg";
+function isAbandoned(createdAt) {
+	if (!createdAt) return false;
+	const t = new Date(createdAt).getTime();
+	if (!Number.isFinite(t)) return false;
+	return Date.now() - t >= 5760 * 60 * 1e3;
+}
 var Requests = () => {
+	const [q, setQ] = useState("");
+	const [filter, setFilter] = useState("all");
+	const list = useMyVendorBillboardBookings();
+	const rows = useMemo(() => {
+		const notNegotiating = (list.data ?? []).filter((r) => r.status !== "negotiating");
+		const filtered = filter === "all" ? notNegotiating : filter === "abandoned" ? notNegotiating.filter((r) => r.status === "pending" && isAbandoned(r.createdAt)) : notNegotiating.filter((r) => r.status === filter);
+		const s = q.trim().toLowerCase();
+		if (!s) return filtered;
+		return filtered.filter((r) => {
+			return `${r.id} ${r.listingName ?? ""} ${r.status ?? ""} ${r.paymentStatus ?? ""}`.toLowerCase().includes(s);
+		});
+	}, [
+		list.data,
+		q,
+		filter
+	]);
 	return /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsxs("section", {
 		className: "bg-ads360-hash min-h-screen px-4 md:px-10 py-14",
-		children: [
-			/* @__PURE__ */ jsxs("div", {
+		children: [/* @__PURE__ */ jsxs("div", {
+			className: "flex flex-col md:flex-row gap-3 md:items-center md:justify-between",
+			children: [/* @__PURE__ */ jsxs("div", {
 				className: "flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10",
-				children: [/* @__PURE__ */ jsx("button", { children: /* @__PURE__ */ jsx("img", {
-					src: search$1,
-					alt: "searchicon"
-				}) }), /* @__PURE__ */ jsx("input", {
+				children: [/* @__PURE__ */ jsx("button", {
+					type: "button",
+					children: /* @__PURE__ */ jsx("img", {
+						src: search$1,
+						alt: "searchicon"
+					})
+				}), /* @__PURE__ */ jsx("input", {
+					value: q,
+					onChange: (e) => setQ(e.target.value),
+					className: "rounded-10 w-full bg-transparent focus:outline-none h-full",
+					placeholder: "search..."
+				})]
+			}), /* @__PURE__ */ jsxs("div", {
+				className: "flex gap-2 items-center justify-end",
+				children: [/* @__PURE__ */ jsx("div", {
+					className: "text-sm text-stone-600",
+					children: "Filter:"
+				}), /* @__PURE__ */ jsxs("select", {
+					value: filter,
+					onChange: (e) => setFilter(e.target.value),
+					className: "bg-white text-black border border-ads360yellow-100 px-3 py-2 rounded-10",
+					children: [
+						/* @__PURE__ */ jsx("option", {
+							value: "all",
+							children: "All (excluding negotiating)"
+						}),
+						/* @__PURE__ */ jsx("option", {
+							value: "abandoned",
+							children: "Abandoned (unpaid 4+ days)"
+						}),
+						/* @__PURE__ */ jsx("option", {
+							value: "pending",
+							children: "Pending"
+						}),
+						/* @__PURE__ */ jsx("option", {
+							value: "active",
+							children: "Active"
+						}),
+						/* @__PURE__ */ jsx("option", {
+							value: "rejected",
+							children: "Rejected"
+						}),
+						/* @__PURE__ */ jsx("option", {
+							value: "completed",
+							children: "Completed"
+						})
+					]
+				})]
+			})]
+		}), /* @__PURE__ */ jsx("div", {
+			className: "w-full my-5",
+			children: /* @__PURE__ */ jsx(BookingsTable, {
+				rows: rows.map((r) => ({
+					id: r.id,
+					listing: r.listingName ?? "-",
+					createdAt: r.createdAt,
+					amount: r.negotiatedAmount ?? r.quotedTotal,
+					status: r.status,
+					paymentStatus: r.paymentStatus ?? "unpaid",
+					actionHref: `/vendors/billboards/requests/${r.id}`,
+					actionLabel: "View"
+				})),
+				isLoading: list.isLoading,
+				isError: list.isError,
+				emptyText: "No requests found",
+				statusOptions: [
+					{
+						value: "all",
+						label: "All (excluding negotiating)"
+					},
+					{
+						value: "abandoned",
+						label: "Abandoned (unpaid 4+ days)"
+					},
+					{
+						value: "pending",
+						label: "Pending"
+					},
+					{
+						value: "active",
+						label: "Active"
+					},
+					{
+						value: "rejected",
+						label: "Rejected"
+					},
+					{
+						value: "completed",
+						label: "Completed"
+					}
+				],
+				pageSize: 10
+			})
+		})]
+	}) });
+};
+var Route$33 = createFileRoute("/vendors/billboards/requests/")({ component: Requests });
+//#endregion
+//#region app/vendors/billboards/negotiations/index.tsx
+var search = "/icons/search.svg";
+function VendorNegotiationsPage() {
+	const [q, setQ] = useState("");
+	const negotiating = useMyVendorNegotiatingBillboardBookings();
+	const rows = useMemo(() => {
+		const raw = negotiating.data ?? [];
+		const s = q.trim().toLowerCase();
+		if (!s) return raw;
+		return raw.filter((r) => {
+			return `${r.id} ${r.listingName ?? ""} ${r.bookerName ?? ""} ${r.status ?? ""}`.toLowerCase().includes(s);
+		});
+	}, [negotiating.data, q]);
+	return /* @__PURE__ */ jsxs("section", {
+		className: "bg-ads360-hash min-h-screen px-4 md:px-10 py-14",
+		children: [
+			/* @__PURE__ */ jsx("div", {
+				className: "flex items-center justify-between",
+				children: /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
+					className: "text-2xl",
+					children: "Negotiations"
+				}), /* @__PURE__ */ jsx("p", {
+					className: "text-stone-400",
+					children: "Bookings currently under negotiation"
+				})] })
+			}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10 mt-6",
+				children: [/* @__PURE__ */ jsx("button", {
+					type: "button",
+					children: /* @__PURE__ */ jsx("img", {
+						src: search,
+						alt: "searchicon"
+					})
+				}), /* @__PURE__ */ jsx("input", {
+					value: q,
+					onChange: (e) => setQ(e.target.value),
 					className: "rounded-10 w-full bg-transparent focus:outline-none h-full",
 					placeholder: "search..."
 				})]
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "w-full overflow-x-auto my-5",
-				children: /* @__PURE__ */ jsxs("table", {
-					className: "min-w-full bg-white",
-					children: [/* @__PURE__ */ jsx("thead", {
-						className: "bg-[#D0B301]/40",
-						children: /* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "ID"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "COST"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "DATE CREATED"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "STATUS"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "ACTIONS"
-							})
-						] })
-					}), /* @__PURE__ */ jsxs("tbody", {
-						className: "text-center",
-						children: [
-							/* @__PURE__ */ jsxs("tr", { children: [
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-br",
-									children: "#1"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "₦200000"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "2023-05-20"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "new"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: /* @__PURE__ */ jsx(Link, {
-										to: `/vendors/billboards/requests/1`,
-										children: "view"
-									})
-								})
-							] }),
-							/* @__PURE__ */ jsxs("tr", { children: [
-								/* @__PURE__ */ jsxs("td", {
-									className: "py-2 px-2 md:px-3 border-br relative",
-									children: ["#2 ", /* @__PURE__ */ jsx("div", {
-										className: "absolute px-1 bg-ads360yellowBtn-100 text-[10px] top-0 rounded-full",
-										children: " new"
-									})]
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "₦60000"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "2023-05-4"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "negotiating"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: /* @__PURE__ */ jsx(Link, {
-										to: `/vendors/billboards/requests/2`,
-										children: "view"
-									})
-								})
-							] }),
-							/* @__PURE__ */ jsxs("tr", { children: [
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-br",
-									children: "#3"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "₦500000"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "2023-05-2"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "paid"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: /* @__PURE__ */ jsx(Link, {
-										to: `/vendors/billboards/requests/3`,
-										children: "view"
-									})
-								})
-							] }),
-							/* @__PURE__ */ jsxs("tr", { children: [
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-br",
-									children: "#4"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "₦500000"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "2023-05-2"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: "completed"
-								}),
-								/* @__PURE__ */ jsx("td", {
-									className: "py-2 px-2 md:px-3 border-b",
-									children: /* @__PURE__ */ jsx(Link, {
-										to: `/vendors/billboards/requests/4`,
-										children: "view"
-									})
-								})
-							] })
-						]
-					})]
+				children: /* @__PURE__ */ jsx(BookingsTable, {
+					showPaymentStatus: false,
+					rows: rows.map((r) => ({
+						id: r.id,
+						listing: r.listingName ?? "-",
+						createdAt: r.createdAt,
+						amount: r.negotiatedAmount ?? r.quotedTotal,
+						status: "negotiating",
+						actionHref: `/vendors/billboards/negotiations/${r.id}`,
+						actionLabel: "View"
+					})),
+					isLoading: negotiating.isLoading,
+					isError: negotiating.isError,
+					emptyText: "No negotiations found",
+					statusOptions: [{
+						value: "all",
+						label: "All"
+					}, {
+						value: "negotiating",
+						label: "Negotiating"
+					}],
+					defaultStatus: "negotiating",
+					pageSize: 10
 				})
-			}),
-			/* @__PURE__ */ jsxs("div", {
-				className: "flex w-full justify-between",
-				children: [/* @__PURE__ */ jsxs("div", {
-					className: "flex space-x-2",
-					children: [
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: "<"
-						}),
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: "1"
-						}),
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: "2"
-						}),
-						/* @__PURE__ */ jsx("button", { children: "..." }),
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: "7"
-						}),
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: "8"
-						}),
-						/* @__PURE__ */ jsx("button", {
-							className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-							children: ">"
-						})
-					]
-				}), /* @__PURE__ */ jsx("div", { children: "1 of 8" })]
 			})
 		]
-	}) });
-};
-var Route$29 = createFileRoute("/vendors/billboards/requests/")({ component: Requests });
+	});
+}
+var Route$32 = createFileRoute("/vendors/billboards/negotiations/")({ component: VendorNegotiationsPage });
 //#endregion
 //#region components/ui/BillboardSorter.tsx
 var cancel$6 = "/icons/usericon/modalCancelBotton.svg";
-var BillboardSorter = ({ toggleModal, modal }) => {
+var BillboardSorter = ({ toggleModal, modal, value, onChange, onApply }) => {
+	const set = (key, v) => onChange({
+		...value,
+		[key]: v
+	});
 	return /* @__PURE__ */ jsxs("div", { children: [
 		/* @__PURE__ */ jsxs("div", {
 			className: "flex justify-between",
-			children: [/* @__PURE__ */ jsx("p", { children: "Filter billboard" }), modal === true && /* @__PURE__ */ jsx("button", {
+			children: [/* @__PURE__ */ jsx("p", { children: "Filter billboard" }), modal ? /* @__PURE__ */ jsx("button", {
+				type: "button",
 				onClick: toggleModal,
 				children: /* @__PURE__ */ jsx("img", {
 					src: cancel$6,
-					alt: "modal cancel botton",
+					alt: "",
 					className: "w-5"
 				})
-			})]
+			}) : null]
 		}),
 		/* @__PURE__ */ jsxs("div", {
 			className: "my-2",
-			children: [/* @__PURE__ */ jsx("p", { children: "Billboard Type" }), /* @__PURE__ */ jsxs("select", {
-				defaultValue: "select",
+			children: [/* @__PURE__ */ jsx("p", { children: "Billboard type" }), /* @__PURE__ */ jsxs("select", {
+				value: value.boardType,
+				onChange: (e) => set("boardType", e.target.value),
 				className: "p-2 border focus:outline-none rounded w-full",
 				children: [
 					/* @__PURE__ */ jsx("option", {
-						disabled: true,
-						children: "select"
+						value: "",
+						children: "Any"
 					}),
-					/* @__PURE__ */ jsx("option", { children: "Double faced Gantry LED" }),
-					/* @__PURE__ */ jsx("option", { children: "Single faced Gantry LED" }),
-					/* @__PURE__ */ jsx("option", { children: "Double faced Gantry LED" })
+					/* @__PURE__ */ jsx("option", {
+						value: "digital",
+						children: "Digital"
+					}),
+					/* @__PURE__ */ jsx("option", {
+						value: "led",
+						children: "LED"
+					}),
+					/* @__PURE__ */ jsx("option", {
+						value: "unipole",
+						children: "Unipole"
+					}),
+					/* @__PURE__ */ jsx("option", {
+						value: "billboard_bridge",
+						children: "Billboard bridge"
+					})
 				]
 			})]
 		}),
 		/* @__PURE__ */ jsxs("div", {
 			className: "my-2",
-			children: [/* @__PURE__ */ jsx("p", { children: "Price Range" }), /* @__PURE__ */ jsxs("div", {
+			children: [/* @__PURE__ */ jsx("p", { children: "Price range (effective daily rate)" }), /* @__PURE__ */ jsxs("div", {
 				className: "flex justify-between space-x-1",
 				children: [/* @__PURE__ */ jsxs("div", {
 					className: "basis-1/2",
-					children: [/* @__PURE__ */ jsx("label", { children: "from:" }), /* @__PURE__ */ jsx("input", {
+					children: [/* @__PURE__ */ jsx("label", {
+						htmlFor: "price-from",
+						children: "From"
+					}), /* @__PURE__ */ jsx("input", {
+						id: "price-from",
 						type: "number",
-						className: "rounded w-full border focus:outline-none p-2"
+						min: 0,
+						value: value.minPrice,
+						onChange: (e) => set("minPrice", e.target.value),
+						className: "rounded w-full border focus:outline-none p-2",
+						placeholder: "₦"
 					})]
 				}), /* @__PURE__ */ jsxs("div", {
 					className: "basis-1/2",
-					children: [/* @__PURE__ */ jsx("label", { children: "to:" }), /* @__PURE__ */ jsx("input", {
+					children: [/* @__PURE__ */ jsx("label", {
+						htmlFor: "price-to",
+						children: "To"
+					}), /* @__PURE__ */ jsx("input", {
+						id: "price-to",
 						type: "number",
-						className: "rounded w-full border focus:outline-none p-2"
+						min: 0,
+						value: value.maxPrice,
+						onChange: (e) => set("maxPrice", e.target.value),
+						className: "rounded w-full border focus:outline-none p-2",
+						placeholder: "₦"
 					})]
 				})]
 			})]
 		}),
 		/* @__PURE__ */ jsxs("div", {
 			className: "my-2",
-			children: [
-				/* @__PURE__ */ jsx("p", { children: "Location" }),
-				/* @__PURE__ */ jsx("input", {
-					list: "location",
-					name: "browser",
-					id: "browser",
-					className: "border focus:outline-none rounded w-full p-2"
-				}),
-				/* @__PURE__ */ jsxs("datalist", {
-					id: "location",
-					className: "",
-					children: [
-						/* @__PURE__ */ jsx("option", { value: "Ikeja" }),
-						/* @__PURE__ */ jsx("option", { value: "ikotun" }),
-						/* @__PURE__ */ jsx("option", { value: "port harcourt" }),
-						/* @__PURE__ */ jsx("option", { value: "abuja" }),
-						/* @__PURE__ */ jsx("option", { value: "victoria island" })
-					]
-				})
-			]
+			children: [/* @__PURE__ */ jsx("p", { children: "Location" }), /* @__PURE__ */ jsx("input", {
+				type: "text",
+				value: value.location,
+				onChange: (e) => set("location", e.target.value),
+				placeholder: "City, area, or address",
+				className: "border focus:outline-none rounded w-full p-2"
+			})]
 		}),
 		/* @__PURE__ */ jsxs("div", {
 			className: "my-2",
-			children: [/* @__PURE__ */ jsx("p", { children: "Status" }), /* @__PURE__ */ jsxs("select", {
+			children: [/* @__PURE__ */ jsx("p", { children: "Negotiable" }), /* @__PURE__ */ jsxs("select", {
+				value: value.negotiable,
+				onChange: (e) => set("negotiable", e.target.value),
 				className: "p-2 border focus:outline-none rounded w-full",
-				children: [/* @__PURE__ */ jsx("option", { children: "Negotiable" }), /* @__PURE__ */ jsx("option", { children: "Non Negotiable" })]
+				children: [
+					/* @__PURE__ */ jsx("option", {
+						value: "all",
+						children: "Any"
+					}),
+					/* @__PURE__ */ jsx("option", {
+						value: "yes",
+						children: "Negotiable"
+					}),
+					/* @__PURE__ */ jsx("option", {
+						value: "no",
+						children: "Non-negotiable"
+					})
+				]
 			})]
 		}),
 		/* @__PURE__ */ jsx("button", {
-			className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5  text-white  w-2/6 h-10",
+			type: "button",
+			onClick: onApply,
+			className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5 text-white w-2/6 h-10",
 			children: "Search"
 		})
 	] });
 };
 //#endregion
+//#region lib/billboardDisplay.ts
+var BOARD_LABEL = {
+	digital: "Digital",
+	led: "LED",
+	unipole: "Unipole",
+	billboard_bridge: "Billboard bridge"
+};
+function formatNaira(n) {
+	return new Intl.NumberFormat("en-NG").format(n);
+}
+function primaryPrice(pricing) {
+	if (pricing.daily != null && pricing.daily > 0) return formatNaira(pricing.daily);
+	if (pricing.weekly != null && pricing.weekly > 0) return `${formatNaira(pricing.weekly)}/wk`;
+	if (pricing.monthly != null && pricing.monthly > 0) return `${formatNaira(pricing.monthly)}/mo`;
+	return "—";
+}
+function formatRuntime(b) {
+	const days = b.activeDays?.length ?? 0;
+	const dayLabel = days === 0 ? "—" : days === 7 ? "7 days/week" : `${days} days/week`;
+	return `${b.startTime}–${b.endTime} · ${dayLabel}`;
+}
+function boardTypeLabel(slug) {
+	return BOARD_LABEL[slug] ?? slug.replace(/_/g, " ");
+}
+var DAY_BIT_LABELS = [
+	"Sun",
+	"Mon",
+	"Tue",
+	"Wed",
+	"Thu",
+	"Fri",
+	"Sat"
+];
+/** Active day bits 0–6 (Sun–Sat), same as add-billboard form. */
+function formatActiveDaysSummary(days) {
+	if (!days?.length) return "—";
+	return [...days].sort((a, b) => a - b).map((d) => DAY_BIT_LABELS[d] ?? String(d)).join(", ");
+}
+function formatListingDate(iso) {
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return "—";
+	return d.toLocaleDateString("en-NG", {
+		day: "numeric",
+		month: "short",
+		year: "numeric"
+	});
+}
+function googleMapsSearchUrl(lat, lng) {
+	return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+//#endregion
+//#region lib/billboardFilters.ts
+function toBillboardListQuery(draft, page, limit) {
+	const minRaw = draft.minPrice.trim();
+	const maxRaw = draft.maxPrice.trim();
+	const minPrice = minRaw ? Number(minRaw) : void 0;
+	const maxPrice = maxRaw ? Number(maxRaw) : void 0;
+	return {
+		page,
+		limit,
+		boardType: draft.boardType || void 0,
+		location: draft.location.trim() || void 0,
+		minPrice: minPrice !== void 0 && !Number.isNaN(minPrice) ? minPrice : void 0,
+		maxPrice: maxPrice !== void 0 && !Number.isNaN(maxPrice) ? maxPrice : void 0,
+		negotiable: draft.negotiable === "all" ? void 0 : draft.negotiable === "yes"
+	};
+}
+var defaultBillboardFilterForm = () => ({
+	boardType: "",
+	minPrice: "",
+	maxPrice: "",
+	location: "",
+	negotiable: "all"
+});
+//#endregion
 //#region app/vendors/billboards/listing/index.tsx
-var billboardImage1$1 = "/del/billboard1.png";
-var billboardImage2$6 = "/del/billboard2.png";
 var naira$2 = "/icons/naira.svg";
-var location$3 = "/icons/yellowlocation.svg";
+var location$1 = "/icons/yellowlocation.svg";
+var PAGE_SIZE$1 = 12;
 function Billboards$1() {
+	const [draft, setDraft] = useState(defaultBillboardFilterForm);
+	const [query, setQuery] = useState({
+		page: 1,
+		limit: PAGE_SIZE$1
+	});
+	const { data, isPending, isError, error, refetch } = useMyBillboardListings(query);
+	const listings = data?.data ?? [];
+	const meta = data?.meta;
 	const [filter, setFilter] = useState(false);
-	const [wishlist, setWishlist] = useState([
-		4,
-		8,
-		2,
-		9
-	]);
+	const applyFilters = useCallback(() => {
+		setQuery(toBillboardListQuery(draft, 1, PAGE_SIZE$1));
+		setFilter(false);
+	}, [draft]);
+	const goPage = (next) => {
+		if (!meta) return;
+		if (next < 1 || next > meta.totalPages) return;
+		setQuery((q) => ({
+			...q,
+			page: next
+		}));
+	};
 	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("section", {
 		className: "bg-ads360-hash min-h-screen px-4 md:px-10 py-14",
 		children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h3", {
@@ -5431,219 +6352,172 @@ function Billboards$1() {
 		}), /* @__PURE__ */ jsx("p", { children: "Check here for all your billboards" })] }), /* @__PURE__ */ jsxs("section", {
 			className: "xl:flex my-5",
 			children: [
-				/* @__PURE__ */ jsx("div", {
+				/* @__PURE__ */ jsxs("div", {
 					className: "gap-4 md:pr-4 grid grid-cols-1 md:grid-cols-2 basis-4/5",
 					children: [
-						{
-							id: 1,
-							name: "Eko hotel led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Eko",
-							image: billboardImage1$1,
-							pricepd: "60000",
-							Impressions: "70 per day",
-							negotiable: "yes",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 2,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							negotiable: "yes",
-							pricepd: "30000",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 3,
-							name: "Eko hotel led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Eko",
-							image: billboardImage1$1,
-							pricepd: "40000",
-							negotiable: "no",
-							Impressions: "50 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 4,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "yes",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 5,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							Impressions: "40 per day",
-							negotiable: "no",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 6,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "no",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 7,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "no",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 8,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "yes",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 9,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "yes",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						},
-						{
-							id: 10,
-							name: "Adetokunbo Ademola led, victoria island",
-							location: "Along Adetokunbo Ademola Street by Bishop",
-							image: billboardImage2$6,
-							pricepd: "35000",
-							negotiable: "yes",
-							Impressions: "40 per day",
-							type: "Double faced Gantry LED",
-							duration: "14hrs (6am - 9pm) 6days/week"
-						}
-					].map((billboard) => /* @__PURE__ */ jsxs("div", {
-						className: "rounded bg-white border border-ads360yellow-100",
-						children: [
-							/* @__PURE__ */ jsxs("div", {
-								className: "relative",
-								children: [
-									billboard.negotiable === "yes" && /* @__PURE__ */ jsx("div", {
-										className: "absolute w-1/2 md:w-2/3 xl:w-1/2 bg-ads360black-100/70 text-ads360light-100 rounded right-3 top-4 text-center py-2",
-										children: "Negotiable"
-									}),
-									/* @__PURE__ */ jsx("img", {
-										alt: billboard.name,
-										src: billboard.image,
-										className: "w-full rounded-t h-auto"
-									}),
-									/* @__PURE__ */ jsxs("div", {
-										className: "flex text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2",
-										children: [/* @__PURE__ */ jsx("img", {
-											src: location$3,
-											alt: ""
-										}), billboard.name.toLocaleUpperCase()]
-									})
-								]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "grid grid-cols-1 md:grid-cols-2 my-3 w-11/12 mx-auto",
-								children: [
-									/* @__PURE__ */ jsxs("div", {
-										className: "my-1",
-										children: [/* @__PURE__ */ jsx("span", {
-											className: "font-bold",
-											children: "location: "
-										}), billboard.location]
-									}),
-									/* @__PURE__ */ jsx("div", {
-										className: "my-1",
-										children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-											className: "font-bold",
-											children: "Impression: "
-										}), billboard.Impressions] })
-									}),
-									/* @__PURE__ */ jsx("div", {
-										className: "my-1",
-										children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-											className: "font-bold",
-											children: "Board-type: "
-										}), billboard.type] })
-									}),
-									/* @__PURE__ */ jsx("div", {
-										className: "my-1",
-										children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-											className: "font-bold",
-											children: "Run-time: "
-										}), billboard.duration] })
-									})
-								]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "mb-5 flex justify-between mx-auto w-11/12",
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "flex items-center",
+						isPending ? /* @__PURE__ */ jsx("p", {
+							className: "text-neutral-600 col-span-full",
+							children: "Loading your billboards…"
+						}) : null,
+						isError ? /* @__PURE__ */ jsxs("div", {
+							className: "col-span-full rounded border border-red-200 bg-red-50 p-4 text-sm text-red-800",
+							children: [/* @__PURE__ */ jsx("p", { children: error instanceof Error ? error.message : "Could not load billboards." }), /* @__PURE__ */ jsx("button", {
+								type: "button",
+								onClick: () => refetch(),
+								className: "mt-2 underline",
+								children: "Try again"
+							})]
+						}) : null,
+						!isPending && !isError && listings.length === 0 ? /* @__PURE__ */ jsx("p", {
+							className: "text-neutral-600 col-span-full",
+							children: "No billboards match your filters yet."
+						}) : null,
+						listings.map((billboard) => /* @__PURE__ */ jsxs("div", {
+							className: "rounded bg-white border border-ads360yellow-100",
+							children: [
+								/* @__PURE__ */ jsxs("div", {
+									className: "relative",
 									children: [
+										billboard.isNegotiable ? /* @__PURE__ */ jsx("div", {
+											className: "absolute w-1/2 md:w-2/3 xl:w-1/2 bg-ads360black-100/70 text-ads360light-100 rounded right-3 top-4 text-center py-2",
+											children: "Negotiable"
+										}) : null,
 										/* @__PURE__ */ jsx("img", {
-											src: naira$2,
-											alt: "naira sign"
+											alt: billboard.name,
+											src: billboard.imageUrl,
+											className: "w-full rounded-t h-auto object-cover max-h-80"
 										}),
-										"From ₦",
-										billboard.pricepd
+										/* @__PURE__ */ jsxs("div", {
+											className: "flex text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2",
+											children: [/* @__PURE__ */ jsx("img", {
+												src: location$1,
+												alt: ""
+											}), billboard.name.toLocaleUpperCase()]
+										})
 									]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "grid grid-cols-1 md:grid-cols-2 my-3 w-11/12 mx-auto",
+									children: [
+										/* @__PURE__ */ jsxs("div", {
+											className: "my-1",
+											children: [
+												/* @__PURE__ */ jsx("span", {
+													className: "font-bold",
+													children: "location: "
+												}),
+												billboard.address,
+												", ",
+												billboard.city,
+												", ",
+												billboard.state
+											]
+										}),
+										billboard.durationPerDisplay != null ? /* @__PURE__ */ jsx("div", {
+											className: "my-1",
+											children: /* @__PURE__ */ jsxs("p", { children: [
+												/* @__PURE__ */ jsx("span", {
+													className: "font-bold",
+													children: "Display: "
+												}),
+												billboard.durationPerDisplay,
+												"s per rotation"
+											] })
+										}) : null,
+										/* @__PURE__ */ jsx("div", {
+											className: "my-1",
+											children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
+												className: "font-bold",
+												children: "Board-type: "
+											}), boardTypeLabel(billboard.boardType)] })
+										}),
+										/* @__PURE__ */ jsx("div", {
+											className: "my-1",
+											children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
+												className: "font-bold",
+												children: "Run-time: "
+											}), formatRuntime(billboard)] })
+										})
+									]
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "mb-5 flex justify-between mx-auto w-11/12",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "flex items-center",
+										children: [
+											/* @__PURE__ */ jsx("img", {
+												src: naira$2,
+												alt: "naira sign"
+											}),
+											"From ₦",
+											primaryPrice(billboard.pricing)
+										]
+									}), /* @__PURE__ */ jsx("button", {
+										type: "button",
+										className: "group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
+										children: /* @__PURE__ */ jsx(Link, {
+											to: "/vendors/billboards/listing/$slug",
+											params: { slug: String(billboard.id) },
+											children: "View Details"
+										})
+									})]
+								})
+							]
+						}, billboard.id)),
+						meta && meta.totalPages > 1 ? /* @__PURE__ */ jsxs("div", {
+							className: "col-span-full flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4",
+							children: [/* @__PURE__ */ jsxs("p", {
+								className: "text-sm text-neutral-600",
+								children: [
+									"Page ",
+									meta.page,
+									" of ",
+									meta.totalPages,
+									" (",
+									meta.total,
+									" total)"
+								]
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex gap-2",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									disabled: meta.page <= 1 || isPending,
+									onClick: () => goPage(meta.page - 1),
+									className: "rounded border border-ads360yellow-100 bg-white px-3 py-1.5 text-sm disabled:opacity-40",
+									children: "Previous"
 								}), /* @__PURE__ */ jsx("button", {
-									className: "group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
-									children: /* @__PURE__ */ jsx(Link, {
-										to: `/vendors/billboards/listing/${billboard.id}`,
-										children: "View Details"
-									})
+									type: "button",
+									disabled: meta.page >= meta.totalPages || isPending,
+									onClick: () => goPage(meta.page + 1),
+									className: "rounded border border-ads360yellow-100 bg-white px-3 py-1.5 text-sm disabled:opacity-40",
+									children: "Next"
 								})]
-							})
-						]
-					}, billboard.id))
+							})]
+						}) : null
+					]
 				}),
 				/* @__PURE__ */ jsx("div", {
 					className: "basis-1/5 text-sm hidden xl:block",
 					children: /* @__PURE__ */ jsx("div", {
 						className: "top-[12.5rem] sticky rounded border p-3 border-ads360yellow-100 bg-white ",
 						children: /* @__PURE__ */ jsx(BillboardSorter, {
+							modal: false,
 							toggleModal: () => {},
-							modal: false
+							value: draft,
+							onChange: setDraft,
+							onApply: applyFilters
 						})
 					})
 				}),
-				filter === false && /* @__PURE__ */ jsx("div", {
+				filter === false ? /* @__PURE__ */ jsx("div", {
 					className: "fixed w-full left-3 bottom-5 xl:hidden",
 					children: /* @__PURE__ */ jsx("button", {
+						type: "button",
 						className: "rounded-10 font-bold border bg-ads360yellow-100 shadow-md border-white w-12 h-12",
-						onClick: () => {
-							setFilter(true);
-						},
+						onClick: () => setFilter(true),
 						children: "Filter"
 					})
-				})
+				}) : null
 			]
 		})]
 	}), /* @__PURE__ */ jsx(Modal, {
@@ -5652,12 +6526,15 @@ function Billboards$1() {
 			className: "bg-white p-3 w-10/12 md:w-9/12 mx-auto rounded-10",
 			children: /* @__PURE__ */ jsx(BillboardSorter, {
 				modal: true,
-				toggleModal: () => setFilter(false)
+				toggleModal: () => setFilter(false),
+				value: draft,
+				onChange: setDraft,
+				onApply: applyFilters
 			})
 		})
 	})] });
 }
-var Route$28 = createFileRoute("/vendors/billboards/listing/")({ component: Billboards$1 });
+var Route$31 = createFileRoute("/vendors/billboards/listing/")({ component: Billboards$1 });
 //#endregion
 //#region components/inputs/FilesInput.tsx
 var FilesInput = ({ handleChange, warning, accept, previewName }) => {
@@ -5666,6 +6543,7 @@ var FilesInput = ({ handleChange, warning, accept, previewName }) => {
 		/* @__PURE__ */ jsxs("div", {
 			className: "bg-white flex items-center pl-3 justify-between rounded-10 my-1 w-full ...",
 			children: [/* @__PURE__ */ jsx("div", { children: previewName !== void 0 && previewName.length > 10 ? previewName.slice(0, 9) + "..." + previewName.slice(-3) : previewName }), /* @__PURE__ */ jsx("button", {
+				type: "button",
 				className: "p-2 rounded-r-10 bg-ads360gray-100",
 				onClick: () => input.current?.click(),
 				children: "browse"
@@ -5686,169 +6564,753 @@ var FilesInput = ({ handleChange, warning, accept, previewName }) => {
 };
 //#endregion
 //#region app/vendors/billboards/add-billboard/index.tsx
+/** Matches intended API / listing schema */
+var BOARD_TYPES = [
+	{
+		value: "digital",
+		label: "Digital"
+	},
+	{
+		value: "led",
+		label: "LED"
+	},
+	{
+		value: "unipole",
+		label: "Unipole"
+	},
+	{
+		value: "billboard_bridge",
+		label: "Billboard bridge"
+	}
+];
+var AUDIENCE_TYPES = [
+	{
+		value: "commuters",
+		label: "Commuters"
+	},
+	{
+		value: "high_income_area",
+		label: "High-income area"
+	},
+	{
+		value: "business_district",
+		label: "Business district"
+	}
+];
+var ILLUMINATION = [{
+	value: "lit",
+	label: "Lit"
+}, {
+	value: "unlit",
+	label: "Unlit"
+}];
+var FACING_DIRECTION = [{
+	value: "inbound_traffic",
+	label: "Inbound traffic"
+}, {
+	value: "outbound_traffic",
+	label: "Outbound traffic"
+}];
+var WEEKDAYS = [
+	{
+		bit: 0,
+		label: "Sun"
+	},
+	{
+		bit: 1,
+		label: "Mon"
+	},
+	{
+		bit: 2,
+		label: "Tue"
+	},
+	{
+		bit: 3,
+		label: "Wed"
+	},
+	{
+		bit: 4,
+		label: "Thu"
+	},
+	{
+		bit: 5,
+		label: "Fri"
+	},
+	{
+		bit: 6,
+		label: "Sat"
+	}
+];
+var inputClass = "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]";
+var initialForm = {
+	name: "",
+	priceDaily: "",
+	priceWeekly: "",
+	priceMonthly: "",
+	address: "",
+	city: "",
+	state: "",
+	latitude: "",
+	longitude: "",
+	boardType: "",
+	orientation: "",
+	isNegotiable: false,
+	trafficDescription: "",
+	durationPerDisplay: "",
+	width: "",
+	height: "",
+	pixelWidth: "",
+	pixelHeight: "",
+	startTime: "06:00",
+	endTime: "21:00",
+	activeDays: [
+		1,
+		2,
+		3,
+		4,
+		5,
+		6
+	],
+	isAvailable: true,
+	audienceTypes: [],
+	nearbyLandmarks: "",
+	illumination: "",
+	facingDirection: ""
+};
+function toggleDay(days, bit) {
+	if (days.includes(bit)) return days.filter((d) => d !== bit);
+	return [...days, bit].sort((a, b) => a - b);
+}
+function toggleAudience(list, value) {
+	if (list.includes(value)) return list.filter((v) => v !== value);
+	return [...list, value];
+}
+function optionalNumber(s) {
+	if (!s.trim()) return void 0;
+	const n = Number(s);
+	return Number.isNaN(n) ? void 0 : n;
+}
+function optionalPositiveInt(s) {
+	if (s.trim() === "") return void 0;
+	const n = Number(s);
+	if (Number.isNaN(n)) return void 0;
+	return Math.round(n);
+}
+function buildListingPayload(form) {
+	const pd = parseFloat(form.priceDaily);
+	const pw = parseFloat(form.priceWeekly);
+	const pm = parseFloat(form.priceMonthly);
+	return {
+		name: form.name.trim(),
+		address: form.address.trim(),
+		city: form.city.trim(),
+		state: form.state.trim(),
+		latitude: optionalNumber(form.latitude),
+		longitude: optionalNumber(form.longitude),
+		pricing: {
+			...pd > 0 && !Number.isNaN(pd) ? { daily: pd } : {},
+			...pw > 0 && !Number.isNaN(pw) ? { weekly: pw } : {},
+			...pm > 0 && !Number.isNaN(pm) ? { monthly: pm } : {}
+		},
+		boardType: form.boardType,
+		orientation: form.orientation || void 0,
+		isNegotiable: form.isNegotiable,
+		trafficDescription: form.trafficDescription.trim() || void 0,
+		durationPerDisplay: optionalNumber(form.durationPerDisplay),
+		width: optionalNumber(form.width),
+		height: optionalNumber(form.height),
+		pixelWidth: optionalPositiveInt(form.pixelWidth),
+		pixelHeight: optionalPositiveInt(form.pixelHeight),
+		startTime: form.startTime,
+		endTime: form.endTime,
+		activeDays: form.activeDays,
+		isAvailable: form.isAvailable,
+		audienceTypes: form.audienceTypes,
+		nearbyLandmarks: form.nearbyLandmarks.trim() || void 0,
+		illumination: form.illumination || void 0,
+		facingDirection: form.facingDirection || void 0
+	};
+}
 var Add = () => {
-	const [successfull, setSuccessfull] = useState(false);
+	const { mutate: createListing, isPending } = useCreateBillboardListing();
+	const [showSuccessModal, setShowSuccessModal] = useState(false);
+	const [validationError, setValidationError] = useState("");
+	const [form, setForm] = useState(() => ({
+		...initialForm,
+		activeDays: [...initialForm.activeDays]
+	}));
+	const [imagePreviewName, setImagePreviewName] = useState("");
+	const [imagePreviewUrl, setImagePreviewUrl] = useState(null);
+	const [imageError, setImageError] = useState("");
+	const [imageFile, setImageFile] = useState(null);
 	const navigate = useNavigate();
-	const handleSubmitTemp = (e) => {
+	useEffect(() => {
+		if (!imageFile) {
+			setImagePreviewUrl(null);
+			return;
+		}
+		const url = URL.createObjectURL(imageFile);
+		setImagePreviewUrl(url);
+		return () => URL.revokeObjectURL(url);
+	}, [imageFile]);
+	const set = (key) => (v) => {
+		if (v && typeof v === "object" && "target" in v) {
+			const t = v.target;
+			const val = t.type === "checkbox" ? t.checked : t.value;
+			setForm((f) => ({
+				...f,
+				[key]: val
+			}));
+		} else setForm((f) => ({
+			...f,
+			[key]: v
+		}));
+	};
+	const handleImageChange = (e) => {
+		const file = e.target.files?.[0];
+		setImageError("");
+		if (!file) {
+			setImagePreviewName("");
+			setImageFile(null);
+			return;
+		}
+		if (!file.type.startsWith("image/")) {
+			setImageError("Use a JPG, PNG, or other image file.");
+			setImagePreviewName("");
+			setImageFile(null);
+			e.target.value = "";
+			return;
+		}
+		setImagePreviewName(file.name);
+		setImageFile(file);
+	};
+	const handleSubmit = (e) => {
 		e.preventDefault();
-		setSuccessfull(true);
+		setValidationError("");
+		if (!form.name.trim() || !form.address.trim() || !form.city.trim() || !form.state.trim()) {
+			setValidationError("Fill in name, address, city, and state.");
+			return;
+		}
+		if (!form.boardType) {
+			setValidationError("Select a board type.");
+			return;
+		}
+		const pd = parseFloat(form.priceDaily);
+		const pw = parseFloat(form.priceWeekly);
+		const pm = parseFloat(form.priceMonthly);
+		if (!(!Number.isNaN(pd) && pd > 0 || !Number.isNaN(pw) && pw > 0 || !Number.isNaN(pm) && pm > 0)) {
+			setValidationError("Enter at least one price: per day, per week, or per month.");
+			return;
+		}
+		if (!imageFile) {
+			const msg = "Upload a hero image.";
+			setImageError(msg);
+			setValidationError(msg);
+			return;
+		}
+		if (form.activeDays.length === 0) {
+			setValidationError("Select at least one active day.");
+			return;
+		}
+		createListing({
+			payload: buildListingPayload(form),
+			imageFile
+		}, { onSuccess: () => setShowSuccessModal(true) });
 	};
 	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("section", {
 		className: "min-h-screen bg-ads360-hash py-14",
 		children: [/* @__PURE__ */ jsxs("div", {
 			className: "mx-auto w-11/12",
 			children: [/* @__PURE__ */ jsx("h3", {
-				className: "text-2xl",
-				children: "Add Billboard"
-			}), /* @__PURE__ */ jsx("p", { children: "Add billboards here" })]
-		}), /* @__PURE__ */ jsx("form", { children: /* @__PURE__ */ jsxs("div", {
-			className: "md:flex mx-auto w-11/12",
-			children: [/* @__PURE__ */ jsxs("div", {
-				className: "basis-6/12 md:pr-5",
-				children: [
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Billboard name" }), /* @__PURE__ */ jsx("input", { className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" })]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Price" }), /* @__PURE__ */ jsx("input", { className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" })]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Location" }), /* @__PURE__ */ jsx("input", { className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" })]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Board Type" }), /* @__PURE__ */ jsx("input", { className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]" })]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Daily Impressions" }), /* @__PURE__ */ jsx("input", {
-							type: "number",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Duration per display" }), /* @__PURE__ */ jsx("input", {
-							type: "number",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Time" }), /* @__PURE__ */ jsx("input", {
-							placeholder: "14hrs (6am - 9pm) 6days/week",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Dimention" }), /* @__PURE__ */ jsxs("div", {
-							className: "flex space-x-3",
-							children: [/* @__PURE__ */ jsx("div", {
-								className: "basis-1/2",
-								children: /* @__PURE__ */ jsx("input", {
-									placeholder: "width",
-									className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-								})
-							}), /* @__PURE__ */ jsx("div", {
-								className: "basis-1/2",
-								children: /* @__PURE__ */ jsx("input", {
-									placeholder: "height",
-									className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-								})
-							})]
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Pixel Size" }), /* @__PURE__ */ jsxs("div", {
-							className: "flex space-x-3",
-							children: [/* @__PURE__ */ jsx("div", {
-								className: "basis-1/2",
-								children: /* @__PURE__ */ jsx("input", {
-									placeholder: "width",
-									className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-								})
-							}), /* @__PURE__ */ jsx("div", {
-								className: "basis-1/2",
-								children: /* @__PURE__ */ jsx("input", {
-									placeholder: "height",
-									className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-								})
-							})]
-						})]
-					})
-				]
-			}), /* @__PURE__ */ jsxs("div", {
-				className: "basis-6/12",
-				children: [
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Orientation" }), /* @__PURE__ */ jsxs("select", {
-							defaultValue: "select",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]",
-							children: [
-								/* @__PURE__ */ jsx("option", {
-									disabled: true,
-									children: "select"
-								}),
-								/* @__PURE__ */ jsx("option", { children: "Potrait" }),
-								/* @__PURE__ */ jsx("option", { children: "Landscape" })
-							]
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Negotiable" }), /* @__PURE__ */ jsxs("select", {
-							defaultValue: "select",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]",
-							children: [
-								/* @__PURE__ */ jsx("option", {
-									disabled: true,
-									children: "select"
-								}),
-								/* @__PURE__ */ jsx("option", { children: "Yes" }),
-								/* @__PURE__ */ jsx("option", { children: "No" })
-							]
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Traffic Description" }), /* @__PURE__ */ jsx("textarea", {
-							rows: 4,
-							placeholder: "Facing Traffic Along Adetokumbo Ademola Street by Eko Hotels,Ahmadu Bello Way, Akin Adesola & Ajose Adeogun.",
-							className: "bg-white w-full rounded-[5px] p-2 focus:outline-none border border-[#E4E4E4]"
-						})]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						className: "my-3",
-						children: [/* @__PURE__ */ jsx("p", { children: "Image" }), /* @__PURE__ */ jsx(FilesInput, {
-							previewName: "",
-							accept: "image",
-							handleChange: () => {},
-							warning: "Require image size"
-						})]
-					}),
-					/* @__PURE__ */ jsx("div", { className: "bg-white w-full h-60 rounded-10" }),
-					/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("button", {
-						onClick: handleSubmitTemp,
-						className: `bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5  text-white p-2`,
-						children: "Submit"
-					}) })
-				]
+				className: "text-2xl font-semibold",
+				children: "Add billboard"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "text-sm text-neutral-600 mt-1",
+				children: "Listing details for location, pricing, schedule, and creative specs."
 			})]
-		}) })]
+		}), /* @__PURE__ */ jsx("form", {
+			onSubmit: handleSubmit,
+			children: /* @__PURE__ */ jsxs("div", {
+				className: "md:flex mx-auto w-11/12 gap-0",
+				children: [/* @__PURE__ */ jsxs("div", {
+					className: "basis-6/12 md:pr-5",
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Billboard name"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "name",
+								required: true,
+								value: form.name,
+								onChange: set("name"),
+								className: inputClass,
+								placeholder: "e.g. Lekki-Epe Express facing VI"
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [
+								/* @__PURE__ */ jsx("p", {
+									className: "text-sm font-medium mb-1",
+									children: "Pricing (₦)"
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-xs text-neutral-500 mb-2",
+									children: "Add one or more: day, week, and month — advertisers can compare options."
+								}),
+								/* @__PURE__ */ jsxs("div", {
+									className: "grid grid-cols-1 sm:grid-cols-3 gap-3",
+									children: [
+										/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+											className: "text-xs text-neutral-600 block mb-1",
+											children: "Per day"
+										}), /* @__PURE__ */ jsx("input", {
+											name: "priceDaily",
+											type: "number",
+											min: 0,
+											step: "0.01",
+											value: form.priceDaily,
+											onChange: set("priceDaily"),
+											className: inputClass,
+											placeholder: "—"
+										})] }),
+										/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+											className: "text-xs text-neutral-600 block mb-1",
+											children: "Per week"
+										}), /* @__PURE__ */ jsx("input", {
+											name: "priceWeekly",
+											type: "number",
+											min: 0,
+											step: "0.01",
+											value: form.priceWeekly,
+											onChange: set("priceWeekly"),
+											className: inputClass,
+											placeholder: "—"
+										})] }),
+										/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("label", {
+											className: "text-xs text-neutral-600 block mb-1",
+											children: "Per month"
+										}), /* @__PURE__ */ jsx("input", {
+											name: "priceMonthly",
+											type: "number",
+											min: 0,
+											step: "0.01",
+											value: form.priceMonthly,
+											onChange: set("priceMonthly"),
+											className: inputClass,
+											placeholder: "—"
+										})] })
+									]
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Street address"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "address",
+								required: true,
+								value: form.address,
+								onChange: set("address"),
+								className: inputClass,
+								placeholder: "Full street address"
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3 grid grid-cols-1 sm:grid-cols-2 gap-3",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "City"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "city",
+								required: true,
+								value: form.city,
+								onChange: set("city"),
+								className: inputClass
+							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "State"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "state",
+								required: true,
+								value: form.state,
+								onChange: set("state"),
+								className: inputClass
+							})] })]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3 grid grid-cols-1 sm:grid-cols-2 gap-3",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Latitude (optional)"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "latitude",
+								type: "number",
+								step: "any",
+								value: form.latitude,
+								onChange: set("latitude"),
+								className: inputClass,
+								placeholder: "6.4281"
+							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Longitude (optional)"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "longitude",
+								type: "number",
+								step: "any",
+								value: form.longitude,
+								onChange: set("longitude"),
+								className: inputClass,
+								placeholder: "3.4219"
+							})] })]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Board type"
+							}), /* @__PURE__ */ jsxs("select", {
+								name: "boardType",
+								required: true,
+								value: form.boardType,
+								onChange: set("boardType"),
+								className: inputClass,
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "",
+									children: "Select type"
+								}), BOARD_TYPES.map((t) => /* @__PURE__ */ jsx("option", {
+									value: t.value,
+									children: t.label
+								}, t.value))]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Duration per display (seconds)"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "durationPerDisplay",
+								type: "number",
+								min: 0,
+								value: form.durationPerDisplay,
+								onChange: set("durationPerDisplay"),
+								className: inputClass
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3 grid grid-cols-1 sm:grid-cols-2 gap-3",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Display from"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "startTime",
+								type: "time",
+								value: form.startTime,
+								onChange: set("startTime"),
+								className: inputClass
+							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Display until"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "endTime",
+								type: "time",
+								value: form.endTime,
+								onChange: set("endTime"),
+								className: inputClass
+							})] })]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [
+								/* @__PURE__ */ jsx("p", {
+									className: "text-sm font-medium mb-1",
+									children: "Active days"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									className: "flex flex-wrap gap-2",
+									children: WEEKDAYS.map(({ bit, label }) => /* @__PURE__ */ jsxs("label", {
+										className: `cursor-pointer rounded border px-2 py-1 text-sm ${form.activeDays.includes(bit) ? "bg-ads360black-100 text-white border-ads360black-100" : "bg-white border-[#E4E4E4]"}`,
+										children: [/* @__PURE__ */ jsx("input", {
+											type: "checkbox",
+											className: "sr-only",
+											checked: form.activeDays.includes(bit),
+											onChange: () => setForm((f) => ({
+												...f,
+												activeDays: toggleDay(f.activeDays, bit)
+											}))
+										}), label]
+									}, bit))
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-xs text-neutral-500 mt-1",
+									children: "At least one day required."
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Physical dimensions (m)"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex gap-3",
+								children: [/* @__PURE__ */ jsx("input", {
+									name: "width",
+									type: "number",
+									min: 0,
+									step: "any",
+									placeholder: "Width",
+									value: form.width,
+									onChange: set("width"),
+									className: inputClass
+								}), /* @__PURE__ */ jsx("input", {
+									name: "height",
+									type: "number",
+									min: 0,
+									step: "any",
+									placeholder: "Height",
+									value: form.height,
+									onChange: set("height"),
+									className: inputClass
+								})]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Creative resolution (px)"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex gap-3",
+								children: [/* @__PURE__ */ jsx("input", {
+									name: "pixelWidth",
+									type: "number",
+									min: 0,
+									placeholder: "Width",
+									value: form.pixelWidth,
+									onChange: set("pixelWidth"),
+									className: inputClass
+								}), /* @__PURE__ */ jsx("input", {
+									name: "pixelHeight",
+									type: "number",
+									min: 0,
+									placeholder: "Height",
+									value: form.pixelHeight,
+									onChange: set("pixelHeight"),
+									className: inputClass
+								})]
+							})]
+						})
+					]
+				}), /* @__PURE__ */ jsxs("div", {
+					className: "basis-6/12 md:pl-2",
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Orientation"
+							}), /* @__PURE__ */ jsxs("select", {
+								name: "orientation",
+								value: form.orientation,
+								onChange: set("orientation"),
+								className: inputClass,
+								children: [
+									/* @__PURE__ */ jsx("option", {
+										value: "",
+										children: "Select"
+									}),
+									/* @__PURE__ */ jsx("option", {
+										value: "portrait",
+										children: "Portrait"
+									}),
+									/* @__PURE__ */ jsx("option", {
+										value: "landscape",
+										children: "Landscape"
+									})
+								]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3 flex items-center gap-2",
+							children: [/* @__PURE__ */ jsx("input", {
+								id: "isNegotiable",
+								type: "checkbox",
+								checked: form.isNegotiable,
+								onChange: (e) => setForm((f) => ({
+									...f,
+									isNegotiable: e.target.checked
+								})),
+								className: "rounded border-[#E4E4E4]"
+							}), /* @__PURE__ */ jsx("label", {
+								htmlFor: "isNegotiable",
+								className: "text-sm font-medium",
+								children: "Price is negotiable"
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Availability"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "flex items-center gap-2",
+								children: [/* @__PURE__ */ jsx("input", {
+									id: "isAvailable",
+									type: "checkbox",
+									checked: form.isAvailable,
+									onChange: (e) => setForm((f) => ({
+										...f,
+										isAvailable: e.target.checked
+									})),
+									className: "rounded border-[#E4E4E4]"
+								}), /* @__PURE__ */ jsx("label", {
+									htmlFor: "isAvailable",
+									className: "text-sm",
+									children: "Currently available for booking"
+								})]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Audience type"
+							}), /* @__PURE__ */ jsx("div", {
+								className: "flex flex-wrap gap-2",
+								children: AUDIENCE_TYPES.map((a) => /* @__PURE__ */ jsxs("label", {
+									className: `cursor-pointer rounded border px-2 py-1 text-sm ${form.audienceTypes.includes(a.value) ? "bg-ads360black-100 text-white border-ads360black-100" : "bg-white border-[#E4E4E4]"}`,
+									children: [/* @__PURE__ */ jsx("input", {
+										type: "checkbox",
+										className: "sr-only",
+										checked: form.audienceTypes.includes(a.value),
+										onChange: () => setForm((f) => ({
+											...f,
+											audienceTypes: toggleAudience(f.audienceTypes, a.value)
+										}))
+									}), a.label]
+								}, a.value))
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Nearby landmarks"
+							}), /* @__PURE__ */ jsx("input", {
+								name: "nearbyLandmarks",
+								value: form.nearbyLandmarks,
+								onChange: set("nearbyLandmarks"),
+								className: inputClass,
+								placeholder: "e.g. Near Eko Hotel, opposite Shoprite"
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3 grid grid-cols-1 sm:grid-cols-2 gap-3",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Illumination"
+							}), /* @__PURE__ */ jsxs("select", {
+								name: "illumination",
+								value: form.illumination,
+								onChange: set("illumination"),
+								className: inputClass,
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "",
+									children: "Select"
+								}), ILLUMINATION.map((i) => /* @__PURE__ */ jsx("option", {
+									value: i.value,
+									children: i.label
+								}, i.value))]
+							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Facing direction"
+							}), /* @__PURE__ */ jsxs("select", {
+								name: "facingDirection",
+								value: form.facingDirection,
+								onChange: set("facingDirection"),
+								className: inputClass,
+								children: [/* @__PURE__ */ jsx("option", {
+									value: "",
+									children: "Select"
+								}), FACING_DIRECTION.map((d) => /* @__PURE__ */ jsx("option", {
+									value: d.value,
+									children: d.label
+								}, d.value))]
+							})] })]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [/* @__PURE__ */ jsx("p", {
+								className: "text-sm font-medium mb-1",
+								children: "Traffic description"
+							}), /* @__PURE__ */ jsx("textarea", {
+								name: "trafficDescription",
+								rows: 4,
+								value: form.trafficDescription,
+								onChange: set("trafficDescription"),
+								placeholder: "Facing traffic along Adetokunbo Ademola by Eko Hotel, Ahmadu Bello Way…",
+								className: inputClass
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "my-3",
+							children: [
+								/* @__PURE__ */ jsx("p", {
+									className: "text-sm font-medium mb-1",
+									children: "Hero image"
+								}),
+								/* @__PURE__ */ jsx("p", {
+									className: "text-xs text-neutral-600 mb-2",
+									children: "JPG, PNG, or other common image formats."
+								}),
+								/* @__PURE__ */ jsx(FilesInput, {
+									previewName: imagePreviewName,
+									accept: "image",
+									handleChange: handleImageChange,
+									warning: imageError || " "
+								})
+							]
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "bg-neutral-50 w-full min-h-[240px] rounded-10 border border-dashed border-[#E4E4E4] overflow-hidden flex items-center justify-center",
+							children: imagePreviewUrl ? /* @__PURE__ */ jsx("img", {
+								src: imagePreviewUrl,
+								alt: "Billboard hero image preview",
+								className: "max-h-[min(480px,70vh)] w-full object-contain"
+							}) : /* @__PURE__ */ jsx("p", {
+								className: "text-sm text-neutral-500 px-4 text-center",
+								children: "Image preview appears here after you choose a file above."
+							})
+						}),
+						validationError ? /* @__PURE__ */ jsx("p", {
+							className: "text-sm text-red-600 mt-4",
+							role: "alert",
+							children: validationError
+						}) : null,
+						/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("button", {
+							type: "submit",
+							disabled: isPending,
+							className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-5 text-white p-2 px-4 disabled:opacity-60 disabled:pointer-events-none",
+							children: isPending ? "Submitting…" : "Submit listing"
+						}) })
+					]
+				})]
+			})
+		})]
 	}), /* @__PURE__ */ jsx(Modal, {
-		isOpen: successfull,
+		isOpen: showSuccessModal,
 		children: /* @__PURE__ */ jsxs("div", {
 			className: "bg-white w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10 grid grid-cols-1 content-center",
 			children: [
 				/* @__PURE__ */ jsx("p", {
 					className: "text-green-500 border-b p-3 font-semibold",
-					children: "Billboard Added Successfully"
+					children: "Billboard added successfully"
 				}),
 				/* @__PURE__ */ jsx("p", {
 					className: "px-3 py-5 border-b",
@@ -5857,31 +7319,307 @@ var Add = () => {
 				/* @__PURE__ */ jsxs("div", {
 					className: "flex justify-end space-x-2 p-3",
 					children: [/* @__PURE__ */ jsx("button", {
-						onClick: () => setSuccessfull(false),
-						className: `bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2`,
+						type: "button",
+						onClick: () => {
+							setShowSuccessModal(false);
+							setValidationError("");
+							setForm({
+								...initialForm,
+								activeDays: [...initialForm.activeDays]
+							});
+							setImagePreviewName("");
+							setImageFile(null);
+							setImageError("");
+						},
+						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2",
 						children: "Yes"
 					}), /* @__PURE__ */ jsx("button", {
+						type: "button",
 						onClick: () => navigate({ to: "/vendors/billboards/listing" }),
-						className: `bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2`,
+						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2",
 						children: "No"
 					})]
-				}),
-				/* @__PURE__ */ jsx("div", {})
+				})
 			]
 		})
 	})] });
 };
-var Route$27 = createFileRoute("/vendors/billboards/add-billboard/")({ component: Add });
+var Route$30 = createFileRoute("/vendors/billboards/add-billboard/")({ component: Add });
+//#endregion
+//#region components/wallet/FundWalletModal.tsx
+var cancel$5 = "/icons/usericon/modalCancelBotton.svg";
+var cardIcon = "/icons/usericon/card.svg";
+function FundWalletModal({ isOpen, onClose }) {
+	const [amount, setAmount] = useState("");
+	const [selected, setSelected] = useState("new");
+	const [saveCard, setSaveCard] = useState(false);
+	const { data: savedCards = [], isFetching: cardsLoading } = useSavedPaymentCards(isOpen);
+	const deposit = useWalletDeposit();
+	const invalidateWallet = useInvalidateWalletQueries();
+	const handleProceed = async () => {
+		const amt = Number(amount);
+		if (!Number.isFinite(amt) || amt <= 0) {
+			toast.error("Enter a valid amount.");
+			return;
+		}
+		try {
+			const res = await deposit.mutateAsync({
+				amount: amt,
+				saveCard: selected === "new" ? saveCard : false,
+				savedCardId: selected === "new" ? void 0 : selected
+			});
+			const link = res && typeof res === "object" && res.data && typeof res.data.link === "string" ? res.data.link : null;
+			if (link) {
+				window.location.assign(link);
+				return;
+			}
+			toast.success("Payment started.");
+			await invalidateWallet();
+			onClose();
+		} catch {}
+	};
+	return /* @__PURE__ */ jsx(Modal, {
+		isOpen,
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "bg-white p-5 w-11/12 max-w-md mx-auto rounded-10 max-h-[90vh] overflow-y-auto",
+			children: [
+				/* @__PURE__ */ jsxs("div", {
+					className: "flex justify-between items-start mb-4",
+					children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+						className: "text-lg font-semibold",
+						children: "Fund wallet"
+					}), /* @__PURE__ */ jsx("p", {
+						className: "text-sm text-stone-500 mt-1",
+						children: "Pay with a saved card or a new card via checkout"
+					})] }), /* @__PURE__ */ jsx("button", {
+						type: "button",
+						onClick: onClose,
+						"aria-label": "Close",
+						children: /* @__PURE__ */ jsx("img", {
+							src: cancel$5,
+							alt: "",
+							className: "w-5"
+						})
+					})]
+				}),
+				/* @__PURE__ */ jsxs("div", {
+					className: "mb-5",
+					children: [/* @__PURE__ */ jsx("label", {
+						className: "text-sm font-medium text-stone-600",
+						htmlFor: "fund-amount",
+						children: "Amount"
+					}), /* @__PURE__ */ jsxs("div", {
+						className: "flex mt-1",
+						children: [/* @__PURE__ */ jsx("div", {
+							className: "bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-14 content-center text-black/50 text-sm",
+							children: "₦"
+						}), /* @__PURE__ */ jsx("input", {
+							id: "fund-amount",
+							inputMode: "decimal",
+							placeholder: "0.00",
+							value: amount,
+							onChange: (e) => setAmount(e.target.value),
+							className: "p-2 w-full border border-l-0 rounded-r focus:outline-none focus:ring-1 focus:ring-ads360yellow-100"
+						})]
+					})]
+				}),
+				/* @__PURE__ */ jsx("p", {
+					className: "text-sm font-medium text-stone-700 mb-2",
+					children: "Saved cards"
+				}),
+				cardsLoading ? /* @__PURE__ */ jsx("p", {
+					className: "text-sm text-stone-500 mb-4",
+					children: "Loading cards…"
+				}) : null,
+				/* @__PURE__ */ jsxs("ul", {
+					className: "space-y-2 mb-4",
+					children: [savedCards.map((c) => /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsxs("button", {
+						type: "button",
+						onClick: () => setSelected(c.id),
+						className: `w-full flex items-center gap-3 rounded border p-3 text-left transition-colors ${selected === c.id ? "border-ads360yellow-100 bg-ads360yellow-100/10" : "border-[#E4E4E4] hover:border-ads360yellow-100/50"}`,
+						children: [
+							/* @__PURE__ */ jsx("img", {
+								src: cardIcon,
+								alt: "",
+								width: 36,
+								height: 36,
+								className: "shrink-0"
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex-1 min-w-0",
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "font-medium text-sm",
+									children: (c.brand ?? "Card") + (c.last4 ? ` ·••• ${c.last4}` : "")
+								}), /* @__PURE__ */ jsx("p", {
+									className: "text-xs text-stone-500",
+									children: c.expMonth && c.expYear ? `Expires ${c.expMonth}/${c.expYear}` : "Saved on file"
+								})]
+							}),
+							/* @__PURE__ */ jsx("span", {
+								className: `h-4 w-4 rounded-full border-2 shrink-0 ${selected === c.id ? "border-ads360black-100 bg-ads360black-100" : "border-stone-300"}`,
+								"aria-hidden": true
+							})
+						]
+					}) }, c.id)), /* @__PURE__ */ jsx("li", { children: /* @__PURE__ */ jsxs("button", {
+						type: "button",
+						onClick: () => setSelected("new"),
+						className: `w-full flex items-center gap-3 rounded border p-3 text-left transition-colors ${selected === "new" ? "border-ads360yellow-100 bg-ads360yellow-100/10" : "border-[#E4E4E4] hover:border-ads360yellow-100/50"}`,
+						children: [
+							/* @__PURE__ */ jsx("div", {
+								className: "h-9 w-9 rounded border border-dashed border-stone-400 grid place-items-center text-stone-500 text-lg shrink-0",
+								children: "+"
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "flex-1",
+								children: [/* @__PURE__ */ jsx("p", {
+									className: "font-medium text-sm",
+									children: "Use a new card"
+								}), /* @__PURE__ */ jsx("p", {
+									className: "text-xs text-stone-500",
+									children: "Opens secure checkout"
+								})]
+							}),
+							/* @__PURE__ */ jsx("span", {
+								className: `h-4 w-4 rounded-full border-2 shrink-0 ${selected === "new" ? "border-ads360black-100 bg-ads360black-100" : "border-stone-300"}`,
+								"aria-hidden": true
+							})
+						]
+					}) })]
+				}),
+				selected === "new" ? /* @__PURE__ */ jsxs("label", {
+					className: "flex items-center gap-2 cursor-pointer select-none mb-6",
+					children: [/* @__PURE__ */ jsx("input", {
+						type: "checkbox",
+						checked: saveCard,
+						onChange: (e) => setSaveCard(e.target.checked),
+						className: "rounded border-stone-400 text-ads360black-100 focus:ring-ads360yellow-100"
+					}), /* @__PURE__ */ jsx("span", {
+						className: "text-sm text-stone-700",
+						children: "Save this card for next time"
+					})]
+				}) : /* @__PURE__ */ jsx("p", {
+					className: "text-xs text-stone-500 mb-6",
+					children: "Paying with a card already on file — no need to save again."
+				}),
+				/* @__PURE__ */ jsx("div", {
+					className: "flex justify-center",
+					children: /* @__PURE__ */ jsx("button", {
+						type: "button",
+						disabled: deposit.isPending,
+						className: "bg-ads360black-100/95 hover:bg-ads360black-100 disabled:opacity-60 rounded text-white w-5/6 h-10 text-sm font-medium",
+						onClick: () => void handleProceed(),
+						children: deposit.isPending ? "Please wait…" : "Proceed"
+					})
+				})
+			]
+		})
+	});
+}
 //#endregion
 //#region app/_usersauth/users/wallet/index.tsx
 var naira$1 = "/icons/naira.svg";
 var filter = "/icons/filter.svg";
 var makepayment = "/icons/makepayment.svg";
 var whatsAppPoint = "/icons/usericon/whatsappPoint.svg";
+function formatMoney(n, currency) {
+	return `${currency === "NGN" ? "₦" : `${currency} `}${new Intl.NumberFormat("en-NG", {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2
+	}).format(n)}`;
+}
+function accountDisplayName(me) {
+	if (!me) return "—";
+	if (me.accountType === "business_user") return me.businessName || me.contactName || me.email;
+	if (me.accountType === "regular_user") return `${me.firstName} ${me.lastName}`.trim() || me.email;
+	return me.email;
+}
+var TYPE_LABELS = {
+	wallet_fund: "Wallet fund",
+	wallet_withdrawal: "Wallet withdrawal",
+	wallet_debit: "Wallet debit",
+	billboard_booking: "Billboard booking",
+	billboard_payout: "Billboard payout",
+	refund: "Refund",
+	admin_adjustment: "Adjustment",
+	other: "Other"
+};
+var STATUS_LABELS = {
+	pending: "Pending",
+	completed: "Completed",
+	failed: "Failed"
+};
+var ALL_TYPES = [
+	"all",
+	"wallet_fund",
+	"wallet_withdrawal",
+	"wallet_debit",
+	"billboard_booking",
+	"billboard_payout",
+	"refund",
+	"admin_adjustment",
+	"other"
+];
+var ALL_STATUSES = [
+	"all",
+	"pending",
+	"completed",
+	"failed"
+];
+function amountPresentation(tx) {
+	const base = formatMoney(Math.abs(tx.amount), tx.currency);
+	const creditTypes = [
+		"wallet_fund",
+		"refund",
+		"billboard_payout"
+	];
+	const debitTypes = [
+		"wallet_withdrawal",
+		"wallet_debit",
+		"billboard_booking"
+	];
+	if (creditTypes.includes(tx.type)) return {
+		text: `+${base}`,
+		className: "text-green-600"
+	};
+	if (debitTypes.includes(tx.type)) return {
+		text: `-${base}`,
+		className: "text-red-600"
+	};
+	return {
+		text: base,
+		className: "text-stone-700"
+	};
+}
+function formatWhen(iso) {
+	const d = new Date(iso);
+	if (Number.isNaN(d.getTime())) return iso;
+	return d.toLocaleString("en-NG", {
+		dateStyle: "medium",
+		timeStyle: "short"
+	});
+}
 var WalletSection = () => {
-	return /* @__PURE__ */ jsx("section", {
+	const { data: me } = useMe();
+	const { data: wallet, isPending: walletLoading, isError: walletError } = useWallet();
+	const { data: transactions = [], isPending: txLoading, isError: txError, refetch: refetchTx } = useWalletTransactions(100);
+	const [fundOpen, setFundOpen] = useState(false);
+	const [statusFilter, setStatusFilter] = useState("all");
+	const [typeFilter, setTypeFilter] = useState("all");
+	const filtered = useMemo(() => {
+		return transactions.filter((t) => {
+			if (statusFilter !== "all" && t.status !== statusFilter) return false;
+			if (typeFilter !== "all" && t.type !== typeFilter) return false;
+			return true;
+		});
+	}, [
+		transactions,
+		statusFilter,
+		typeFilter
+	]);
+	const displayName = accountDisplayName(me);
+	return /* @__PURE__ */ jsxs("section", {
 		className: "min-h-screen bg-ads360-hash px-4 md:px-10 py-14",
-		children: /* @__PURE__ */ jsxs("div", {
+		children: [/* @__PURE__ */ jsxs("div", {
 			className: "container mx-auto",
 			children: [
 				/* @__PURE__ */ jsx("h2", {
@@ -5893,13 +7631,13 @@ var WalletSection = () => {
 					children: "View billing history and current balance here"
 				}),
 				/* @__PURE__ */ jsxs("div", {
-					className: "md:flex my-10 justify-around bg-white p-5 shadow-md rounded-10 border border-ads360yellow-100",
+					className: "md:flex my-10 justify-around items-start gap-6 bg-white p-5 shadow-md rounded-10 border border-ads360yellow-100",
 					children: [
 						/* @__PURE__ */ jsxs("div", { children: [
 							/* @__PURE__ */ jsx("h3", { children: "Account Name" }),
 							/* @__PURE__ */ jsx("p", {
 								className: "text-stone-400 text-xl my-4",
-								children: "Ayomike Charles"
+								children: displayName
 							}),
 							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
 								className: "my-3",
@@ -5907,14 +7645,20 @@ var WalletSection = () => {
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "flex",
 								children: [/* @__PURE__ */ jsx("img", {
-									alt: "naira",
+									alt: "",
 									src: naira$1,
 									className: "w-14 h-14"
 								}), /* @__PURE__ */ jsxs("div", {
 									className: "px-3",
-									children: [/* @__PURE__ */ jsx("p", {
+									children: [walletLoading ? /* @__PURE__ */ jsx("p", {
+										className: "text-2xl text-stone-400",
+										children: "…"
+									}) : walletError ? /* @__PURE__ */ jsx("p", {
+										className: "text-sm text-red-600",
+										children: "Could not load balance"
+									}) : /* @__PURE__ */ jsx("p", {
 										className: "text-2xl",
-										children: "₦1000000.00"
+										children: formatMoney(wallet?.balance ?? 0, wallet?.currency ?? "NGN")
 									}), /* @__PURE__ */ jsx("h3", {
 										className: "text-stone-400 text-sm",
 										children: "Available Balance"
@@ -5922,22 +7666,15 @@ var WalletSection = () => {
 								})]
 							})] })
 						] }),
-						/* @__PURE__ */ jsxs("div", { children: [
-							/* @__PURE__ */ jsx("h3", {
-								className: "mt-5 md:my-0",
-								children: "360ads Wallet ID"
-							}),
-							/* @__PURE__ */ jsx("p", {
-								className: "text-xl text-ads360yellow-100 my-4",
-								children: "3211711562"
-							}),
-							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
+						/* @__PURE__ */ jsxs("div", {
+							className: "mt-5 md:mt-0",
+							children: [/* @__PURE__ */ jsx("p", {
 								className: "my-3",
 								children: "WhatsApp Point"
 							}), /* @__PURE__ */ jsxs("div", {
 								className: "flex",
 								children: [/* @__PURE__ */ jsx("img", {
-									alt: "naira",
+									alt: "",
 									src: whatsAppPoint,
 									className: "w-14 h-14"
 								}), /* @__PURE__ */ jsxs("div", {
@@ -5950,15 +7687,16 @@ var WalletSection = () => {
 										children: "Available Balance"
 									})]
 								})]
-							})] })
-						] }),
+							})]
+						}),
 						/* @__PURE__ */ jsx("div", {
-							className: "",
-							children: /* @__PURE__ */ jsxs(Link, {
-								to: "wallet/fundwallet",
+							className: "shrink-0",
+							children: /* @__PURE__ */ jsxs("button", {
+								type: "button",
+								onClick: () => setFundOpen(true),
 								className: "flex px-10 space-x-5 py-5 my-5 md:my-0 rounded border text-ads360light-100 bg-ads360black-100/95 hover:bg-ads360black-100",
 								children: [/* @__PURE__ */ jsx("img", {
-									alt: "make payment icon",
+									alt: "",
 									src: makepayment,
 									className: "w-5 h-5"
 								}), /* @__PURE__ */ jsx("span", { children: "Fund Wallet" })]
@@ -5967,327 +7705,293 @@ var WalletSection = () => {
 					]
 				}),
 				/* @__PURE__ */ jsx("div", {
-					className: "group",
-					children: /* @__PURE__ */ jsx("div", {
-						className: "flex justify-end",
-						children: /* @__PURE__ */ jsxs("button", {
-							className: "flex space-x-2 bg-[#E4E4E4] p-1 rounded-full px-5",
+					className: "group my-4",
+					children: /* @__PURE__ */ jsxs("div", {
+						className: "flex flex-col md:flex-row md:items-center md:justify-end gap-3",
+						children: [/* @__PURE__ */ jsxs("div", {
+							className: "flex items-center space-x-2 bg-[#E4E4E4] p-1 rounded-full px-5 w-fit",
 							children: [/* @__PURE__ */ jsx("img", {
 								src: filter,
-								alt: "filter",
+								alt: "",
 								className: "py-2",
 								width: 20,
 								height: 20
 							}), /* @__PURE__ */ jsx("span", { children: "filter" })]
-						})
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "flex flex-col sm:flex-row gap-2 sm:justify-end",
+							children: [/* @__PURE__ */ jsx("select", {
+								value: statusFilter,
+								onChange: (e) => setStatusFilter(e.target.value),
+								className: "rounded p-2 focus:outline-none bg-ads360light-100 border border-transparent min-w-[10rem]",
+								children: ALL_STATUSES.map((v) => /* @__PURE__ */ jsx("option", {
+									value: v,
+									children: v === "all" ? "All statuses" : STATUS_LABELS[v]
+								}, v))
+							}), /* @__PURE__ */ jsx("select", {
+								value: typeFilter,
+								onChange: (e) => setTypeFilter(e.target.value),
+								className: "rounded p-2 focus:outline-none bg-ads360light-100 border border-transparent min-w-[10rem]",
+								children: ALL_TYPES.map((v) => /* @__PURE__ */ jsx("option", {
+									value: v,
+									children: v === "all" ? "All types" : TYPE_LABELS[v]
+								}, v))
+							})]
+						})]
 					})
 				}),
 				/* @__PURE__ */ jsxs("div", {
 					className: "bg-white p-4 shadow-md my-3 rounded-10 border border-ads360yellow-100",
-					children: [/* @__PURE__ */ jsx("h3", {
-						className: "text-lg mb-2",
-						children: "Transaction History"
-					}), /* @__PURE__ */ jsxs("ul", { children: [
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "funded wallet"
-							}), /* @__PURE__ */ jsx("p", { children: "June 1, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-green-500",
-								children: "+₦5000.00"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "debited wallet"
-							}), /* @__PURE__ */ jsx("p", { children: "June 6, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-red-500",
-								children: "+₦3000.00"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("li", {
-							className: "mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded",
-							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", {
-								className: "font-bold",
-								children: "funded wallet"
-							}), /* @__PURE__ */ jsx("p", { children: "June 8, 2023" })] }), /* @__PURE__ */ jsx("div", {
-								className: "text-green-500",
-								children: "+₦8000.00"
-							})]
+					children: [/* @__PURE__ */ jsxs("div", {
+						className: "flex flex-wrap items-center justify-between gap-2 mb-3",
+						children: [/* @__PURE__ */ jsx("h3", {
+							className: "text-lg",
+							children: "Transaction History"
+						}), txError ? /* @__PURE__ */ jsx("button", {
+							type: "button",
+							onClick: () => refetchTx(),
+							className: "text-sm text-ads360yellow-100 underline",
+							children: "Retry"
+						}) : null]
+					}), txLoading ? /* @__PURE__ */ jsx("p", {
+						className: "text-stone-500 text-sm py-4",
+						children: "Loading transactions…"
+					}) : txError ? /* @__PURE__ */ jsx("p", {
+						className: "text-red-600 text-sm py-4",
+						children: "Could not load transactions."
+					}) : filtered.length === 0 ? /* @__PURE__ */ jsx("p", {
+						className: "text-stone-500 text-sm py-4",
+						children: "No transactions match your filters."
+					}) : /* @__PURE__ */ jsx("ul", {
+						className: "space-y-3",
+						children: filtered.map((tx) => {
+							const amt = amountPresentation(tx);
+							return /* @__PURE__ */ jsxs("li", {
+								className: "bg-[#f1f1f1] p-3 rounded text-sm",
+								children: [/* @__PURE__ */ jsxs("div", {
+									className: "flex justify-between gap-3 items-start",
+									children: [/* @__PURE__ */ jsxs("div", {
+										className: "min-w-0 flex-1",
+										children: [/* @__PURE__ */ jsx("p", {
+											className: "font-bold text-stone-900",
+											children: tx.description
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-stone-500 mt-0.5",
+											children: formatWhen(tx.createdAt)
+										})]
+									}), /* @__PURE__ */ jsx("div", {
+										className: `font-semibold shrink-0 ${amt.className}`,
+										children: amt.text
+									})]
+								}), /* @__PURE__ */ jsxs("dl", {
+									className: "mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-1 text-xs text-stone-600 border-t border-stone-200/80 pt-2",
+									children: [
+										/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("dt", {
+											className: "text-stone-400",
+											children: "Type"
+										}), /* @__PURE__ */ jsx("dd", { children: TYPE_LABELS[tx.type] ?? tx.type })] }),
+										/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("dt", {
+											className: "text-stone-400",
+											children: "Status"
+										}), /* @__PURE__ */ jsx("dd", { children: STATUS_LABELS[tx.status] ?? tx.status })] }),
+										tx.provider ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("dt", {
+											className: "text-stone-400",
+											children: "Provider"
+										}), /* @__PURE__ */ jsx("dd", {
+											className: "capitalize",
+											children: tx.provider
+										})] }) : null,
+										tx.providerRef ? /* @__PURE__ */ jsxs("div", {
+											className: "sm:col-span-2",
+											children: [/* @__PURE__ */ jsx("dt", {
+												className: "text-stone-400",
+												children: "Reference"
+											}), /* @__PURE__ */ jsx("dd", {
+												className: "font-mono break-all",
+												children: tx.providerRef
+											})]
+										}) : null,
+										tx.referenceType != null || tx.referenceId != null ? /* @__PURE__ */ jsxs("div", {
+											className: "sm:col-span-2",
+											children: [/* @__PURE__ */ jsx("dt", {
+												className: "text-stone-400",
+												children: "Linked record"
+											}), /* @__PURE__ */ jsxs("dd", { children: [tx.referenceType ?? "—", tx.referenceId != null ? ` #${tx.referenceId}` : ""] })]
+										}) : null
+									]
+								})]
+							}, tx.id);
 						})
-					] })]
+					})]
 				})
 			]
-		})
+		}), /* @__PURE__ */ jsx(FundWalletModal, {
+			isOpen: fundOpen,
+			onClose: () => setFundOpen(false)
+		})]
 	});
 };
-var Route$26 = createFileRoute("/_usersauth/users/wallet/")({ component: WalletSection });
+var Route$29 = createFileRoute("/_usersauth/users/wallet/")({ component: WalletSection });
 //#endregion
 //#region app/_usersauth/users/settings/index.tsx
-var $$splitComponentImporter = () => import("./settings-Bx8hHtA1.js");
-var Route$25 = createFileRoute("/_usersauth/users/settings/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
+var $$splitComponentImporter = () => import("./settings-CgU6HwSR.js");
+var Route$28 = createFileRoute("/_usersauth/users/settings/")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
 //#endregion
-//#region components/ui/Table.tsx
-var search = "/icons/search.svg";
-var Table = () => {
-	return /* @__PURE__ */ jsxs(Fragment, { children: [
-		/* @__PURE__ */ jsxs("div", {
-			className: "flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10",
-			children: [/* @__PURE__ */ jsx("button", { children: /* @__PURE__ */ jsx("img", {
-				src: search,
-				alt: "searchicon"
-			}) }), /* @__PURE__ */ jsx("input", {
-				className: "rounded-10 w-full bg-transparent focus:outline-none h-full",
-				placeholder: "search..."
-			})]
-		}),
-		/* @__PURE__ */ jsx("div", {
-			className: "w-full overflow-x-auto my-5",
-			children: /* @__PURE__ */ jsxs("table", {
-				className: "min-w-full bg-white",
-				children: [/* @__PURE__ */ jsx("thead", {
-					className: "bg-[#D0B301]/40",
-					children: /* @__PURE__ */ jsxs("tr", { children: [
-						/* @__PURE__ */ jsx("th", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "ID"
-						}),
-						/* @__PURE__ */ jsx("th", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "COST"
-						}),
-						/* @__PURE__ */ jsx("th", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "DATE CREATED"
-						}),
-						/* @__PURE__ */ jsx("th", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "STATUS"
-						}),
-						/* @__PURE__ */ jsx("th", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "ACTIONS"
-						})
-					] })
-				}), /* @__PURE__ */ jsxs("tbody", {
-					className: "text-center",
-					children: [
-						/* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-br",
-								children: "#1"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "₦200000"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-20"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "new"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/users/campaign/1`,
-									children: "view"
-								})
-							})
-						] }),
-						/* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-br",
-								children: "#2"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "₦60000"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-4"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "negotiating"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/users/campaign/2`,
-									children: "view"
-								})
-							})
-						] }),
-						/* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-br",
-								children: "#3"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "₦500000"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-2"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "paid"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/users/campaign/3`,
-									children: "view"
-								})
-							})
-						] }),
-						/* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-br",
-								children: "#3"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "₦500000"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-2"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "completed"
-							}),
-							/* @__PURE__ */ jsx("td", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/users/campaign/3`,
-									children: "view"
-								})
-							})
-						] })
-					]
-				})]
-			})
-		}),
-		/* @__PURE__ */ jsxs("div", {
-			className: "flex w-full justify-between",
-			children: [/* @__PURE__ */ jsxs("div", {
-				className: "flex space-x-2",
-				children: [
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: "<"
-					}),
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: "1"
-					}),
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: "2"
-					}),
-					/* @__PURE__ */ jsx("button", { children: "..." }),
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: "7"
-					}),
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: "8"
-					}),
-					/* @__PURE__ */ jsx("button", {
-						className: "border rounded-10 border-ads360yellow-100 py-1 px-2",
-						children: ">"
-					})
-				]
-			}), /* @__PURE__ */ jsx("div", { children: "1 of 8" })]
-		})
-	] });
-};
-//#endregion
-//#region app/_usersauth/users/campaign/index.tsx
+//#region app/_usersauth/users/negotiations/index.tsx
 var dash$2 = "/icons/dash.svg";
-var Campaign = () => {
-	const [view, setView] = useState("Billboard");
+function NegotiationsPage() {
+	const { data, isLoading, isError } = useMyNegotiatingBillboardBookings();
 	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("section", {
 		className: "bg-[#E9E9E9] px-4 md:px-10 pt-14",
 		children: [
 			/* @__PURE__ */ jsx("h3", {
 				className: "text-2xl",
-				children: "Campaigns"
+				children: "Negotiations"
 			}),
 			/* @__PURE__ */ jsx("p", {
 				className: "text-stone-400 mb-5 mt-3",
-				children: "Check all ads campaign history"
+				children: "Bookings currently in negotiation"
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "overflow-x-auto py-1",
-				children: /* @__PURE__ */ jsxs("div", {
-					className: "w-[600px]  md:w-full flex justify-between md:justify-start md:space-x-3",
-					children: [
-						/* @__PURE__ */ jsxs("button", {
-							className: "relative",
-							onClick: () => setView("Billboard"),
-							children: ["Billboard", view === "Billboard" && /* @__PURE__ */ jsx("img", {
-								alt: "Billboard Overview selected",
-								src: dash$2,
-								className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							className: "relative",
-							onClick: () => setView("Influencer"),
-							children: ["Influencer", view === "Influencer" && /* @__PURE__ */ jsx("img", {
-								alt: "Billboard Overview selected",
-								src: dash$2,
-								className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							className: "relative",
-							onClick: () => setView("sms"),
-							children: ["Smart sms", view === "sms" && /* @__PURE__ */ jsx("img", {
-								alt: "Billboard Overview selected",
-								src: dash$2,
-								className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							className: "relative",
-							onClick: () => setView("Whatsapp"),
-							children: ["Whatsapp", view === "Whatsapp" && /* @__PURE__ */ jsx("img", {
-								alt: "Billboard Overview selected",
-								src: dash$2,
-								className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
-							})]
-						}),
-						/* @__PURE__ */ jsxs("button", {
-							className: "relative",
-							onClick: () => setView("Digital"),
-							children: ["Digital Ads", view === "Digital" && /* @__PURE__ */ jsx("img", {
-								alt: "Billboard Overview selected",
-								src: dash$2,
-								className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
-							})]
-						})
-					]
+				children: /* @__PURE__ */ jsx("div", {
+					className: "w-[600px] md:w-full flex justify-start md:space-x-3",
+					children: /* @__PURE__ */ jsxs("button", {
+						className: "relative",
+						children: ["Billboard", /* @__PURE__ */ jsx("img", {
+							alt: "Billboard Overview selected",
+							src: dash$2,
+							className: "w-2/3 mx-auto absolute top-[20px] left-[17%]"
+						})]
+					})
 				})
 			})
 		]
+	}), /* @__PURE__ */ jsx("section", {
+		className: "min-h-screen bg-ads360-hash px-4 md:px-10 py-14",
+		children: /* @__PURE__ */ jsx(BookingsTable, {
+			showPaymentStatus: false,
+			rows: (data ?? []).map((r) => ({
+				id: r.id,
+				listing: r.listingName ?? "-",
+				createdAt: r.createdAt,
+				amount: r.negotiatedAmount ?? r.quotedTotal,
+				status: "negotiating",
+				actionHref: `/users/negotiations/${r.id}`,
+				actionLabel: "View"
+			})),
+			isLoading,
+			isError,
+			emptyText: "No negotiations found",
+			statusOptions: [{
+				value: "all",
+				label: "All"
+			}, {
+				value: "negotiating",
+				label: "Negotiating"
+			}],
+			defaultStatus: "negotiating",
+			pageSize: 10
+		})
+	})] });
+}
+var Route$27 = createFileRoute("/_usersauth/users/negotiations/")({ component: NegotiationsPage });
+//#endregion
+//#region app/_usersauth/users/campaign/index.tsx
+var Campaign = () => {
+	const [view, setView] = useState("Billboard");
+	const { data, isLoading, isError } = useMyPaidBillboardBookings();
+	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 py-2",
+		children: [/* @__PURE__ */ jsx("h3", {
+			className: "text-2xl",
+			children: "Campaigns"
+		}), /* @__PURE__ */ jsx("p", {
+			className: "text-stone-400 mt-3",
+			children: "Check all ads campaign history"
+		})]
 	}), /* @__PURE__ */ jsxs("section", {
 		className: "min-h-screen bg-ads360-hash px-4 md:px-10 py-14",
 		children: [
-			view === "Billboard" && /* @__PURE__ */ jsx(Table, {}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "flex justify-between items-center",
+				children: [/* @__PURE__ */ jsx("div", {
+					className: "flex justify-between items-center",
+					children: /* @__PURE__ */ jsx("button", {
+						className: "bg-ads360yellow-100 text-white px-4 py-2 rounded-md",
+						children: /* @__PURE__ */ jsx(Link, {
+							to: "/users/campaign/create",
+							children: "Create Campaign"
+						})
+					})
+				}), /* @__PURE__ */ jsx("div", {
+					className: "",
+					children: /* @__PURE__ */ jsxs("select", {
+						onChange: (e) => setView(e.target.value),
+						className: "bg-white text-black border-2 border-ads360yellow-100 px-4 py-2 rounded-md",
+						children: [
+							/* @__PURE__ */ jsx("option", {
+								value: "Billboard",
+								children: "Billboard"
+							}),
+							/* @__PURE__ */ jsx("option", {
+								value: "Influencer",
+								children: "Influencer"
+							}),
+							/* @__PURE__ */ jsx("option", {
+								value: "Whatsapp",
+								children: "Whatsapp"
+							}),
+							/* @__PURE__ */ jsx("option", {
+								value: "sms",
+								children: "SMS"
+							}),
+							/* @__PURE__ */ jsx("option", {
+								value: "Digital",
+								children: "Digital"
+							})
+						]
+					})
+				})]
+			}),
+			view === "Billboard" && /* @__PURE__ */ jsx(Fragment, { children: /* @__PURE__ */ jsx(BookingsTable, {
+				rows: (data ?? []).map((r) => ({
+					id: r.id,
+					listing: r.listingName ?? "-",
+					createdAt: r.createdAt,
+					amount: r.negotiatedAmount ?? r.quotedTotal,
+					status: r.status,
+					paymentStatus: r.paymentStatus ?? "unpaid",
+					actionHref: `/users/campaign/${r.id}`,
+					actionLabel: "View"
+				})),
+				isLoading,
+				isError,
+				emptyText: "No campaigns found",
+				statusFilterLabel: "Filter by status",
+				statusOptions: [
+					{
+						value: "all",
+						label: "All"
+					},
+					{
+						value: "pending",
+						label: "Pending"
+					},
+					{
+						value: "active",
+						label: "Active"
+					},
+					{
+						value: "rejected",
+						label: "Rejected"
+					},
+					{
+						value: "completed",
+						label: "Completed"
+					}
+				],
+				pageSize: 10
+			}) }),
 			view === "Influencer" && /* @__PURE__ */ jsx("div", { children: "No matching records found" }),
 			view === "sms" && /* @__PURE__ */ jsx("div", { children: "No matching records found" }),
 			view === "Digital" && /* @__PURE__ */ jsx("div", { children: "No matching records found" }),
@@ -6295,19 +7999,19 @@ var Campaign = () => {
 		]
 	})] });
 };
-var Route$24 = createFileRoute("/_usersauth/users/campaign/")({ component: Campaign });
+var Route$26 = createFileRoute("/_usersauth/users/campaign/")({ component: Campaign });
 //#endregion
 //#region app/_usersauth/users/analysis/index.tsx
 var Analysis = () => {
 	return /* @__PURE__ */ jsx("div", { children: "Analysis" });
 };
-var Route$23 = createFileRoute("/_usersauth/users/analysis/")({ component: Analysis });
+var Route$25 = createFileRoute("/_usersauth/users/analysis/")({ component: Analysis });
 //#endregion
 //#region app/_usersauth/ads/whatsapp/index.tsx
 function Whatsapp() {
 	return /* @__PURE__ */ jsx("div", { children: "Coming Soon" });
 }
-var Route$22 = createFileRoute("/_usersauth/ads/whatsapp/")({ component: Whatsapp });
+var Route$24 = createFileRoute("/_usersauth/ads/whatsapp/")({ component: Whatsapp });
 //#endregion
 //#region components/inputs/Tick.tsx
 var tick2 = "/icons/tick2.svg";
@@ -8248,7 +9952,7 @@ function Sms() {
 		]
 	});
 }
-var Route$21 = createFileRoute("/_usersauth/ads/sms/")({ component: Sms });
+var Route$23 = createFileRoute("/_usersauth/ads/sms/")({ component: Sms });
 //#endregion
 //#region node_modules/react-icons/bs/index.esm.js
 function BsSuitHeartFill(props) {
@@ -8548,30 +10252,43 @@ function Influencer() {
 		})
 	})] });
 }
-var Route$20 = createFileRoute("/_usersauth/ads/influencer/")({ component: Influencer });
+var Route$22 = createFileRoute("/_usersauth/ads/influencer/")({ component: Influencer });
 //#endregion
 //#region app/_usersauth/ads/digital/index.tsx
 function Digital() {
 	return /* @__PURE__ */ jsx("div", { children: "Coming Soon" });
 }
-var Route$19 = createFileRoute("/_usersauth/ads/digital/")({ component: Digital });
+var Route$21 = createFileRoute("/_usersauth/ads/digital/")({ component: Digital });
 //#endregion
 //#region app/_usersauth/ads/billboard/index.tsx
-var billboardImage1 = "/del/billboard1.png";
-var billboardImage2$5 = "/del/billboard2.png";
 var naira = "/icons/naira.svg";
-var location$2 = "/icons/yellowlocation.svg";
+var location = "/icons/yellowlocation.svg";
+var PAGE_SIZE = 12;
 function Billboards() {
+	const [draft, setDraft] = useState(defaultBillboardFilterForm);
+	const [query, setQuery] = useState({
+		page: 1,
+		limit: PAGE_SIZE
+	});
+	const { data, isPending, isError, error, refetch } = useBrowseBillboardListings(query);
+	const listings = data?.data ?? [];
+	const meta = data?.meta;
 	const [filter, setFilter] = useState(false);
-	const [wishlist, setWishlist] = useState([
-		4,
-		8,
-		2,
-		9
-	]);
+	const [wishlist, setWishlist] = useState([]);
 	const handleWishlist = (billboardId) => {
-		if (wishlist.includes(billboardId)) setWishlist(wishlist.filter((item) => item !== billboardId));
-		else setWishlist((prev) => [...prev, billboardId]);
+		setWishlist((prev) => prev.includes(billboardId) ? prev.filter((id) => id !== billboardId) : [...prev, billboardId]);
+	};
+	const applyFilters = useCallback(() => {
+		setQuery(toBillboardListQuery(draft, 1, PAGE_SIZE));
+		setFilter(false);
+	}, [draft]);
+	const goPage = (next) => {
+		if (!meta) return;
+		if (next < 1 || next > meta.totalPages) return;
+		setQuery((q) => ({
+			...q,
+			page: next
+		}));
 	};
 	return /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsxs("section", {
 		className: "px-4 md:px-10 py-24",
@@ -8584,208 +10301,159 @@ function Billboards() {
 			/* @__PURE__ */ jsxs("section", {
 				className: "xl:flex my-5",
 				children: [
-					/* @__PURE__ */ jsx("div", {
+					/* @__PURE__ */ jsxs("div", {
 						className: "gap-5 md:px-5 grid grid-cols-1 md:grid-cols-2 basis-4/5",
 						children: [
-							{
-								id: 1,
-								name: "Eko hotel led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Eko",
-								image: billboardImage1,
-								pricepd: "60000",
-								Impressions: "70 per day",
-								negotiable: "yes",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 2,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								negotiable: "yes",
-								pricepd: "30000",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 3,
-								name: "Eko hotel led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Eko",
-								image: billboardImage1,
-								pricepd: "40000",
-								negotiable: "no",
-								Impressions: "50 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 4,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "yes",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 5,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								Impressions: "40 per day",
-								negotiable: "no",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 6,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "no",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 7,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "no",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 8,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "yes",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 9,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "yes",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							},
-							{
-								id: 10,
-								name: "Adetokunbo Ademola led, victoria island",
-								location: "Along Adetokunbo Ademola Street by Bishop",
-								image: billboardImage2$5,
-								pricepd: "35000",
-								negotiable: "yes",
-								Impressions: "40 per day",
-								type: "Double faced Gantry LED",
-								duration: "14hrs (6am - 9pm) 6days/week"
-							}
-						].map((billboard) => /* @__PURE__ */ jsxs("div", {
-							className: "rounded bg-white border border-ads360yellow-100",
-							children: [
-								/* @__PURE__ */ jsxs("div", {
-									className: "relative",
-									children: [
-										billboard.negotiable === "yes" && /* @__PURE__ */ jsx("div", {
-											className: "absolute w-1/2 md:w-2/3 xl:w-1/2 bg-ads360black-100/70 text-ads360light-100 rounded right-3 top-4 text-center py-2",
-											children: "Negotiable"
-										}),
-										/* @__PURE__ */ jsx("div", {
-											className: "absolute bottom-14 md:bottom-10 right-8 font-semibold text-ads360yellowBtn-100 hover:bg-ads360yellowBtn-100/30 hover:rounded-full flex justify-center p-2",
-											children: wishlist.includes(billboard.id) ? /* @__PURE__ */ jsx("button", {
-												onClick: () => handleWishlist(billboard.id),
-												children: /* @__PURE__ */ jsx(BsSuitHeartFill, { size: 20 })
-											}) : /* @__PURE__ */ jsx("button", {
-												onClick: () => handleWishlist(billboard.id),
-												children: /* @__PURE__ */ jsx(BsSuitHeart, { size: 20 })
-											})
-										}),
-										/* @__PURE__ */ jsx("img", {
-											alt: billboard.name,
-											src: billboard.image,
-											className: "w-full rounded-t h-auto"
-										}),
-										/* @__PURE__ */ jsxs("div", {
-											className: "flex truncate ... text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2",
-											children: [/* @__PURE__ */ jsx("img", {
-												src: location$2,
-												alt: ""
-											}), billboard.name.toLocaleUpperCase()]
-										})
-									]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "grid grid-cols-1 md:grid-cols-2 my-3 w-11/12 mx-auto",
-									children: [
-										/* @__PURE__ */ jsxs("div", {
-											className: "my-1",
-											children: [/* @__PURE__ */ jsx("span", {
-												className: "font-bold",
-												children: "location: "
-											}), billboard.location]
-										}),
-										/* @__PURE__ */ jsx("div", {
-											className: "my-1",
-											children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-												className: "font-bold",
-												children: "Impression: "
-											}), billboard.Impressions] })
-										}),
-										/* @__PURE__ */ jsx("div", {
-											className: "my-1",
-											children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-												className: "font-bold",
-												children: "Board-type: "
-											}), billboard.type] })
-										}),
-										/* @__PURE__ */ jsx("div", {
-											className: "my-1",
-											children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
-												className: "font-bold",
-												children: "Run-time: "
-											}), billboard.duration] })
-										})
-									]
-								}),
-								/* @__PURE__ */ jsxs("div", {
-									className: "mb-5 flex justify-between mx-auto w-11/12",
-									children: [/* @__PURE__ */ jsxs("div", {
-										className: "flex items-center",
+							isPending ? /* @__PURE__ */ jsx("p", {
+								className: "text-neutral-600 col-span-full",
+								children: "Loading billboards…"
+							}) : null,
+							isError ? /* @__PURE__ */ jsxs("div", {
+								className: "col-span-full rounded border border-red-200 bg-red-50 p-4 text-sm text-red-800",
+								children: [/* @__PURE__ */ jsx("p", { children: error instanceof Error ? error.message : "Could not load billboards." }), /* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => refetch(),
+									className: "mt-2 underline",
+									children: "Try again"
+								})]
+							}) : null,
+							!isPending && !isError && listings.length === 0 ? /* @__PURE__ */ jsx("p", {
+								className: "text-neutral-600 col-span-full",
+								children: "No billboards match your filters. Try adjusting search criteria."
+							}) : null,
+							listings.map((billboard) => /* @__PURE__ */ jsxs("div", {
+								className: "rounded bg-white border border-ads360yellow-100",
+								children: [
+									/* @__PURE__ */ jsxs("div", {
+										className: "relative",
 										children: [
-											/* @__PURE__ */ jsx("img", {
-												src: naira,
-												alt: "naira sign"
+											billboard.isNegotiable ? /* @__PURE__ */ jsx("div", {
+												className: "absolute w-1/2 md:w-2/3 xl:w-1/2 bg-ads360black-100/70 text-ads360light-100 rounded right-3 top-4 text-center py-2",
+												children: "Negotiable"
+											}) : null,
+											/* @__PURE__ */ jsx("div", {
+												className: "absolute bottom-14 md:bottom-10 right-8 font-semibold text-ads360yellowBtn-100 hover:bg-ads360yellowBtn-100/30 hover:rounded-full flex justify-center p-2",
+												children: wishlist.includes(billboard.id) ? /* @__PURE__ */ jsx("button", {
+													type: "button",
+													onClick: () => handleWishlist(billboard.id),
+													"aria-label": "Remove from wishlist",
+													children: /* @__PURE__ */ jsx(BsSuitHeartFill, { size: 20 })
+												}) : /* @__PURE__ */ jsx("button", {
+													type: "button",
+													onClick: () => handleWishlist(billboard.id),
+													"aria-label": "Add to wishlist",
+													children: /* @__PURE__ */ jsx(BsSuitHeart, { size: 20 })
+												})
 											}),
-											"From ₦",
-											billboard.pricepd
+											/* @__PURE__ */ jsx("img", {
+												alt: "",
+												src: billboard.imageUrl,
+												className: "w-full rounded-t h-auto object-cover max-h-80"
+											}),
+											/* @__PURE__ */ jsxs("div", {
+												className: "flex truncate ... text-ads360yellow-100 font-bold w-full text-sm md:text-base p-2",
+												children: [/* @__PURE__ */ jsx("img", {
+													src: location,
+													alt: ""
+												}), billboard.name.toLocaleUpperCase()]
+											})
 										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "grid grid-cols-1 md:grid-cols-2 my-3 w-11/12 mx-auto",
+										children: [
+											/* @__PURE__ */ jsxs("div", {
+												className: "my-1",
+												children: [
+													/* @__PURE__ */ jsx("span", {
+														className: "font-bold",
+														children: "Location: "
+													}),
+													billboard.address,
+													", ",
+													billboard.city,
+													", ",
+													billboard.state
+												]
+											}),
+											billboard.nearbyLandmarks ? /* @__PURE__ */ jsx("div", {
+												className: "my-1",
+												children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
+													className: "font-bold",
+													children: "Nearby: "
+												}), billboard.nearbyLandmarks] })
+											}) : null,
+											/* @__PURE__ */ jsx("div", {
+												className: "my-1",
+												children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
+													className: "font-bold",
+													children: "Board-type: "
+												}), boardTypeLabel(billboard.boardType)] })
+											}),
+											/* @__PURE__ */ jsx("div", {
+												className: "my-1",
+												children: /* @__PURE__ */ jsxs("p", { children: [/* @__PURE__ */ jsx("span", {
+													className: "font-bold",
+													children: "Run-time: "
+												}), formatRuntime(billboard)] })
+											})
+										]
+									}),
+									/* @__PURE__ */ jsxs("div", {
+										className: "mb-5 flex justify-between mx-auto w-11/12",
+										children: [/* @__PURE__ */ jsxs("div", {
+											className: "flex items-center",
+											children: [
+												/* @__PURE__ */ jsx("img", {
+													src: naira,
+													alt: ""
+												}),
+												"From ₦",
+												primaryPrice(billboard.pricing)
+											]
+										}), /* @__PURE__ */ jsx("button", {
+											type: "button",
+											className: "group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
+											children: /* @__PURE__ */ jsx(Link, {
+												to: "/ads/billboard/$slug",
+												params: { slug: String(billboard.id) },
+												children: "View BillBoard"
+											})
+										})]
+									})
+								]
+							}, billboard.id)),
+							meta && meta.totalPages > 1 ? /* @__PURE__ */ jsxs("div", {
+								className: "col-span-full flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-4",
+								children: [/* @__PURE__ */ jsxs("p", {
+									className: "text-sm text-neutral-600",
+									children: [
+										"Page ",
+										meta.page,
+										" of ",
+										meta.totalPages,
+										" (",
+										meta.total,
+										" total)"
+									]
+								}), /* @__PURE__ */ jsxs("div", {
+									className: "flex gap-2",
+									children: [/* @__PURE__ */ jsx("button", {
+										type: "button",
+										disabled: meta.page <= 1 || isPending,
+										onClick: () => goPage(meta.page - 1),
+										className: "rounded border border-ads360yellow-100 bg-white px-3 py-1.5 text-sm disabled:opacity-40",
+										children: "Previous"
 									}), /* @__PURE__ */ jsx("button", {
-										className: "group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
-										children: /* @__PURE__ */ jsx(Link, {
-											to: `/ads/billboard/${billboard.id}`,
-											children: "View BillBoard"
-										})
+										type: "button",
+										disabled: meta.page >= meta.totalPages || isPending,
+										onClick: () => goPage(meta.page + 1),
+										className: "rounded border border-ads360yellow-100 bg-white px-3 py-1.5 text-sm disabled:opacity-40",
+										children: "Next"
 									})]
-								})
-							]
-						}, billboard.id))
+								})]
+							}) : null
+						]
 					}),
 					/* @__PURE__ */ jsx("div", {
 						className: "basis-1/5 text-sm hidden xl:block",
@@ -8793,20 +10461,22 @@ function Billboards() {
 							className: "top-[12.5rem] sticky rounded p-3 border border-ads360yellow-100 bg-white",
 							children: /* @__PURE__ */ jsx(BillboardSorter, {
 								modal: false,
-								toggleModal: () => {}
+								toggleModal: () => {},
+								value: draft,
+								onChange: setDraft,
+								onApply: applyFilters
 							})
 						})
 					}),
-					filter === false && /* @__PURE__ */ jsx("div", {
+					filter === false ? /* @__PURE__ */ jsx("div", {
 						className: "fixed w-full left-3 bottom-5 xl:hidden",
 						children: /* @__PURE__ */ jsx("button", {
+							type: "button",
 							className: "rounded-10 font-bold border bg-ads360yellow-100 shadow-md border-white w-12 h-12",
-							onClick: () => {
-								setFilter(true);
-							},
+							onClick: () => setFilter(true),
 							children: "Filter"
 						})
-					})
+					}) : null
 				]
 			})
 		]
@@ -8816,24 +10486,31 @@ function Billboards() {
 			className: "bg-white p-3 w-10/12 md:w-9/12 mx-auto rounded-10",
 			children: /* @__PURE__ */ jsx(BillboardSorter, {
 				modal: true,
-				toggleModal: () => setFilter(false)
+				toggleModal: () => setFilter(false),
+				value: draft,
+				onChange: setDraft,
+				onApply: applyFilters
 			})
 		})
 	})] });
 }
-var Route$18 = createFileRoute("/_usersauth/ads/billboard/")({ component: Billboards });
+var Route$20 = createFileRoute("/_usersauth/ads/billboard/")({ component: Billboards });
 //#endregion
 //#region app/_usersauth/ads/$transaction_id/index.tsx
 var card$3 = "/icons/usericon/card.svg";
-var dollar$1 = "/icons/usericon/dollar-sign.svg";
 var purse = "/icons/usericon/purse.svg";
 var Arrowleft = "/icons/Arrowleft.svg";
 var mark = "/icons/mark.svg";
-var cancel$5 = "/icons/usericon/modalCancelBotton.svg";
+var cancel$4 = "/icons/usericon/modalCancelBotton.svg";
 var Payment$1 = () => {
-	const amount = 27e3;
-	const wallet = 0;
-	const router = useRouter();
+	const params = useParams({ strict: false });
+	const bookingId = Number(params.transaction_id);
+	const booking = useBillboardBooking(Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null);
+	const walletQuery = useWallet();
+	const payNow = usePayNow();
+	const navigate = useNavigate();
+	const amount = Number(booking.data?.negotiatedAmount ?? booking.data?.quotedTotal ?? 0);
+	const walletBalance = Number(walletQuery.data?.balance ?? 0);
 	const [selected, setSelected] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
 	const handleClick = (paymentMethod) => {
@@ -8847,7 +10524,7 @@ var Payment$1 = () => {
 			/* @__PURE__ */ jsxs("div", {
 				className: "flex items-center font-bold",
 				children: [/* @__PURE__ */ jsx("button", {
-					onClick: () => router.history.back(),
+					onClick: () => window.history.back(),
 					className: "group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white",
 					children: /* @__PURE__ */ jsx("img", {
 						src: Arrowleft,
@@ -8928,23 +10605,15 @@ var Payment$1 = () => {
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "grid grid-cols-1 gap-5 my-10",
-				children: [
-					{
-						image: purse,
-						link: "ads/",
-						name: "Wallet"
-					},
-					{
-						image: card$3,
-						link: "ads/",
-						name: "Naira Funding Card"
-					},
-					{
-						image: dollar$1,
-						link: "ads/",
-						name: "USD Card"
-					}
-				].map((ad, i) => /* @__PURE__ */ jsx("div", {
+				children: [{
+					image: purse,
+					link: "ads/",
+					name: "Wallet"
+				}, {
+					image: card$3,
+					link: "ads/",
+					name: "Flutterwave Payment"
+				}].map((ad, i) => /* @__PURE__ */ jsx("div", {
 					onClick: () => handleClick(ad.name),
 					children: /* @__PURE__ */ jsx("div", {
 						className: `${ad.name === "USD Card" ? "bg-white/50 text-gray-400" : "bg-white group cursor-pointer"} shadow flex justify-between rounded px-3 md:px-10 py-7 border border-ads360yellow-100 items-center`,
@@ -8980,7 +10649,7 @@ var Payment$1 = () => {
 					}), /* @__PURE__ */ jsx("button", {
 						onClick: () => setIsOpen(false),
 						children: /* @__PURE__ */ jsx("img", {
-							src: cancel$5,
+							src: cancel$4,
 							alt: "modal cancel botton",
 							className: "w-5"
 						})
@@ -9000,7 +10669,7 @@ var Payment$1 = () => {
 						children: amount
 					})]
 				}),
-				wallet < amount ? /* @__PURE__ */ jsx("div", {
+				walletBalance < amount ? /* @__PURE__ */ jsx("div", {
 					className: "my-3",
 					children: /* @__PURE__ */ jsxs("p", {
 						className: "text-red-700 text-xs",
@@ -9018,13 +10687,25 @@ var Payment$1 = () => {
 				/* @__PURE__ */ jsx("div", {
 					className: "flex justify-center",
 					children: /* @__PURE__ */ jsx("button", {
-						disabled: wallet < amount ? true : false,
-						className: `${wallet < amount ? "bg-ads360gray-100 mt-5" : "bg-ads360black-100/95 hover:bg-ads360black-100 mt-10"} rounded  text-white  w-5/6 h-10`,
-						children: "Proceed"
+						disabled: walletBalance < amount || payNow.isPending || !bookingId,
+						onClick: async () => {
+							if (!bookingId) return;
+							try {
+								await payNow.mutateAsync({
+									bookingId,
+									paymentMethod: "wallet"
+								});
+								setIsOpen(false);
+								toast.success("Payment successful");
+								await navigate({ to: "/users/campaign" });
+							} catch {}
+						},
+						className: `${walletBalance < amount ? "bg-ads360gray-100 mt-5" : "bg-ads360black-100/95 hover:bg-ads360black-100 mt-10"} rounded  text-white  w-5/6 h-10`,
+						children: payNow.isPending ? "Processing..." : "Proceed"
 					})
 				})
 			]
-		}) : selected === "Naira Funding Card" ? /* @__PURE__ */ jsxs("div", {
+		}) : selected === "Flutterwave Payment" ? /* @__PURE__ */ jsxs("div", {
 			className: "bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10",
 			children: [
 				/* @__PURE__ */ jsxs("div", {
@@ -9035,7 +10716,7 @@ var Payment$1 = () => {
 					}), /* @__PURE__ */ jsx("button", {
 						onClick: () => setIsOpen(false),
 						children: /* @__PURE__ */ jsx("img", {
-							src: cancel$5,
+							src: cancel$4,
 							alt: "modal cancel botton",
 							className: "w-5"
 						})
@@ -9058,15 +10739,30 @@ var Payment$1 = () => {
 				/* @__PURE__ */ jsx("div", {
 					className: "flex justify-center",
 					children: /* @__PURE__ */ jsx("button", {
-						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-10  text-white  w-5/6 h-10",
-						children: "Proceed"
+						disabled: payNow.isPending || !bookingId,
+						onClick: async () => {
+							if (!bookingId) return;
+							try {
+								const link = (await payNow.mutateAsync({
+									bookingId,
+									paymentMethod: "flutterwave"
+								}))?.data?.link;
+								if (typeof link === "string" && link.length > 0) {
+									window.location.href = link;
+									return;
+								}
+								toast.error("Payment link not returned");
+							} catch {}
+						},
+						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-10  text-white  w-5/6 h-10 disabled:opacity-60",
+						children: payNow.isPending ? "Starting..." : "Proceed"
 					})
 				})
 			]
 		}) : null
 	})] });
 };
-var Route$17 = createFileRoute("/_usersauth/ads/$transaction_id/")({ component: Payment$1 });
+var Route$19 = createFileRoute("/_usersauth/ads/$transaction_id/")({ component: Payment$1 });
 //#endregion
 //#region node_modules/react-icons/fa/index.esm.js
 function FaAngleDown(props) {
@@ -9165,7 +10861,7 @@ var Faq = () => {
 		})
 	}), /* @__PURE__ */ jsx(Faqs, {})] });
 };
-var Route$16 = createFileRoute("/_public/_lightnavbar/faqs/")({ component: Faq });
+var Route$18 = createFileRoute("/_public/_lightnavbar/faqs/")({ component: Faq });
 //#endregion
 //#region app/_public/_lightnavbar/contact/index.tsx
 var phone = "/icons/phone.svg";
@@ -9320,7 +11016,7 @@ var Contact = () => {
 		})
 	] });
 };
-var Route$15 = createFileRoute("/_public/_lightnavbar/contact/")({ component: Contact });
+var Route$17 = createFileRoute("/_public/_lightnavbar/contact/")({ component: Contact });
 //#endregion
 //#region components/buttons/BlackButtonsLong.tsx
 var BlackButtonsLong = ({ text }) => {
@@ -9381,7 +11077,7 @@ var About = () => {
 		})
 	] });
 };
-var Route$14 = createFileRoute("/_public/_lightnavbar/about/")({ component: About });
+var Route$16 = createFileRoute("/_public/_lightnavbar/about/")({ component: About });
 //#endregion
 //#region components/slides/InViewX.tsx
 var SectionX = ({ children, val }) => {
@@ -9755,7 +11451,7 @@ var Service = () => {
 		/* @__PURE__ */ jsx(NewsLetter, { img: manads2 })
 	] });
 };
-var Route$13 = createFileRoute("/_public/_darknavbar/discovery/")({ component: Service });
+var Route$15 = createFileRoute("/_public/_darknavbar/discovery/")({ component: Service });
 //#endregion
 //#region lib/nigeriaStatesLgas.ts
 var NIGERIA_STATES_LGAS = [
@@ -10486,286 +12182,910 @@ var VendorAccessOnboarding = () => {
 		})]
 	});
 };
-var Route$12 = createFileRoute("/_access/vendor-access/onboarding/")({ component: VendorAccessOnboarding });
+var Route$14 = createFileRoute("/_access/vendor-access/onboarding/")({ component: VendorAccessOnboarding });
 //#endregion
-//#region node_modules/react-icons/ai/index.esm.js
-function AiOutlineDownload(props) {
-	return GenIcon({
-		"tag": "svg",
-		"attr": { "viewBox": "0 0 1024 1024" },
-		"child": [{
-			"tag": "path",
-			"attr": { "d": "M505.7 661a8 8 0 0 0 12.6 0l112-141.7c4.1-5.2.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8zM878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z" }
-		}]
-	})(props);
+//#region components/ui/CreativeMedia.tsx
+function youtubeEmbed(url) {
+	try {
+		const u = new URL(url);
+		const host = u.hostname.replace(/^www\./, "");
+		if (host === "youtu.be") {
+			const id = u.pathname.split("/").filter(Boolean)[0];
+			return id ? `https://www.youtube.com/embed/${id}` : null;
+		}
+		if (host === "youtube.com" || host === "m.youtube.com") {
+			const id = u.searchParams.get("v");
+			return id ? `https://www.youtube.com/embed/${id}` : null;
+		}
+	} catch {}
+	return null;
+}
+async function copyText(text) {
+	try {
+		if (navigator?.clipboard?.writeText) {
+			await navigator.clipboard.writeText(text);
+			toast.success("Copied");
+			return;
+		}
+	} catch {}
+	toast.error("Unable to copy");
+}
+function CreativeMedia({ creativeKind, creativeImageUrl, creativeVideoUrl, className, hideActions = false }) {
+	const kind = String(creativeKind ?? "").toLowerCase();
+	const url = (kind === "video" ? creativeVideoUrl : creativeImageUrl)?.trim() || "";
+	const yt = useMemo(() => url ? youtubeEmbed(url) : null, [url]);
+	if (!url) return /* @__PURE__ */ jsx("div", {
+		className: className ?? "",
+		children: /* @__PURE__ */ jsx("div", {
+			className: "bg-white rounded-10 p-4 text-center text-stone-500 border",
+			children: "No creative uploaded for this booking yet."
+		})
+	});
+	const canDownload = kind !== "video";
+	return /* @__PURE__ */ jsxs("div", {
+		className: className ?? "",
+		children: [kind === "video" ? yt ? /* @__PURE__ */ jsx("iframe", {
+			className: "w-full h-80 rounded-10",
+			src: yt,
+			title: "Creative video",
+			allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+			allowFullScreen: true
+		}) : /* @__PURE__ */ jsxs("div", {
+			className: "bg-white rounded-10 p-4 border",
+			children: [/* @__PURE__ */ jsx("div", {
+				className: "text-stone-500 text-sm mb-2",
+				children: "Video link"
+			}), /* @__PURE__ */ jsx("a", {
+				className: "text-ads360yellow-100 break-all",
+				href: url,
+				target: "_blank",
+				rel: "noreferrer",
+				children: url
+			})]
+		}) : /* @__PURE__ */ jsx("img", {
+			alt: "Creative",
+			src: url,
+			className: "mx-auto w-full rounded-10 max-h-[420px] object-contain bg-white border"
+		}), !hideActions ? /* @__PURE__ */ jsxs("div", {
+			className: "mt-3 flex flex-wrap gap-2 justify-end",
+			children: [/* @__PURE__ */ jsx("button", {
+				type: "button",
+				className: "px-3 py-2 rounded bg-white border hover:bg-stone-50 text-sm",
+				onClick: () => copyText(url),
+				children: "Copy URL"
+			}), /* @__PURE__ */ jsx("a", {
+				className: "px-3 py-2 rounded bg-ads360black-100/95 hover:bg-ads360black-100 text-ads360light-100 text-sm",
+				href: url,
+				target: "_blank",
+				rel: "noreferrer",
+				download: canDownload ? "" : void 0,
+				children: canDownload ? "Download" : "Open"
+			})]
+		}) : null]
+	});
+}
+//#endregion
+//#region components/campaign/CampaignDetailShared.tsx
+function formatCampaignMoney(amount, currency = "NGN") {
+	return `${currency === "NGN" ? "₦" : `${currency} `}${amount.toLocaleString()}`;
+}
+function formatDateShort(iso) {
+	if (!iso) return "—";
+	const d = new Date(iso);
+	if (!Number.isFinite(d.getTime())) return String(iso).slice(0, 10);
+	return d.toLocaleDateString("en-GB", {
+		day: "2-digit",
+		month: "short",
+		year: "numeric"
+	});
+}
+function formatDateRange(start, end) {
+	const a = formatDateShort(start ?? null);
+	const b = formatDateShort(end ?? null);
+	if (a === "—" && b === "—") return "—";
+	return `${a} – ${b}`;
+}
+function personDisplayName(p) {
+	const biz = p.businessName?.trim();
+	if (biz) return biz;
+	return `${p.firstName ?? ""} ${p.lastName ?? ""}`.trim() || "—";
+}
+var statusStyles = {
+	pending: "bg-amber-50 text-amber-800 border-amber-200",
+	active: "bg-green-50 text-green-700 border-green-200",
+	rejected: "bg-red-50 text-red-700 border-red-200",
+	completed: "bg-emerald-50 text-emerald-800 border-emerald-200",
+	paid: "bg-green-50 text-green-700 border-green-200"
+};
+function CampaignStatusBadge({ status }) {
+	const s = String(status ?? "").toLowerCase();
+	const cls = statusStyles[s] ?? "bg-stone-100 text-stone-700 border-stone-200";
+	const label = s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";
+	return /* @__PURE__ */ jsx("span", {
+		className: `inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${cls}`,
+		children: label
+	});
+}
+var paymentStatusStyles = {
+	paid: "bg-emerald-50 text-emerald-800 border-emerald-200",
+	unpaid: "bg-amber-50 text-amber-900 border-amber-200",
+	refunded: "bg-violet-50 text-violet-800 border-violet-200"
+};
+function CampaignPaymentStatusBadge({ paymentStatus }) {
+	const s = String(paymentStatus ?? "unpaid").toLowerCase();
+	const cls = paymentStatusStyles[s] ?? "bg-stone-100 text-stone-700 border-stone-200";
+	const label = s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";
+	return /* @__PURE__ */ jsxs("span", {
+		className: `inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${cls}`,
+		title: "Payment status",
+		children: ["Payment: ", label]
+	});
+}
+function SectionLabel({ children }) {
+	return /* @__PURE__ */ jsx("p", {
+		className: "text-[11px] font-semibold tracking-widest text-stone-500 uppercase mb-2",
+		children
+	});
+}
+function InfoCard({ icon, label, value, sub }) {
+	return /* @__PURE__ */ jsx("div", {
+		className: "rounded-2xl border border-stone-200/80 bg-[#F7F7F5] p-5",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "flex items-start gap-3",
+			children: [/* @__PURE__ */ jsx("div", {
+				className: "flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ads360yellow-100/30 text-ads360yellow-100",
+				children: icon
+			}), /* @__PURE__ */ jsxs("div", {
+				className: "min-w-0",
+				children: [
+					/* @__PURE__ */ jsx(SectionLabel, { children: label }),
+					/* @__PURE__ */ jsx("div", {
+						className: "text-lg font-semibold text-stone-900 leading-tight",
+						children: value
+					}),
+					sub ? /* @__PURE__ */ jsx("div", {
+						className: "mt-1 text-sm text-stone-600",
+						children: sub
+					}) : null
+				]
+			})]
+		})
+	});
+}
+function MediaFrame({ title, children }) {
+	return /* @__PURE__ */ jsxs("div", {
+		className: "flex min-h-[200px] flex-col rounded-2xl border border-dashed border-amber-200/80 bg-[#FAFAF8] p-4",
+		children: [/* @__PURE__ */ jsx(SectionLabel, { children: title }), /* @__PURE__ */ jsx("div", {
+			className: "flex flex-1 flex-col justify-center",
+			children
+		})]
+	});
+}
+//#endregion
+//#region components/campaign/CampaignIcons.tsx
+function NairaIcon() {
+	return /* @__PURE__ */ jsx("span", {
+		className: "text-sm font-bold",
+		"aria-hidden": true,
+		children: "₦"
+	});
+}
+function CalendarDays() {
+	return /* @__PURE__ */ jsx("svg", {
+		className: "h-5 w-5 text-stone-700",
+		fill: "none",
+		viewBox: "0 0 24 24",
+		stroke: "currentColor",
+		strokeWidth: 1.5,
+		"aria-hidden": true,
+		children: /* @__PURE__ */ jsx("path", {
+			strokeLinecap: "round",
+			strokeLinejoin: "round",
+			d: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
+		})
+	});
 }
 //#endregion
 //#region app/vendors/billboards/requests/$slug/index.tsx
-var cancel$4 = "/icons/usericon/modalCancelBotton.svg";
-var billboardImage2$4 = "/del/billboard2.png";
-var Request = ({ params }) => {
-	const [accept, setAccept] = useState(false);
-	const [reject, setReject] = useState(false);
-	const [billboard, setBillboard] = useState({
-		id: 2,
-		name: "Adetokunbo Ademola led, victoria island",
-		location: "Along Adetokunbo Ademola Street by Bishop",
-		image: billboardImage2$4,
-		status: params.slug === "3" ? "paid" : params.slug === "2" ? "negotiating" : params.slug === "1" ? "new" : "completed",
-		pricepd: "30000",
-		negotiationCount: 1,
-		feedback: "",
-		finalprice: "29500",
-		yourPrice: "28000",
-		Impressions: "40 per day",
-		minimumNegotiableAmount: 26e3,
-		type: "Double faced Gantry LED",
-		duration: "14hrs (6am - 9pm) 6days/week"
-	});
-	return /* @__PURE__ */ jsxs("section", {
-		className: "px-4 md:px-10 py-14   min-h-screen bg-ads360-hash",
-		children: [
-			/* @__PURE__ */ jsx("div", { className: "my-5 font-bold" }),
-			/* @__PURE__ */ jsxs("div", {
-				className: "relative mx-auto w-8/12",
-				children: [/* @__PURE__ */ jsx("div", {
-					className: "absolute right-0 bg-black text-white p-2 cursor-pointer",
-					children: /* @__PURE__ */ jsx(AiOutlineDownload, { size: 20 })
-				}), /* @__PURE__ */ jsx("img", {
-					alt: "billboard",
-					className: "w-full",
-					src: billboardImage2$4
-				})]
-			}),
-			/* @__PURE__ */ jsx("div", {
-				className: "w-full overflow-x-auto my-5",
-				children: /* @__PURE__ */ jsxs("table", {
-					className: "min-w-full bg-white",
-					children: [/* @__PURE__ */ jsx("thead", {
-						className: "bg-[#D0B301]/40",
-						children: /* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Name"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Location"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Size"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Duration"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Start Date"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "End Date"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Cost/day"
-							})
-						] })
-					}), /* @__PURE__ */ jsx("tbody", { children: /* @__PURE__ */ jsxs("tr", { children: [
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "Eko hotel LED, Victoria Island"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "Along Adetokunbo Ademola Street by Eko Hotels"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "4m(H) by 12m(W)"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "1 day(s)"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "2023-05-20"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "2023-05-21"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "₦30,000"
-						})
-					] }) })]
-				})
-			}),
-			/* @__PURE__ */ jsxs("div", {
-				className: "md:flex md:space-x-2 justify-end",
-				children: [
-					/* @__PURE__ */ jsxs("div", {
-						className: "bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3",
-						children: [/* @__PURE__ */ jsxs("div", {
-							className: "flex",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "basis-1/2",
-								children: "Status"
-							}), /* @__PURE__ */ jsx("div", {
-								className: "font-bold basis-1/2",
-								children: billboard.status
-							})]
-						}), /* @__PURE__ */ jsxs("div", {
-							className: "flex",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "basis-1/2",
-								children: "Total Amount"
-							}), /* @__PURE__ */ jsxs("div", {
-								className: "basis-1/2",
-								children: [/* @__PURE__ */ jsx("div", {
-									className: "font-bold",
-									children: "30000"
-								}), /* @__PURE__ */ jsx("div", { children: "cost x 1 day(s)" })]
-							})]
-						})]
-					}),
-					billboard.status === "negotiating" && /* @__PURE__ */ jsx("div", {
-						className: "bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3 my-5 md:my-0",
-						children: /* @__PURE__ */ jsxs("div", {
-							className: "",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "font-bold",
-								children: "Remark"
-							}), /* @__PURE__ */ jsxs("div", {
-								className: "",
+var cancel$3 = "/icons/usericon/modalCancelBotton.svg";
+var Request = () => {
+	const { slug } = Route$13.useParams();
+	const id = Number(slug);
+	const booking = useVendorBillboardBooking(Number.isFinite(id) && id > 0 ? id : null);
+	const b = booking.data;
+	const markActive = useMarkVendorBookingActive();
+	const rejectMutation = useRejectVendorBillboardBooking();
+	const [proofFile, setProofFile] = useState(null);
+	const [proofPreviewUrl, setProofPreviewUrl] = useState("");
+	const [rejectOpen, setRejectOpen] = useState(false);
+	const [rejectReason, setRejectReason] = useState("");
+	const canAct = (b?.paymentStatus === "paid" || b?.status === "paid") && b?.status === "pending" && b?.paymentStatus !== "refunded" && b?.status !== "rejected" && b?.status !== "completed";
+	const creativeUrl = String(b?.creativeKind ?? "").toLowerCase() === "video" ? b?.creativeVideoUrl?.trim() ?? "" : b?.creativeImageUrl?.trim() ?? "";
+	const canDownload = String(b?.creativeKind ?? "").toLowerCase() !== "video";
+	async function copyCreative() {
+		if (!creativeUrl) {
+			toast.error("No creative URL");
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(creativeUrl);
+			toast.success("Copied");
+		} catch {
+			toast.error("Unable to copy");
+		}
+	}
+	return /* @__PURE__ */ jsx("section", {
+		className: "min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "mx-auto max-w-3xl",
+			children: [
+				booking.isLoading && /* @__PURE__ */ jsx("p", {
+					className: "text-center text-stone-600",
+					children: "Loading…"
+				}),
+				booking.isError && /* @__PURE__ */ jsx("p", {
+					className: "text-center text-red-600",
+					children: "Unable to load request"
+				}),
+				!booking.isLoading && !booking.isError && b && /* @__PURE__ */ jsxs("div", {
+					className: "overflow-hidden rounded-2xl border border-amber-200/40 bg-white shadow-sm",
+					children: [
+						/* @__PURE__ */ jsxs("header", {
+							className: "flex flex-col gap-3 border-b border-stone-100 px-5 pt-6 pb-4 sm:flex-row sm:items-start sm:justify-between sm:px-7",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h1", {
+								className: "font-serif text-2xl font-medium tracking-tight text-stone-900 md:text-3xl",
+								children: "Campaign details"
+							}), /* @__PURE__ */ jsxs("p", {
+								className: "mt-1.5 text-sm text-stone-500",
 								children: [
-									/* @__PURE__ */ jsxs("p", { children: [
-										"this user is negotiating this product for",
-										" ",
-										/* @__PURE__ */ jsx("b", { children: billboard.yourPrice }),
-										" kindly accept or reject the offer"
-									] }),
-									/* @__PURE__ */ jsx("button", {
-										onClick: () => setAccept(true),
-										className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 text-white p-2",
-										children: "accept"
-									}),
-									/* @__PURE__ */ jsx("button", {
-										onClick: () => setReject(true),
-										className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 mx-2 text-white p-2",
-										children: "reject"
+									"ID: NG#",
+									b.id,
+									" ·",
+									" ",
+									formatDateRange(b.campaignStartDate, b.campaignEndDate)
+								]
+							})] }), /* @__PURE__ */ jsxs("div", {
+								className: "flex flex-wrap items-center gap-2 self-end sm:self-start sm:justify-end",
+								children: [
+									/* @__PURE__ */ jsx(CampaignStatusBadge, { status: b.status }),
+									/* @__PURE__ */ jsx(CampaignPaymentStatusBadge, { paymentStatus: b.paymentStatus }),
+									/* @__PURE__ */ jsx(Link, {
+										to: "/vendors/billboards/requests",
+										className: "text-xl leading-none text-stone-400 transition hover:text-stone-700",
+										"aria-label": "Back to requests",
+										children: "×"
 									})
 								]
 							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "px-5 pt-5 sm:px-7",
+							children: [/* @__PURE__ */ jsx("h2", {
+								className: "font-serif text-xl text-stone-900 md:text-2xl",
+								children: b.listing?.name ?? "Billboard request"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "mt-2 flex flex-wrap gap-2",
+								children: [
+									/* @__PURE__ */ jsx("span", {
+										className: "rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700",
+										children: "Billboard"
+									}),
+									/* @__PURE__ */ jsx("span", {
+										className: "rounded-full border border-stone-200 bg-white px-2.5 py-0.5 text-xs text-stone-600",
+										children: b.status
+									}),
+									b.paymentStatus ? /* @__PURE__ */ jsx("span", {
+										className: "rounded-full border border-stone-200 bg-white px-2.5 py-0.5 text-xs text-stone-600",
+										children: b.paymentStatus
+									}) : null
+								]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7",
+							children: [/* @__PURE__ */ jsx(InfoCard, {
+								label: "Total budget",
+								icon: /* @__PURE__ */ jsx(NairaIcon, {}),
+								value: formatCampaignMoney(b.negotiatedAmount ?? b.quotedTotal, b.currency),
+								sub: "Booker’s agreed price"
+							}), /* @__PURE__ */ jsx(InfoCard, {
+								label: "Campaign duration",
+								icon: /* @__PURE__ */ jsx(CalendarDays, {}),
+								value: formatDateRange(b.campaignStartDate, b.campaignEndDate),
+								sub: b.durationPlan ? `Plan: ${b.durationPlan}` : void 0
+							})]
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "px-5 pb-6 sm:px-7",
+							children: /* @__PURE__ */ jsxs("div", {
+								className: "rounded-2xl border border-stone-200/80 bg-[#F7F7F5] p-5",
+								children: [/* @__PURE__ */ jsx(SectionLabel, { children: "Campaign owner (booker)" }), b.booker ? /* @__PURE__ */ jsxs("div", {
+									className: "flex items-center gap-4",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ads360yellow-100 text-lg font-serif text-white",
+										children: personDisplayName(b.booker).slice(0, 1).toUpperCase()
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "min-w-0",
+										children: [/* @__PURE__ */ jsx("p", {
+											className: "font-semibold text-stone-900",
+											children: personDisplayName(b.booker)
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-sm text-stone-600",
+											children: b.booker.email
+										})]
+									})]
+								}) : /* @__PURE__ */ jsx("p", {
+									className: "text-sm text-stone-500",
+									children: "No booker details"
+								})]
+							})
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid gap-4 px-5 pb-6 sm:grid-cols-3 sm:px-7",
+							children: [
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Campaign creative",
+									children: b.creativeImageUrl || b.creativeVideoUrl ? /* @__PURE__ */ jsx(CreativeMedia, {
+										creativeKind: b.creativeKind,
+										creativeImageUrl: b.creativeImageUrl,
+										creativeVideoUrl: b.creativeVideoUrl,
+										hideActions: true,
+										className: "w-full"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "No creative uploaded"
+									})
+								}),
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Billboard",
+									children: b.listing?.imageUrl ? /* @__PURE__ */ jsx("img", {
+										src: b.listing.imageUrl,
+										alt: b.listing.name ?? "Billboard",
+										className: "max-h-52 w-full rounded-lg object-contain"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "No image"
+									})
+								}),
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Active proof",
+									children: b.activeProofImageUrl ? /* @__PURE__ */ jsx("img", {
+										src: b.activeProofImageUrl,
+										alt: "Activation proof",
+										className: "max-h-52 w-full rounded-lg object-contain"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "Upload proof when you accept the campaign"
+									})
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "flex flex-col gap-3 border-t border-stone-100 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:px-7",
+							children: [
+								creativeUrl ? /* @__PURE__ */ jsxs(Fragment, { children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => void copyCreative(),
+									className: "rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50",
+									children: "Copy creative URL"
+								}), /* @__PURE__ */ jsx("a", {
+									className: "inline-flex items-center justify-center rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50",
+									href: creativeUrl,
+									target: "_blank",
+									rel: "noreferrer",
+									download: canDownload ? "" : void 0,
+									children: canDownload ? "Download" : "Open creative"
+								})] }) : null,
+								canAct ? /* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setRejectOpen(true),
+									disabled: rejectMutation.isPending,
+									className: "rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-800 transition hover:bg-red-100 disabled:opacity-50",
+									children: "Reject"
+								}) : null,
+								canAct ? /* @__PURE__ */ jsxs("div", {
+									className: "flex w-full flex-col gap-2 sm:w-auto sm:min-w-[220px]",
+									children: [
+										/* @__PURE__ */ jsx("p", {
+											className: "text-xs text-stone-500",
+											children: "Proof image required to accept"
+										}),
+										/* @__PURE__ */ jsx(FilesInput, {
+											previewName: proofFile?.name ?? "",
+											accept: "image",
+											handleChange: (e) => {
+												const f = e.target.files?.[0];
+												if (!f) return;
+												setProofFile(f);
+												setProofPreviewUrl(URL.createObjectURL(f));
+											},
+											warning: ""
+										}),
+										proofPreviewUrl ? /* @__PURE__ */ jsx("img", {
+											src: proofPreviewUrl,
+											alt: "Preview",
+											className: "max-h-32 w-full rounded-lg border object-contain"
+										}) : null,
+										/* @__PURE__ */ jsx("button", {
+											type: "button",
+											disabled: !proofFile || markActive.isPending || !Number.isFinite(id),
+											onClick: async () => {
+												if (!proofFile) {
+													toast.error("Select a proof image");
+													return;
+												}
+												try {
+													await markActive.mutateAsync({
+														bookingId: id,
+														proofImage: proofFile
+													});
+													await booking.refetch();
+													setProofFile(null);
+													setProofPreviewUrl("");
+												} catch {}
+											},
+											className: "rounded-xl border-2 border-stone-900 bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-stone-800 disabled:opacity-50",
+											children: markActive.isPending ? "Accepting…" : "Accept campaign"
+										})
+									]
+								}) : null
+							]
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "px-5 pb-6 sm:px-7",
+							children: /* @__PURE__ */ jsx(Link, {
+								to: "/vendors/billboards/requests",
+								className: "text-sm font-medium text-ads360yellow-100",
+								children: "← Back to requests"
+							})
+						})
+					]
+				}),
+				/* @__PURE__ */ jsx(Modal, {
+					isOpen: rejectOpen,
+					children: /* @__PURE__ */ jsxs("div", {
+						className: "mx-auto w-11/12 max-w-md rounded-10 bg-white p-5 md:w-full",
+						children: [
+							/* @__PURE__ */ jsxs("div", {
+								className: "mb-4 flex justify-between",
+								children: [/* @__PURE__ */ jsx("h4", {
+									className: "font-serif text-lg",
+									children: "Reject campaign"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "button",
+									onClick: () => setRejectOpen(false),
+									"aria-label": "Close",
+									children: /* @__PURE__ */ jsx("img", {
+										src: cancel$3,
+										alt: "",
+										className: "h-5 w-5"
+									})
+								})]
+							}),
+							/* @__PURE__ */ jsx("p", {
+								className: "text-sm text-stone-600",
+								children: "This will refund the booker (wallet or card) per your platform rules. Optional reason:"
+							}),
+							/* @__PURE__ */ jsx("textarea", {
+								className: "mt-3 w-full rounded-lg border border-stone-200 p-3 text-sm",
+								rows: 3,
+								value: rejectReason,
+								onChange: (e) => setRejectReason(e.target.value),
+								placeholder: "Reason (optional)"
+							}),
+							/* @__PURE__ */ jsxs("div", {
+								className: "mt-4 flex justify-end gap-2",
+								children: [/* @__PURE__ */ jsx("button", {
+									type: "button",
+									className: "rounded-lg border px-4 py-2 text-sm",
+									onClick: () => setRejectOpen(false),
+									children: "Cancel"
+								}), /* @__PURE__ */ jsx("button", {
+									type: "button",
+									disabled: rejectMutation.isPending,
+									className: "rounded-lg bg-red-600 px-4 py-2 text-sm text-white disabled:opacity-50",
+									onClick: async () => {
+										try {
+											await rejectMutation.mutateAsync({
+												bookingId: id,
+												reason: rejectReason.trim() || void 0
+											});
+											setRejectOpen(false);
+											setRejectReason("");
+											await booking.refetch();
+										} catch {}
+									},
+									children: rejectMutation.isPending ? "Rejecting…" : "Confirm reject"
+								})]
+							})
+						]
+					})
+				})
+			]
+		})
+	});
+};
+var Route$13 = createFileRoute("/vendors/billboards/requests/$slug/")({ component: Request });
+//#endregion
+//#region app/vendors/billboards/negotiations/$id/index.tsx
+function VendorNegotiationDetail() {
+	const { id: idParam } = Route$12.useParams();
+	const id = Number(idParam);
+	const booking = useVendorBillboardBooking(Number.isFinite(id) && id > 0 ? id : null);
+	const b = booking.data;
+	const bookerLabel = b?.booker?.businessName || `${b?.booker?.firstName ?? ""} ${b?.booker?.lastName ?? ""}`.trim() || b?.booker?.email || "-";
+	return /* @__PURE__ */ jsxs("section", {
+		className: "px-4 md:px-10 py-14 min-h-screen bg-ads360-hash",
+		children: [
+			/* @__PURE__ */ jsxs("div", {
+				className: "flex justify-between items-center mb-6",
+				children: [/* @__PURE__ */ jsx("h3", {
+					className: "text-2xl font-bold",
+					children: "Negotiation"
+				}), /* @__PURE__ */ jsx(Link, {
+					to: "/vendors/billboards/negotiations",
+					className: "text-ads360yellow-100",
+					children: "Back"
+				})]
+			}),
+			booking.isLoading && /* @__PURE__ */ jsx("div", { children: "Loading..." }),
+			booking.isError && /* @__PURE__ */ jsx("div", { children: "Unable to load negotiation" }),
+			!booking.isLoading && !booking.isError && b && /* @__PURE__ */ jsxs("div", {
+				className: "bg-white rounded-10 p-5 border",
+				children: [
+					/* @__PURE__ */ jsx("div", {
+						className: "mb-5",
+						children: /* @__PURE__ */ jsx(CreativeMedia, {
+							creativeKind: b.creativeKind,
+							creativeImageUrl: b.creativeImageUrl,
+							creativeVideoUrl: b.creativeVideoUrl
 						})
 					}),
-					billboard.status === "paid" && /* @__PURE__ */ jsx("div", {
-						className: "bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3 my-5 md:my-0",
-						children: /* @__PURE__ */ jsxs("div", {
-							className: "",
-							children: [/* @__PURE__ */ jsx("h4", {
-								className: "font-bold",
-								children: "Remark"
+					/* @__PURE__ */ jsxs("div", {
+						className: "grid md:grid-cols-2 gap-4",
+						children: [
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Booking ID"
 							}), /* @__PURE__ */ jsxs("div", {
-								className: "",
-								children: [/* @__PURE__ */ jsx("p", { children: "this user has made payment this transaction" }), /* @__PURE__ */ jsxs("div", { children: ["notify user when you carry out transaction", /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx(FilesInput, {
-									previewName: "",
-									accept: "image",
-									handleChange: () => {},
-									warning: "Require image size"
-								}), /* @__PURE__ */ jsx("button", {
-									className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2",
-									children: "Upload"
-								})] })] })]
-							})]
-						})
+								className: "font-bold",
+								children: ["#", b.id]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Status"
+							}), /* @__PURE__ */ jsx("div", {
+								className: "font-bold",
+								children: b.status
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Listing"
+							}), /* @__PURE__ */ jsx("div", {
+								className: "font-bold",
+								children: b.listing?.name ?? "-"
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Booker"
+							}), /* @__PURE__ */ jsx("div", {
+								className: "font-bold",
+								children: bookerLabel
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Quoted Total"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "font-bold",
+								children: ["₦", b.quotedTotal]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Minimum Negotiable"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "font-bold",
+								children: ["₦", b.minimumNegotiableAmount ?? 0]
+							})] }),
+							/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+								className: "text-stone-500 text-sm",
+								children: "Their Offer"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "font-bold",
+								children: ["₦", b.negotiatedAmount ?? 0]
+							})] })
+						]
+					}),
+					/* @__PURE__ */ jsx("div", {
+						className: "mt-6 text-stone-600",
+						children: "This booking is currently under negotiation. (Accept/reject actions will be wired once the vendor negotiation endpoints are implemented.)"
 					})
 				]
-			}),
-			/* @__PURE__ */ jsx(Modal, {
-				isOpen: accept,
-				children: /* @__PURE__ */ jsxs("div", {
-					className: "bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex justify-between mb-5",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "",
-							children: "Accept Offer"
-						}), /* @__PURE__ */ jsx("button", {
-							onClick: () => setAccept(false),
-							children: /* @__PURE__ */ jsx("img", {
-								src: cancel$4,
-								alt: "modal cancel botton",
-								className: "w-5"
-							})
-						})]
-					}), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("button", {
-						onClick: () => setAccept(true),
-						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 text-white p-2",
-						children: "Yes"
-					}), /* @__PURE__ */ jsx("button", {
-						onClick: () => setAccept(true),
-						className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 mx-2 text-white p-2",
-						children: "No"
-					})] })]
-				})
-			}),
-			/* @__PURE__ */ jsx(Modal, {
-				isOpen: reject,
-				children: /* @__PURE__ */ jsxs("div", {
-					className: "bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex justify-between mb-5",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "",
-							children: "Reject Offer"
-						}), /* @__PURE__ */ jsx("button", {
-							onClick: () => setReject(false),
-							children: /* @__PURE__ */ jsx("img", {
-								src: cancel$4,
-								alt: "modal cancel botton",
-								className: "w-5"
-							})
-						})]
-					}), /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("form", { children: /* @__PURE__ */ jsxs("div", { children: [
-						/* @__PURE__ */ jsx("p", { children: "kindly enter the minimum price you would accept for this offer" }),
-						/* @__PURE__ */ jsx("input", { className: "p-2 focus:outline-none w-full border rounded" }),
-						/* @__PURE__ */ jsx("button", {
-							className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 text-white p-2",
-							children: "Reject"
-						})
-					] }) }) }) })]
-				})
 			})
 		]
 	});
-};
-var Route$11 = createFileRoute("/vendors/billboards/requests/$slug/")({ component: Request });
+}
+var Route$12 = createFileRoute("/vendors/billboards/negotiations/$id/")({ component: VendorNegotiationDetail });
+//#endregion
+//#region components/billboard/BillboardDetailInfo.tsx
+var locationIcon = "/icons/location.svg";
+function BillboardDetailMainColumn({ bb }) {
+	const hasCoords = bb.latitude != null && bb.longitude != null && Number.isFinite(bb.latitude) && Number.isFinite(bb.longitude);
+	const sizeLine = bb.width != null && bb.height != null ? `${bb.width}m (W) × ${bb.height}m (H)` : bb.width != null ? `Width: ${bb.width}m` : bb.height != null ? `Height: ${bb.height}m` : null;
+	const pixelLine = bb.pixelWidth != null && bb.pixelHeight != null ? `${bb.pixelWidth}px (W) × ${bb.pixelHeight}px (H)` : null;
+	const audience = bb.audienceTypes?.filter(Boolean).length > 0 ? bb.audienceTypes.join(", ") : null;
+	return /* @__PURE__ */ jsxs("div", {
+		className: "md:w-4/5 space-y-4",
+		children: [
+			/* @__PURE__ */ jsxs("h3", {
+				className: "flex items-center gap-2 font-bold text-lg",
+				children: [/* @__PURE__ */ jsx("img", {
+					alt: "",
+					src: locationIcon,
+					className: "h-5 w-5 shrink-0"
+				}), bb.name]
+			}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "flex flex-wrap items-center gap-2",
+				children: [/* @__PURE__ */ jsx("span", {
+					className: `rounded-full px-2.5 py-0.5 text-xs font-medium ${bb.isAvailable ? "bg-emerald-100 text-emerald-900" : "bg-amber-100 text-amber-900"}`,
+					children: bb.isAvailable ? "Available for booking" : "Not available"
+				}), bb.isNegotiable ? /* @__PURE__ */ jsx("span", {
+					className: "rounded-full bg-neutral-200 px-2.5 py-0.5 text-xs font-medium text-neutral-800",
+					children: "Negotiable"
+				}) : /* @__PURE__ */ jsx("span", {
+					className: "rounded-full bg-neutral-100 px-2.5 py-0.5 text-xs text-neutral-600",
+					children: "Fixed pricing"
+				})]
+			}),
+			/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Board type"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: boardTypeLabel(bb.boardType)
+			})] }),
+			/* @__PURE__ */ jsxs("div", { children: [
+				/* @__PURE__ */ jsx("h4", {
+					className: "text-sm font-semibold text-neutral-600",
+					children: "Location"
+				}),
+				/* @__PURE__ */ jsx("p", {
+					className: "mt-0.5",
+					children: bb.address
+				}),
+				/* @__PURE__ */ jsxs("p", {
+					className: "text-neutral-700",
+					children: [
+						bb.city,
+						", ",
+						bb.state
+					]
+				}),
+				hasCoords ? /* @__PURE__ */ jsx("a", {
+					href: googleMapsSearchUrl(bb.latitude, bb.longitude),
+					target: "_blank",
+					rel: "noopener noreferrer",
+					className: "mt-1 inline-block text-sm text-ads360yellowBtn-100 underline",
+					children: "Open in Google Maps"
+				}) : null
+			] }),
+			bb.nearbyLandmarks ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Nearby"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: bb.nearbyLandmarks
+			})] }) : null,
+			bb.trafficDescription ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Traffic"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: bb.trafficDescription
+			})] }) : null,
+			sizeLine ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Physical size"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: sizeLine
+			})] }) : null,
+			pixelLine ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Pixel size"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: pixelLine
+			})] }) : null,
+			bb.orientation ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Orientation"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: bb.orientation
+			})] }) : null,
+			bb.illumination ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Illumination"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: bb.illumination
+			})] }) : null,
+			bb.facingDirection ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Facing direction"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: bb.facingDirection
+			})] }) : null,
+			/* @__PURE__ */ jsxs("div", { children: [
+				/* @__PURE__ */ jsx("h4", {
+					className: "text-sm font-semibold text-neutral-600",
+					children: "Schedule"
+				}),
+				/* @__PURE__ */ jsx("p", {
+					className: "mt-0.5",
+					children: formatRuntime(bb)
+				}),
+				/* @__PURE__ */ jsxs("p", {
+					className: "mt-1 text-sm text-neutral-600",
+					children: ["Active days: ", formatActiveDaysSummary(bb.activeDays)]
+				})
+			] }),
+			audience ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Audience"
+			}), /* @__PURE__ */ jsx("p", {
+				className: "mt-0.5",
+				children: audience
+			})] }) : null,
+			bb.durationPerDisplay != null ? /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h4", {
+				className: "text-sm font-semibold text-neutral-600",
+				children: "Spot duration"
+			}), /* @__PURE__ */ jsxs("p", {
+				className: "mt-0.5",
+				children: [
+					"About ",
+					bb.durationPerDisplay,
+					" seconds per display rotation"
+				]
+			})] }) : null,
+			/* @__PURE__ */ jsxs("div", {
+				className: "border-t border-neutral-200 pt-4 text-sm text-neutral-500",
+				children: [/* @__PURE__ */ jsxs("p", { children: ["Listing ID: ", bb.id] }), /* @__PURE__ */ jsxs("p", {
+					className: "mt-1",
+					children: [
+						"Listed ",
+						formatListingDate(bb.createdAt),
+						" · Updated",
+						" ",
+						formatListingDate(bb.updatedAt)
+					]
+				})]
+			})
+		]
+	});
+}
+function BillboardDetailPricingColumn({ bb, actions }) {
+	const p = bb.pricing;
+	const rows = [];
+	if (p.daily != null && p.daily > 0) rows.push({
+		label: "Daily",
+		value: `₦${formatNaira(p.daily)}`
+	});
+	if (p.weekly != null && p.weekly > 0) rows.push({
+		label: "Weekly",
+		value: `₦${formatNaira(p.weekly)}`
+	});
+	if (p.monthly != null && p.monthly > 0) rows.push({
+		label: "Monthly",
+		value: `₦${formatNaira(p.monthly)}`
+	});
+	return /* @__PURE__ */ jsxs("div", {
+		className: "md:px-3 basis-1/3",
+		children: [
+			/* @__PURE__ */ jsx("h4", {
+				className: "my-3 font-semibold",
+				children: "Price"
+			}),
+			/* @__PURE__ */ jsxs("p", {
+				className: "mt-1 text-lg font-medium text-ads360black-100",
+				children: [
+					"From ₦",
+					primaryPrice(bb.pricing),
+					p.daily != null && p.daily > 0 ? /* @__PURE__ */ jsx("span", {
+						className: "text-sm font-normal text-neutral-600",
+						children: " / day"
+					}) : null
+				]
+			}),
+			rows.length > 0 ? /* @__PURE__ */ jsx("ul", {
+				className: "mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm",
+				children: rows.map((r) => /* @__PURE__ */ jsxs("li", {
+					className: "flex justify-between gap-3",
+					children: [/* @__PURE__ */ jsx("span", {
+						className: "text-neutral-600",
+						children: r.label
+					}), /* @__PURE__ */ jsx("span", {
+						className: "font-medium",
+						children: r.value
+					})]
+				}, r.label))
+			}) : /* @__PURE__ */ jsx("p", {
+				className: "mt-2 text-sm text-neutral-500",
+				children: "No rate tiers listed."
+			}),
+			/* @__PURE__ */ jsxs("div", {
+				className: "mt-6 border-t border-neutral-200 pt-4",
+				children: [
+					/* @__PURE__ */ jsx("h4", {
+						className: "font-semibold text-neutral-800",
+						children: "Notes"
+					}),
+					bb.isNegotiable ? /* @__PURE__ */ jsx("p", {
+						className: "mt-2 text-sm text-neutral-700",
+						children: "The owner has indicated this placement may be negotiable."
+					}) : /* @__PURE__ */ jsx("p", {
+						className: "mt-2 text-sm text-neutral-700",
+						children: "Pricing is as shown unless otherwise agreed on-platform."
+					}),
+					bb.durationPerDisplay != null ? /* @__PURE__ */ jsxs("p", {
+						className: "mt-2 text-sm text-neutral-600",
+						children: [
+							"Each loop runs about ",
+							bb.durationPerDisplay,
+							" seconds on screen."
+						]
+					}) : null
+				]
+			}),
+			/* @__PURE__ */ jsx("div", {
+				className: "mt-6",
+				children: actions
+			})
+		]
+	});
+}
 //#endregion
 //#region app/vendors/billboards/listing/$slug/index.tsx
 var led$1 = "/icons/led.svg";
 var duration$1 = "/icons/duration.svg";
 var impression$1 = "/icons/impression.svg";
-var location$1 = "/icons/location.svg";
 var dash$1 = "/icons/dash.svg";
-var billboardImage2$3 = "/del/billboard2.png";
 var Billboard$1 = () => {
+	const { slug } = Route$11.useParams();
+	const parsed = Number.parseInt(slug, 10);
+	const listingId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+	const { data: bb, isPending, isError, error, refetch } = useMyBillboardListing(listingId);
 	const [view, setView] = useState("Billboard Overview");
 	const [preview, setPreview] = useState(false);
-	const billboard = {
-		id: 2,
-		name: "Adetokunbo Ademola led, victoria island",
-		location: "Along Adetokunbo Ademola Street by Bishop",
-		image: billboardImage2$3,
-		pricepd: "30000",
-		Impressions: "40 per day",
-		type: "Double faced Gantry LED",
-		duration: "14hrs (6am - 9pm) 6days/week"
-	};
+	if (listingId == null) return /* @__PURE__ */ jsx("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-5",
+		children: /* @__PURE__ */ jsx("p", {
+			className: "mt-4 text-red-700",
+			children: "Invalid billboard link."
+		})
+	});
+	if (isPending) return /* @__PURE__ */ jsx("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-5",
+		children: /* @__PURE__ */ jsx("p", {
+			className: "mt-4 text-stone-500",
+			children: "Loading billboard…"
+		})
+	});
+	if (isError || !bb) return /* @__PURE__ */ jsx("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-5",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "mt-4 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-800",
+			children: [/* @__PURE__ */ jsx("p", { children: error instanceof Error ? error.message : "Could not load this billboard." }), /* @__PURE__ */ jsx("button", {
+				type: "button",
+				onClick: () => refetch(),
+				className: "mt-2 underline",
+				children: "Try again"
+			})]
+		})
+	});
+	const displayLine = bb.durationPerDisplay != null ? `${bb.durationPerDisplay}s per display` : "—";
 	return /* @__PURE__ */ jsxs(Fragment, { children: [
 		/* @__PURE__ */ jsxs("section", {
 			className: "bg-[#E9E9E9] px-4 md:px-10 pt-5",
@@ -10775,7 +13095,7 @@ var Billboard$1 = () => {
 			}), /* @__PURE__ */ jsxs("div", {
 				className: "w-full flex text-sm md:text-base justify-between md:justify-start md:space-x-3",
 				children: [/* @__PURE__ */ jsxs("button", {
-					className: "",
+					type: "button",
 					onClick: () => setView("Billboard Overview"),
 					children: ["Billboard Overview", view === "Billboard Overview" && /* @__PURE__ */ jsx("img", {
 						alt: "Billboard Overview selected",
@@ -10783,10 +13103,10 @@ var Billboard$1 = () => {
 						className: "w-2/3 mx-auto relative top-[4px] -left-2"
 					})]
 				}), /* @__PURE__ */ jsxs("button", {
-					className: "",
+					type: "button",
 					onClick: () => setView("License Agreement"),
 					children: ["License Agreement", view === "License Agreement" && /* @__PURE__ */ jsx("img", {
-						alt: "Billboard Overview selected",
+						alt: "License Agreement selected",
 						src: dash$1,
 						className: "w-2/3 mx-auto relative top-[4px] -left-2"
 					})]
@@ -10794,7 +13114,6 @@ var Billboard$1 = () => {
 			})]
 		}),
 		/* @__PURE__ */ jsx(AnimatePresence, { children: view === "Billboard Overview" && /* @__PURE__ */ jsx(motion.div, {
-			className: "",
 			initial: {
 				opacity: 0,
 				scale: .75
@@ -10821,8 +13140,8 @@ var Billboard$1 = () => {
 					className: "md:px-3 lg:px-6 basis-2/3",
 					children: [
 						/* @__PURE__ */ jsx("img", {
-							src: billboardImage2$3,
-							alt: "billboard",
+							src: bb.imageUrl,
+							alt: bb.name,
 							className: "rounded-t-10 w-full",
 							onClick: () => setPreview(true)
 						}),
@@ -10833,99 +13152,52 @@ var Billboard$1 = () => {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: impression$1,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "70 impressions daily" })]
+									}), /* @__PURE__ */ jsx("p", { children: displayLine })]
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: duration$1,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "14hrs (6am - 9pm) 6days/week" })]
+									}), /* @__PURE__ */ jsx("p", { children: formatRuntime(bb) })]
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: led$1,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "Double faced Gantry LED" })]
+									}), /* @__PURE__ */ jsx("p", { children: boardTypeLabel(bb.boardType) })]
 								})
 							]
 						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "md:w-4/5",
-							children: [
-								/* @__PURE__ */ jsxs("h3", {
-									className: "flex items-center font-bold text-lg my-3",
-									children: [/* @__PURE__ */ jsx("img", {
-										alt: "location",
-										src: location$1
-									}), "Hebert Macaulay Way LED"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Traffic:" }), " Facing Traffic Along Adetokumbo Ademola Street by Eko Hotels,Ahmadu Bello Way, Akin Adesola & Ajose Adeogun."]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Size:" }), " 4m(H) by 12m(W)"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Pixel Size:" }), " 385(H) by 1125(W)"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Orientation:" }), " Landscape"]
-								})
-							]
-						})
+						/* @__PURE__ */ jsx(BillboardDetailMainColumn, { bb })
 					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "md:px-3 basis-1/3",
-					children: [
-						/* @__PURE__ */ jsx("h4", {
-							className: "my-3 font-semibold",
-							children: "Daily price"
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "mt-3 mb-7",
-							children: "₦40,000 (per day)"
-						}),
-						/* @__PURE__ */ jsx("h4", {
-							className: "my-3 font-semibold",
-							children: "Note:"
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "my-3",
-							children: "Your advert will be displayed 70 times daily on the billboard."
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "my-3",
-							children: "Adverts will be displayed for 10 seconds each time it appears on the billboard."
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "flex space-x-4 justify-end",
-							children: [/* @__PURE__ */ jsx("button", {
-								className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/vendors/billboards/listing/${billboard.id}/edit`,
-									children: "Edit"
-								})
-							}), /* @__PURE__ */ jsx("button", {
-								className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white p-2",
-								children: "Delete"
-							})]
-						})
-					]
+				}), /* @__PURE__ */ jsx(BillboardDetailPricingColumn, {
+					bb,
+					actions: /* @__PURE__ */ jsxs("div", {
+						className: "flex flex-wrap justify-end gap-3",
+						children: [/* @__PURE__ */ jsx("button", {
+							type: "button",
+							className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white px-4 py-2",
+							children: /* @__PURE__ */ jsx(Link, {
+								to: "/vendors/billboards/listing/$slug/edit",
+								params: { slug: String(bb.id) },
+								children: "Edit"
+							})
+						}), /* @__PURE__ */ jsx("button", {
+							type: "button",
+							className: "bg-ads360black-100/95 hover:bg-ads360black-100 rounded text-white px-4 py-2",
+							children: "Delete"
+						})]
+					})
 				})]
 			})
 		}) }),
 		/* @__PURE__ */ jsx(AnimatePresence, { children: view === "License Agreement" && /* @__PURE__ */ jsx(motion.div, {
-			className: "",
 			initial: {
 				opacity: 0,
 				scale: .75
@@ -10958,7 +13230,18 @@ var Billboard$1 = () => {
 						className: "my-3 text-2xl font-semibold",
 						children: "Negotiations"
 					}),
-					/* @__PURE__ */ jsx("p", { children: "360ads - NG is an investment platform, that enables Africans to purchase fractional shares of global real estate assets. Meristem Trustees - Investments & Assets are managed by SEC- regulated Meristem trustees" })
+					/* @__PURE__ */ jsx("p", { children: bb.isNegotiable ? "Advertisers may request negotiated terms where applicable." : "Standard listed pricing applies." }),
+					/* @__PURE__ */ jsxs("p", {
+						className: "mt-6 text-sm text-neutral-500",
+						children: [
+							"Your listing #",
+							bb.id,
+							" · Last updated",
+							" ",
+							formatListingDate(bb.updatedAt),
+							"."
+						]
+					})
 				]
 			})
 		}) }),
@@ -10969,25 +13252,26 @@ var Billboard$1 = () => {
 				children: [/* @__PURE__ */ jsx("div", {
 					className: "fixed w-full left-0 top-[30%]  md:left-[20%] md:top-[10%] md:w-2/3 z-[1000000000]",
 					children: /* @__PURE__ */ jsx("img", {
-						src: billboardImage2$3,
-						alt: "billboard",
+						src: bb.imageUrl,
+						alt: bb.name,
 						className: "rounded-10 w-full"
 					})
 				}), /* @__PURE__ */ jsx("div", {
+					role: "presentation",
 					onClick: () => setPreview(false),
-					className: `fixed w-full px-5 py-10 bg-black/20 top-0 left-0 h-full z-[100000]`
+					className: "fixed w-full px-5 py-10 bg-black/20 top-0 left-0 h-full z-[100000]"
 				})]
 			})
 		})
 	] });
 };
-var Route$10 = createFileRoute("/vendors/billboards/listing/$slug/")({ component: Billboard$1 });
+var Route$11 = createFileRoute("/vendors/billboards/listing/$slug/")({ component: Billboard$1 });
 //#endregion
 //#region app/_usersauth/users/wallet/fundwallet/index.tsx
 var card$2 = "/icons/usericon/card.svg";
 var dollar = "/icons/usericon/dollar-sign.svg";
 var bank = "/icons/usericon/banking.svg";
-var cancel$3 = "/icons/usericon/modalCancelBotton.svg";
+var cancel$2 = "/icons/usericon/modalCancelBotton.svg";
 var Payment = () => {
 	const [selected, setSelected] = useState("");
 	const [isOpen, setIsOpen] = useState(false);
@@ -11058,7 +13342,7 @@ var Payment = () => {
 					children: /* @__PURE__ */ jsx("button", {
 						onClick: () => setIsOpen(false),
 						children: /* @__PURE__ */ jsx("img", {
-							src: cancel$3,
+							src: cancel$2,
 							alt: "modal cancel botton",
 							className: "w-5"
 						})
@@ -11108,7 +13392,7 @@ var Payment = () => {
 					}), /* @__PURE__ */ jsx("button", {
 						onClick: () => setIsOpen(false),
 						children: /* @__PURE__ */ jsx("img", {
-							src: cancel$3,
+							src: cancel$2,
 							alt: "modal cancel botton",
 							className: "w-5"
 						})
@@ -11136,236 +13420,276 @@ var Payment = () => {
 		}) : null
 	})] });
 };
-var Route$9 = createFileRoute("/_usersauth/users/wallet/fundwallet/")({ component: Payment });
+var Route$10 = createFileRoute("/_usersauth/users/wallet/fundwallet/")({ component: Payment });
 //#endregion
-//#region app/_usersauth/users/campaign/$slug/index.tsx
-var cancel$2 = "/icons/usericon/modalCancelBotton.svg";
-var billboardImage2$2 = "/del/billboard2.png";
-var Checkout$3 = ({ params }) => {
-	const [negotia, setNegotia] = useState(false);
-	const [negotiatedAmount, setNegotiatedAmount] = useState("");
-	const [successfull, setSuccessfull] = useState(false);
-	const [billboard, setBillboard] = useState({
-		id: 2,
-		name: "Adetokunbo Ademola led, victoria island",
-		location: "Along Adetokunbo Ademola Street by Bishop",
-		image: billboardImage2$2,
-		status: params.slug === "1" ? "completed" : params.slug === "2" ? "negotiating" : "ongoing",
-		pricepd: "30000",
-		negotiationCount: 1,
-		feedback: "rejected",
-		finalprice: "29500",
-		yourPrice: "28000",
-		Impressions: "40 per day",
-		minimumNegotiableAmount: 26e3,
-		type: "Double faced Gantry LED",
-		duration: "14hrs (6am - 9pm) 6days/week"
-	});
-	const handleNegotiate = (e) => {
-		setNegotiatedAmount(e.target.value);
-	};
-	const submit = (e) => {
-		e.preventDefault();
-		setSuccessfull(true);
-		setNegotia(false);
-		setBillboard((prev) => ({
-			...prev,
-			negotiationCount: 1
-		}));
-		setTimeout(() => {
-			setSuccessfull(false);
-		}, 4e3);
-	};
+//#region app/_usersauth/users/negotiations/$id/index.tsx
+function NegotiationDetail() {
+	const { id: idParam } = Route$9.useParams();
+	const id = Number(idParam);
+	const booking = useBillboardBooking(Number.isFinite(id) && id > 0 ? id : null);
+	const b = booking.data;
 	return /* @__PURE__ */ jsxs("section", {
-		className: "px-4 md:px-10 py-14   min-h-screen bg-ads360-hash",
+		className: "px-4 md:px-10 py-14 min-h-screen bg-ads360-hash",
 		children: [
-			/* @__PURE__ */ jsx("div", { className: "my-5 font-bold" }),
-			/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("img", {
-				alt: "billboard",
-				src: billboardImage2$2,
-				className: "mx-auto"
-			}) }),
-			/* @__PURE__ */ jsx("div", {
-				className: "w-full overflow-x-auto my-5",
-				children: /* @__PURE__ */ jsxs("table", {
-					className: "min-w-full bg-white",
-					children: [/* @__PURE__ */ jsx("thead", {
-						className: "bg-[#D0B301]/40",
-						children: /* @__PURE__ */ jsxs("tr", { children: [
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Name"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Location"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Size"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Duration"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Start Date"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "End Date"
-							}),
-							/* @__PURE__ */ jsx("th", {
-								className: "py-2 px-2 md:px-3 border-b",
-								children: "Cost/day"
-							})
-						] })
-					}), /* @__PURE__ */ jsx("tbody", { children: /* @__PURE__ */ jsxs("tr", { children: [
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "Eko hotel LED, Victoria Island"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "Along Adetokunbo Ademola Street by Eko Hotels"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "4m(H) by 12m(W)"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "1 day(s)"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "2023-05-20"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "2023-05-21"
-						}),
-						/* @__PURE__ */ jsx("td", {
-							className: "py-2 px-2 md:px-3 border-b",
-							children: "₦30,000"
-						})
-					] }) })]
-				})
-			}),
 			/* @__PURE__ */ jsxs("div", {
-				className: "md:flex md:space-x-2 justify-end",
-				children: [billboard.status === "negotiating" && /* @__PURE__ */ jsx("div", {
-					className: "bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3 my-5 md:my-0",
-					children: /* @__PURE__ */ jsxs("div", {
-						className: "",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "basis-1/2",
-							children: "Remark"
-						}), /* @__PURE__ */ jsx("div", {
-							className: "font-bold basis-1/2",
-							children: billboard.feedback === "rejected" ? `the billboard owner has rejected your request, and their final price is ${billboard.finalprice}` : "the billboard owner has accepted your request, you can proceed to make payment"
-						})]
-					})
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "basis-1/2",
+				className: "flex justify-between items-center mb-6",
+				children: [/* @__PURE__ */ jsx("h3", {
+					className: "text-2xl font-bold",
+					children: "Negotiation"
+				}), /* @__PURE__ */ jsx(Link, {
+					to: "/users/negotiations",
+					className: "text-ads360yellow-100",
+					children: "Back"
+				})]
+			}),
+			booking.isLoading && /* @__PURE__ */ jsx("div", { children: "Loading..." }),
+			booking.isError && /* @__PURE__ */ jsx("div", { children: "Unable to load negotiation" }),
+			!booking.isLoading && !booking.isError && b && /* @__PURE__ */ jsxs("div", {
+				className: "bg-white rounded-10 p-5 border",
+				children: [/* @__PURE__ */ jsxs("div", {
+					className: "grid md:grid-cols-2 gap-4",
+					children: [
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
+							children: "Booking ID"
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "font-bold",
+							children: ["#", b.id]
+						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
 							children: "Status"
 						}), /* @__PURE__ */ jsx("div", {
-							className: "font-bold basis-1/2",
-							children: billboard.status
-						})]
-					}), /* @__PURE__ */ jsxs("div", {
-						className: "flex",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "basis-1/2",
-							children: "Total Amount"
+							className: "font-bold",
+							children: b.status
+						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
+							children: "Listing"
+						}), /* @__PURE__ */ jsx("div", {
+							className: "font-bold",
+							children: b.listing?.name ?? "-"
+						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
+							children: "Quoted Total"
 						}), /* @__PURE__ */ jsxs("div", {
-							className: "basis-1/2",
-							children: [/* @__PURE__ */ jsx("div", {
-								className: "font-bold",
-								children: billboard.finalprice !== "" && billboard.feedback === "rejected" ? billboard.finalprice : billboard.feedback === "accepted" ? billboard.yourPrice : "₦30,000"
-							}), /* @__PURE__ */ jsx("div", { children: "cost x 1 day(s)" })]
-						})]
-					})]
+							className: "font-bold",
+							children: ["₦", b.quotedTotal]
+						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
+							children: "Minimum Negotiable"
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "font-bold",
+							children: ["₦", b.minimumNegotiableAmount ?? 0]
+						})] }),
+						/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+							className: "text-stone-500 text-sm",
+							children: "Your Offer"
+						}), /* @__PURE__ */ jsxs("div", {
+							className: "font-bold",
+							children: ["₦", b.negotiatedAmount ?? 0]
+						})] })
+					]
+				}), /* @__PURE__ */ jsx("div", {
+					className: "mt-6 text-stone-600",
+					children: "This booking is currently under negotiation. Once the billboard owner responds, you’ll be able to proceed to payment."
 				})]
-			}),
-			billboard.status === "negotiating" && /* @__PURE__ */ jsxs("div", {
-				className: "flex md:justify-end space-x-3 my-3",
-				children: [billboard.negotiationCount > 1 && billboard.feedback === "rejected" && /* @__PURE__ */ jsx("button", {
-					onClick: () => setNegotia(true),
-					className: "group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
-					children: "Negotiat"
-				}), /* @__PURE__ */ jsx("button", {
-					className: "group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12",
-					children: "Pay Now"
-				})]
-			}),
-			/* @__PURE__ */ jsx(Modal, {
-				isOpen: negotia,
-				children: /* @__PURE__ */ jsxs("div", {
-					className: "bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10",
-					children: [/* @__PURE__ */ jsxs("div", {
-						className: "flex justify-between mb-5",
-						children: [/* @__PURE__ */ jsx("h4", {
-							className: "",
-							children: "Input Amount"
-						}), /* @__PURE__ */ jsx("button", {
-							onClick: () => setNegotia(false),
-							children: /* @__PURE__ */ jsx("img", {
-								src: cancel$2,
-								alt: "modal cancel botton",
-								className: "w-5"
-							})
-						})]
-					}), /* @__PURE__ */ jsxs("form", {
-						onSubmit: submit,
-						children: [
-							/* @__PURE__ */ jsxs("div", {
-								className: "flex",
-								children: [/* @__PURE__ */ jsxs("div", {
-									className: "bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-1/5 content-center text-black/50",
-									children: [
-										" ",
-										"₦",
-										" "
-									]
-								}), /* @__PURE__ */ jsx("input", {
-									type: "number",
-									value: negotiatedAmount,
-									onChange: handleNegotiate,
-									className: "p-2 focus:outline-none w-full border rounded-r"
-								})]
-							}),
-							/* @__PURE__ */ jsxs("div", {
-								className: "my-3",
-								children: [/* @__PURE__ */ jsxs("p", {
-									className: "text-red-700 text-xs",
-									children: ["You cannot negotiat lower than ₦", billboard.minimumNegotiableAmount]
-								}), /* @__PURE__ */ jsx("p", {
-									className: "text-red-700 text-xs",
-									children: "You can only negotiat once"
-								})]
-							}),
-							/* @__PURE__ */ jsx("div", {
-								className: "flex justify-center",
-								children: /* @__PURE__ */ jsx("button", {
-									disabled: negotiatedAmount === "" || parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount ? true : false,
-									className: `${negotiatedAmount === "" || parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount ? "bg-ads360gray-100" : "bg-ads360black-100/95 hover:bg-ads360black-100"} rounded mt-5  text-white  w-5/6 h-10`,
-									children: "Send Request"
-								})
-							})
-						]
-					})]
-				})
 			})
 		]
 	});
+}
+var Route$9 = createFileRoute("/_usersauth/users/negotiations/$id/")({ component: NegotiationDetail });
+//#endregion
+//#region app/_usersauth/users/campaign/$slug/index.tsx
+var CampaignDetail = () => {
+	const { slug } = Route$8.useParams();
+	const id = Number(slug);
+	const booking = useBillboardBooking(Number.isFinite(id) && id > 0 ? id : null);
+	const complete = useCompleteBillboardBooking();
+	const b = booking.data;
+	const isPaid = b?.paymentStatus === "paid" || b?.status === "paid";
+	const canComplete = Boolean(b) && isPaid && b?.paymentStatus !== "refunded" && b?.status === "active";
+	return /* @__PURE__ */ jsx("section", {
+		className: "min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12",
+		children: /* @__PURE__ */ jsxs("div", {
+			className: "mx-auto max-w-3xl",
+			children: [
+				booking.isLoading && /* @__PURE__ */ jsx("p", {
+					className: "text-center text-stone-600",
+					children: "Loading…"
+				}),
+				booking.isError && /* @__PURE__ */ jsx("p", {
+					className: "text-center text-red-600",
+					children: "Unable to load campaign"
+				}),
+				!booking.isLoading && !booking.isError && b && /* @__PURE__ */ jsxs("div", {
+					className: "overflow-hidden rounded-2xl border border-amber-200/40 bg-white shadow-sm",
+					children: [
+						/* @__PURE__ */ jsxs("header", {
+							className: "flex flex-col gap-3 border-b border-stone-100 px-5 pt-6 pb-4 sm:flex-row sm:items-start sm:justify-between sm:px-7",
+							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("h1", {
+								className: "font-serif text-2xl font-medium tracking-tight text-stone-900 md:text-3xl",
+								children: "Campaign details"
+							}), /* @__PURE__ */ jsxs("p", {
+								className: "mt-1.5 text-sm text-stone-500",
+								children: [
+									"ID: NG#",
+									b.id,
+									" · ",
+									formatDateRange(b.campaignStartDate, b.campaignEndDate)
+								]
+							})] }), /* @__PURE__ */ jsxs("div", {
+								className: "flex flex-wrap items-center gap-2 self-end sm:self-start sm:justify-end",
+								children: [
+									/* @__PURE__ */ jsx(CampaignStatusBadge, { status: b.status }),
+									/* @__PURE__ */ jsx(CampaignPaymentStatusBadge, { paymentStatus: b.paymentStatus }),
+									/* @__PURE__ */ jsx(Link, {
+										to: "/users/campaign",
+										className: "text-xl leading-none text-stone-400 transition hover:text-stone-700",
+										"aria-label": "Back to campaigns",
+										children: "×"
+									})
+								]
+							})]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "px-5 pt-5 sm:px-7",
+							children: [/* @__PURE__ */ jsx("h2", {
+								className: "font-serif text-xl text-stone-900 md:text-2xl",
+								children: b.listing?.name ?? "Billboard campaign"
+							}), /* @__PURE__ */ jsxs("div", {
+								className: "mt-2 flex flex-wrap gap-2",
+								children: [/* @__PURE__ */ jsx("span", {
+									className: "rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700",
+									children: "Billboard"
+								}), /* @__PURE__ */ jsx("span", {
+									className: "rounded-full border border-stone-200 bg-white px-2.5 py-0.5 text-xs text-stone-600",
+									children: b.status
+								})]
+							})]
+						}),
+						!isPaid && /* @__PURE__ */ jsxs("div", {
+							className: "mx-5 my-4 rounded-xl border border-amber-200/50 bg-amber-50/50 p-4 text-sm text-stone-700 sm:mx-7",
+							children: [
+								"This booking is not paid yet. Unpaid and negotiating bookings are under",
+								" ",
+								/* @__PURE__ */ jsx(Link, {
+									to: "/users/negotiations",
+									className: "font-medium text-ads360yellow-100 underline",
+									children: "Negotiations"
+								}),
+								"."
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7",
+							children: [/* @__PURE__ */ jsx(InfoCard, {
+								label: "Total budget",
+								icon: /* @__PURE__ */ jsx(NairaIcon, {}),
+								value: formatCampaignMoney(b.negotiatedAmount ?? b.quotedTotal, b.currency),
+								sub: "Agreed price for this placement"
+							}), /* @__PURE__ */ jsx(InfoCard, {
+								label: "Campaign duration",
+								icon: /* @__PURE__ */ jsx(CalendarDays, {}),
+								value: formatDateRange(b.campaignStartDate, b.campaignEndDate),
+								sub: b.durationPlan ? `Plan: ${b.durationPlan}` : void 0
+							})]
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "px-5 pb-6 sm:px-7",
+							children: /* @__PURE__ */ jsxs("div", {
+								className: "rounded-2xl border border-stone-200/80 bg-[#F7F7F5] p-5",
+								children: [/* @__PURE__ */ jsx(SectionLabel, { children: "Billboard owner" }), b.billboardOwner ? /* @__PURE__ */ jsxs("div", {
+									className: "flex items-center gap-4",
+									children: [/* @__PURE__ */ jsx("div", {
+										className: "flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ads360yellow-100 text-lg font-serif text-white",
+										children: personDisplayName(b.billboardOwner).slice(0, 1).toUpperCase()
+									}), /* @__PURE__ */ jsxs("div", {
+										className: "min-w-0",
+										children: [/* @__PURE__ */ jsx("p", {
+											className: "font-semibold text-stone-900",
+											children: personDisplayName(b.billboardOwner)
+										}), /* @__PURE__ */ jsx("p", {
+											className: "text-sm text-stone-600",
+											children: b.billboardOwner.email
+										})]
+									})]
+								}) : /* @__PURE__ */ jsx("p", {
+									className: "text-sm text-stone-500",
+									children: "No owner details"
+								})]
+							})
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							className: "grid gap-4 px-5 pb-6 sm:grid-cols-3 sm:px-7",
+							children: [
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Campaign creative",
+									children: b.creativeImageUrl || b.creativeVideoUrl ? /* @__PURE__ */ jsx(CreativeMedia, {
+										creativeKind: b.creativeKind,
+										creativeImageUrl: b.creativeImageUrl,
+										creativeVideoUrl: b.creativeVideoUrl,
+										hideActions: true,
+										className: "w-full"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "No creative uploaded yet"
+									})
+								}),
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Billboard",
+									children: b.listing?.imageUrl ? /* @__PURE__ */ jsx("img", {
+										src: b.listing.imageUrl,
+										alt: b.listing.name ?? "Billboard",
+										className: "max-h-52 w-full rounded-lg object-contain"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "No image"
+									})
+								}),
+								/* @__PURE__ */ jsx(MediaFrame, {
+									title: "Active proof",
+									children: b.activeProofImageUrl ? /* @__PURE__ */ jsx("img", {
+										src: b.activeProofImageUrl,
+										alt: "Proof of activation",
+										className: "max-h-52 w-full rounded-lg object-contain"
+									}) : /* @__PURE__ */ jsx("p", {
+										className: "py-8 text-center text-sm text-stone-500",
+										children: "The owner has not uploaded activation proof yet"
+									})
+								})
+							]
+						}),
+						canComplete && /* @__PURE__ */ jsx("div", {
+							className: "flex justify-end border-t border-stone-100 px-5 py-5 sm:px-7",
+							children: /* @__PURE__ */ jsx("button", {
+								type: "button",
+								disabled: complete.isPending,
+								onClick: () => {
+									if (!Number.isFinite(id) || id <= 0) return;
+									complete.mutateAsync(id);
+								},
+								className: "rounded-xl border-2 border-stone-900 bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:opacity-50",
+								children: complete.isPending ? "Completing…" : "Complete campaign"
+							})
+						}),
+						/* @__PURE__ */ jsx("div", {
+							className: "px-5 pb-6 sm:px-7",
+							children: /* @__PURE__ */ jsx(Link, {
+								to: "/users/campaign",
+								className: "text-sm font-medium text-ads360yellow-100",
+								children: "← Back to campaigns"
+							})
+						})
+					]
+				})
+			]
+		})
+	});
 };
-var Route$8 = createFileRoute("/_usersauth/users/campaign/$slug/")({ component: Checkout$3 });
+var Route$8 = createFileRoute("/_usersauth/users/campaign/$slug/")({ component: CampaignDetail });
 //#endregion
 //#region app/_usersauth/ads/sms/checkout/index.tsx
 var card$1 = "/del/cards.png";
@@ -11588,22 +13912,41 @@ var Route$6 = createFileRoute("/_usersauth/ads/influencer/$slug/")({ component: 
 var led = "/icons/led.svg";
 var duration = "/icons/duration.svg";
 var impression = "/icons/impression.svg";
-var location = "/icons/location.svg";
 var dash = "/icons/dash.svg";
-var billboardImage2$1 = "/del/billboard2.png";
 var Billboard = () => {
+	const { slug } = Route$5.useParams();
+	const parsed = Number.parseInt(slug, 10);
+	const listingId = Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+	const { data: bb, isPending, isError, error, refetch } = useBillboardListing(listingId);
 	const [view, setView] = useState("Billboard Overview");
 	const [preview, setPreview] = useState(false);
-	const billboard = {
-		id: 2,
-		name: "Adetokunbo Ademola led, victoria island",
-		location: "Along Adetokunbo Ademola Street by Bishop",
-		image: billboardImage2$1,
-		pricepd: "30000",
-		Impressions: "40 per day",
-		type: "Double faced Gantry LED",
-		duration: "14hrs (6am - 9pm) 6days/week"
-	};
+	if (listingId == null) return /* @__PURE__ */ jsxs("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-24",
+		children: [/* @__PURE__ */ jsx(BackBtn, { children: " Billboard Details" }), /* @__PURE__ */ jsx("p", {
+			className: "mt-4 text-red-700",
+			children: "Invalid billboard link."
+		})]
+	});
+	if (isPending) return /* @__PURE__ */ jsxs("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-24",
+		children: [/* @__PURE__ */ jsx(BackBtn, { children: " Billboard Details" }), /* @__PURE__ */ jsx("p", {
+			className: "mt-4 text-stone-500",
+			children: "Loading billboard…"
+		})]
+	});
+	if (isError || !bb) return /* @__PURE__ */ jsxs("section", {
+		className: "bg-[#E9E9E9] px-4 md:px-10 pt-24",
+		children: [/* @__PURE__ */ jsx(BackBtn, { children: " Billboard Details" }), /* @__PURE__ */ jsxs("div", {
+			className: "mt-4 rounded border border-red-200 bg-red-50 p-4 text-sm text-red-800",
+			children: [/* @__PURE__ */ jsx("p", { children: error instanceof Error ? error.message : "Could not load this billboard." }), /* @__PURE__ */ jsx("button", {
+				type: "button",
+				onClick: () => refetch(),
+				className: "mt-2 underline",
+				children: "Try again"
+			})]
+		})]
+	});
+	const displayLine = bb.durationPerDisplay != null ? `${bb.durationPerDisplay}s per display` : "—";
 	return /* @__PURE__ */ jsxs(Fragment, { children: [
 		/* @__PURE__ */ jsxs("section", {
 			className: "bg-[#E9E9E9] px-4 md:px-10 pt-24",
@@ -11616,7 +13959,7 @@ var Billboard = () => {
 				/* @__PURE__ */ jsxs("div", {
 					className: "w-full flex text-sm md:text-base justify-between md:justify-start md:space-x-3",
 					children: [/* @__PURE__ */ jsxs("button", {
-						className: "",
+						type: "button",
 						onClick: () => setView("Billboard Overview"),
 						children: ["Billboard Overview", view === "Billboard Overview" && /* @__PURE__ */ jsx("img", {
 							alt: "Billboard Overview selected",
@@ -11624,10 +13967,10 @@ var Billboard = () => {
 							className: "w-2/3 mx-auto relative top-[4px] -left-2"
 						})]
 					}), /* @__PURE__ */ jsxs("button", {
-						className: "",
+						type: "button",
 						onClick: () => setView("License Agreement"),
 						children: ["License Agreement", view === "License Agreement" && /* @__PURE__ */ jsx("img", {
-							alt: "Billboard Overview selected",
+							alt: "License Agreement selected",
 							src: dash,
 							className: "w-2/3 mx-auto relative top-[4px] -left-2"
 						})]
@@ -11636,7 +13979,6 @@ var Billboard = () => {
 			]
 		}),
 		/* @__PURE__ */ jsx(AnimatePresence, { children: view === "Billboard Overview" && /* @__PURE__ */ jsx(motion.div, {
-			className: "",
 			initial: {
 				opacity: 0,
 				scale: .75
@@ -11663,8 +14005,8 @@ var Billboard = () => {
 					className: "md:px-3 lg:px-6 basis-2/3",
 					children: [
 						/* @__PURE__ */ jsx("img", {
-							src: billboardImage2$1,
-							alt: "billboard",
+							src: bb.imageUrl,
+							alt: bb.name,
 							className: "rounded-t-10 w-full",
 							onClick: () => setPreview(true)
 						}),
@@ -11675,96 +14017,49 @@ var Billboard = () => {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: impression,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "70 impressions daily" })]
+									}), /* @__PURE__ */ jsx("p", { children: displayLine })]
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: duration,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "14hrs (6am - 9pm) 6days/week" })]
+									}), /* @__PURE__ */ jsx("p", { children: formatRuntime(bb) })]
 								}),
 								/* @__PURE__ */ jsxs("div", {
 									className: "flex items-center space-x-1 lg:px-3",
 									children: [/* @__PURE__ */ jsx("img", {
 										src: led,
-										alt: "boardtype LED",
+										alt: "",
 										className: "rounded-t-10"
-									}), /* @__PURE__ */ jsx("p", { children: "Double faced Gantry LED" })]
+									}), /* @__PURE__ */ jsx("p", { children: boardTypeLabel(bb.boardType) })]
 								})
 							]
 						}),
-						/* @__PURE__ */ jsxs("div", {
-							className: "md:w-4/5",
-							children: [
-								/* @__PURE__ */ jsxs("h3", {
-									className: "flex items-center font-bold text-lg my-3",
-									children: [/* @__PURE__ */ jsx("img", {
-										alt: "location",
-										src: location
-									}), "Hebert Macaulay Way LED"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Traffic:" }), " Facing Traffic Along Adetokumbo Ademola Street by Eko Hotels,Ahmadu Bello Way, Akin Adesola & Ajose Adeogun."]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Size:" }), " 4m(H) by 12m(W)"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Pixel Size:" }), " 385(H) by 1125(W)"]
-								}),
-								/* @__PURE__ */ jsxs("p", {
-									className: "my-3",
-									children: [/* @__PURE__ */ jsx("b", { children: "Orientation:" }), " Landscape"]
-								})
-							]
-						})
+						/* @__PURE__ */ jsx(BillboardDetailMainColumn, { bb })
 					]
-				}), /* @__PURE__ */ jsxs("div", {
-					className: "md:px-3 basis-1/3",
-					children: [
-						/* @__PURE__ */ jsx("h4", {
-							className: "my-3 font-semibold",
-							children: "Daily price"
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "mt-3 mb-7",
-							children: "₦40,000 (per day)"
-						}),
-						/* @__PURE__ */ jsx("h4", {
-							className: "my-3 font-semibold",
-							children: "Note:"
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "my-3",
-							children: "Your advert will be displayed 70 times daily on the billboard."
-						}),
-						/* @__PURE__ */ jsx("p", {
-							className: "my-3",
-							children: "Adverts will be displayed for 10 seconds each time it appears on the billboard."
-						}),
-						/* @__PURE__ */ jsx("div", {
-							className: "flex justify-end",
-							children: /* @__PURE__ */ jsx("button", {
-								className: "group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12",
-								children: /* @__PURE__ */ jsx(Link, {
-									to: `/ads/billboard/${billboard.id}/onboard`,
-									children: "Select Billboard"
-								})
+				}), /* @__PURE__ */ jsx(BillboardDetailPricingColumn, {
+					bb,
+					actions: /* @__PURE__ */ jsx("div", {
+						className: "flex justify-end",
+						children: /* @__PURE__ */ jsx("button", {
+							type: "button",
+							className: "group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-4 h-12",
+							children: /* @__PURE__ */ jsx(Link, {
+								to: "/ads/billboard/$slug/onboard",
+								params: { slug: String(bb.id) },
+								search: { data: bb },
+								children: "Select Billboard"
 							})
 						})
-					]
+					})
 				})]
 			})
 		}) }),
 		/* @__PURE__ */ jsx(AnimatePresence, { children: view === "License Agreement" && /* @__PURE__ */ jsx(motion.div, {
-			className: "",
 			initial: {
 				opacity: 0,
 				scale: .75
@@ -11797,7 +14092,18 @@ var Billboard = () => {
 						className: "my-3 text-2xl font-semibold",
 						children: "Negotiations"
 					}),
-					/* @__PURE__ */ jsx("p", { children: "360ads - NG is an investment platform, that enables Africans to purchase fractional shares of global real estate assets. Meristem Trustees - Investments & Assets are managed by SEC- regulated Meristem trustees" })
+					/* @__PURE__ */ jsx("p", { children: bb.isNegotiable ? "Pricing and terms may be negotiated according to platform rules." : "Pricing for this placement is fixed as listed." }),
+					/* @__PURE__ */ jsxs("p", {
+						className: "mt-6 text-sm text-neutral-500",
+						children: [
+							"Listing #",
+							bb.id,
+							" · Terms snapshot as of",
+							" ",
+							formatListingDate(bb.updatedAt),
+							"."
+						]
+					})
 				]
 			})
 		}) }),
@@ -11808,13 +14114,14 @@ var Billboard = () => {
 				children: [/* @__PURE__ */ jsx("div", {
 					className: "fixed w-full left-0 top-[30%]  md:left-[20%] md:top-[10%] md:w-2/3 z-[1000000000]",
 					children: /* @__PURE__ */ jsx("img", {
-						src: billboardImage2$1,
-						alt: "billboard",
+						src: bb.imageUrl,
+						alt: bb.name,
 						className: "rounded-10 w-full"
 					})
 				}), /* @__PURE__ */ jsx("div", {
+					role: "presentation",
 					onClick: () => setPreview(false),
-					className: `fixed w-full px-5 py-10 bg-black/20 top-0 left-0 h-full z-[100000]`
+					className: "fixed w-full px-5 py-10 bg-black/20 top-0 left-0 h-full z-[100000]"
 				})]
 			})
 		})
@@ -12070,12 +14377,16 @@ function MdOutlineCancel(props) {
 //#region components/inputs/CalenderBox.tsx
 var CalenderBox = ({ addDate, selectedDate, removeDate }) => {
 	const [value, onChange] = useState(/* @__PURE__ */ new Date());
+	const today = /* @__PURE__ */ new Date();
+	today.setHours(0, 0, 0, 0);
 	return /* @__PURE__ */ jsxs("div", {
 		className: "flex w-full",
 		children: [/* @__PURE__ */ jsx(Calendar, {
 			onChange: (value) => {
+				onChange(value);
 				addDate(value);
 			},
+			minDate: today,
 			className: `shadow-lg rounded-l-10 basis-[67%] md:basis-[70%]`,
 			value
 		}), /* @__PURE__ */ jsxs("div", {
@@ -12098,7 +14409,24 @@ var CalenderBox = ({ addDate, selectedDate, removeDate }) => {
 };
 //#endregion
 //#region components/ui/Preview.tsx
-var Preview = ({ previewImage, attachmentType, previewVideo, needMessage, platform, needPlatform, writeup, plan, selectedDate }) => {
+var Preview = ({ previewImage, attachmentType, previewVideo, externalVideoUrl, needMessage, platform, needPlatform, writeup, plan, selectedDate, durationText }) => {
+	const yt = (() => {
+		const raw = externalVideoUrl?.trim();
+		if (!raw) return null;
+		try {
+			const u = new URL(raw);
+			const host = u.hostname.replace(/^www\./, "");
+			if (host === "youtu.be") {
+				const id = u.pathname.split("/").filter(Boolean)[0];
+				return id ? `https://www.youtube.com/embed/${id}` : null;
+			}
+			if (host === "youtube.com" || host === "m.youtube.com") {
+				const id = u.searchParams.get("v");
+				return id ? `https://www.youtube.com/embed/${id}` : null;
+			}
+		} catch {}
+		return null;
+	})();
 	return /* @__PURE__ */ jsxs("div", {
 		className: "",
 		children: [
@@ -12109,14 +14437,11 @@ var Preview = ({ previewImage, attachmentType, previewVideo, needMessage, platfo
 			/* @__PURE__ */ jsxs("div", {
 				className: "bg-white my-5 rounded-10 p-2 min-h-[40px]",
 				children: [
-					plan === "Immediate" && /* @__PURE__ */ jsx("div", { children: "this ad will run once, immediately as soon as payment is confirm" }),
-					plan === "Days" && /* @__PURE__ */ jsxs("div", { children: [
-						"this ad will be run on seleted days",
-						" ",
-						selectedDate.map((day, i) => /* @__PURE__ */ jsx("div", { children: day?.toDateString() }, i))
-					] }),
-					plan === "Weeks" && /* @__PURE__ */ jsx("div", { children: "this ad will for 4 weeks from 1/2/2023" }),
-					plan === "Months" && /* @__PURE__ */ jsx("div", { children: "this ad will for 2 months from 1/2/2023" }),
+					durationText?.trim() ? /* @__PURE__ */ jsx("div", { children: durationText }) : null,
+					plan === "Immediate" && /* @__PURE__ */ jsx("div", { children: "This ad will run once, immediately after payment is confirmed." }),
+					plan === "Days" && /* @__PURE__ */ jsxs("div", { children: ["This ad will run on selected day(s):", selectedDate.map((day, i) => /* @__PURE__ */ jsx("div", { children: day?.toDateString() }, i))] }),
+					plan === "Weeks" && !durationText?.trim() && /* @__PURE__ */ jsx("div", { children: "Choose a start date and number of weeks to preview." }),
+					plan === "Months" && !durationText?.trim() && /* @__PURE__ */ jsx("div", { children: "Choose a start date and number of months to preview." }),
 					plan === "" && /* @__PURE__ */ jsx("div", {
 						className: "text-gray-500 text-center",
 						children: "Preview Duration Plan"
@@ -12145,7 +14470,7 @@ var Preview = ({ previewImage, attachmentType, previewVideo, needMessage, platfo
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "rounded-10 w-full",
-				children: attachmentType === "video" && previewVideo ? /* @__PURE__ */ jsxs("video", {
+				children: attachmentType === "video" ? previewVideo ? /* @__PURE__ */ jsxs("video", {
 					className: "rounded- h-80 w-full",
 					controls: true,
 					children: [
@@ -12161,6 +14486,30 @@ var Preview = ({ previewImage, attachmentType, previewVideo, needMessage, platfo
 						}),
 						"Your browser does not support the video tag."
 					]
+				}) : yt ? /* @__PURE__ */ jsx("iframe", {
+					className: "w-full h-80 rounded-10",
+					src: yt,
+					title: "Video preview",
+					allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+					allowFullScreen: true
+				}) : externalVideoUrl?.trim() ? /* @__PURE__ */ jsxs("div", {
+					className: "my-5 bg-white rounded-10 p-4",
+					children: [/* @__PURE__ */ jsx("div", {
+						className: "text-stone-500 text-sm mb-2",
+						children: "Video link"
+					}), /* @__PURE__ */ jsx("a", {
+						className: "text-ads360yellow-100 break-all",
+						href: externalVideoUrl,
+						target: "_blank",
+						rel: "noreferrer",
+						children: externalVideoUrl
+					})]
+				}) : /* @__PURE__ */ jsx("div", {
+					className: "my-5 flex justify-center items-center bg-white rounded-10 p-2 h-[300px]",
+					children: /* @__PURE__ */ jsx("p", {
+						className: "text-gray-500 text-center",
+						children: "Paste a video link to preview"
+					})
 				}) : attachmentType === "image" && previewImage ? /* @__PURE__ */ jsx("img", {
 					alt: "influencer",
 					src: previewImage.src,
@@ -12431,7 +14780,22 @@ function Onboard$1() {
 var Route$3 = createFileRoute("/_usersauth/ads/influencer/$slug/onboarding/")({ component: Onboard$1 });
 //#endregion
 //#region app/_usersauth/ads/billboard/$slug/onboard/index.tsx
+function isoDateOnly(d) {
+	return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function startOfToday() {
+	const d = /* @__PURE__ */ new Date();
+	d.setHours(0, 0, 0, 0);
+	return d;
+}
+function isPastDateOnly(dateOnly) {
+	if (!dateOnly) return false;
+	const d = /* @__PURE__ */ new Date(`${dateOnly}T00:00:00`);
+	if (Number.isNaN(d.getTime())) return false;
+	return d.getTime() < startOfToday().getTime();
+}
 function Onboard() {
+	const { data } = Route$2.useSearch();
 	const [plan, setPlan] = useState("");
 	const [startWeek, setStartWeek] = useState({
 		startday: "",
@@ -12445,8 +14809,31 @@ function Onboard() {
 	const [selectedDate, setSelectedDate] = useState([]);
 	const [attachmentType, setAttachmentType] = useState("image");
 	const [previewImage, setPreviewImage] = useState();
-	const [previewVideo, setPreviewVideo] = useState();
-	useParams({ strict: false }).slug;
+	const selectedbillboard = useParams({ strict: false }).slug;
+	const listingId = useMemo(() => Number(selectedbillboard), [selectedbillboard]);
+	const navigate = useNavigate();
+	const createBooking = useCreateBillboardBooking();
+	const [imageFile, setImageFile] = useState(null);
+	const [creativeVideoUrl, setCreativeVideoUrl] = useState("");
+	const durationText = useMemo(() => {
+		if (plan === "Weeks") {
+			const n = Number(startWeek.duration);
+			if (startWeek.startday && Number.isFinite(n) && n > 0) return `This ad will run for ${n} week(s) from ${startWeek.startday}.`;
+			return "";
+		}
+		if (plan === "Months") {
+			const n = Number(startMonth.duration);
+			if (startMonth.startday && Number.isFinite(n) && n > 0) return `This ad will run for ${n} month(s) from ${startMonth.startday}.`;
+			return "";
+		}
+		return "";
+	}, [
+		plan,
+		startWeek.duration,
+		startWeek.startday,
+		startMonth.duration,
+		startMonth.startday
+	]);
 	const handlePlan = (e) => {
 		const { value } = e.target;
 		if (value === "Select") {
@@ -12464,22 +14851,15 @@ function Onboard() {
 		setSelectedDate(selectedDate.filter((dates) => rmDate !== dates));
 	};
 	const handleChange = (e, type) => {
+		if (type !== "image") return;
 		const file = e.target.files;
 		if (file !== null && file.length > 0) {
 			const objectUrl = URL.createObjectURL(file[0]);
-			if (type === "image") {
-				setPreviewVideo(void 0);
-				setPreviewImage({
-					src: objectUrl,
-					name: file[0].name
-				});
-			} else {
-				setPreviewImage(void 0);
-				setPreviewVideo({
-					src: objectUrl,
-					name: file[0].name
-				});
-			}
+			setImageFile(file[0]);
+			setPreviewImage({
+				src: objectUrl,
+				name: file[0].name
+			});
 		}
 	};
 	const handleDuration = (e, type) => {
@@ -12505,6 +14885,56 @@ function Onboard() {
 			});
 		}
 		setSelectedDate([]);
+	};
+	const handleNext = async () => {
+		if (!Number.isFinite(listingId) || listingId <= 0) {
+			toast.error("Invalid billboard id");
+			return;
+		}
+		const durationPlan = plan === "Immediate" ? "immediate" : plan === "Days" ? "days" : plan === "Weeks" ? "weeks" : plan === "Months" ? "months" : null;
+		if (!durationPlan) {
+			toast.error("kindly selete a duration plan");
+			return;
+		}
+		const selectedDates = durationPlan === "days" ? selectedDate.filter((d) => d instanceof Date).map((d) => isoDateOnly(d)) : void 0;
+		const periodStart = durationPlan === "weeks" ? startWeek.startday || void 0 : durationPlan === "months" ? startMonth.startday || void 0 : void 0;
+		const periodDurationCount = durationPlan === "weeks" ? Number(startWeek.duration) : durationPlan === "months" ? Number(startMonth.duration) : void 0;
+		const creativeKind = attachmentType === "image" ? "image" : "video";
+		const payload = {
+			durationPlan,
+			selectedDates,
+			periodStart,
+			periodDurationCount: periodDurationCount != null && Number.isFinite(periodDurationCount) ? periodDurationCount : void 0,
+			creativeKind,
+			creativeVideoUrl: creativeKind === "video" ? creativeVideoUrl.trim() || void 0 : void 0
+		};
+		if (creativeKind === "image" && !imageFile) {
+			toast.error("Please select an image file");
+			return;
+		}
+		if (creativeKind === "video" && !payload.creativeVideoUrl) {
+			toast.error("Please paste a video link");
+			return;
+		}
+		if (selectedDates?.some((d) => isPastDateOnly(d))) {
+			toast.error("You cannot select a past date");
+			return;
+		}
+		if (periodStart && isPastDateOnly(periodStart)) {
+			toast.error("Start date cannot be in the past");
+			return;
+		}
+		try {
+			const res = await createBooking.mutateAsync({
+				listingId,
+				payload,
+				imageFile: imageFile ?? void 0
+			});
+			await navigate({
+				to: `/ads/billboard/${listingId}/onboard/checkout`,
+				search: { bookingId: res.id }
+			});
+		} catch {}
 	};
 	return /* @__PURE__ */ jsxs("section", {
 		className: "px-4 md:px-7 xl:px-20 py-24",
@@ -12546,6 +14976,7 @@ function Onboard() {
 							className: "flex justify-between space-x-2 md:space-x-0 my-3",
 							children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", { children: "Start day" }), /* @__PURE__ */ jsx("input", {
 								type: "date",
+								min: isoDateOnly(startOfToday()),
 								value: startWeek?.startday,
 								name: "startday",
 								onChange: (e) => handleDuration(e, "week"),
@@ -12564,6 +14995,7 @@ function Onboard() {
 								name: "startday",
 								onChange: (e) => handleDuration(e, "month"),
 								type: "date",
+								min: isoDateOnly(startOfToday()),
 								className: "w-full bg-white rounded-10 p-2 focus:outline-none"
 							})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("p", { children: "Number of Months" }), /* @__PURE__ */ jsx("input", {
 								value: startMonth?.duration,
@@ -12598,13 +15030,20 @@ function Onboard() {
 									previewName: previewImage?.name,
 									accept: "image",
 									handleChange,
-									warning: "Required billboard image dimension: 496(H) by 800(W)"
-								}) : /* @__PURE__ */ jsx(FilesInput, {
-									previewName: previewVideo?.name,
-									accept: "video",
-									handleChange,
-									warning: "Required billboard video dimension: 496(H) by 800(W)"
-								})
+									warning: `Required billboard image dimension: ${data?.width}px by ${data?.height}px (W x H)`
+								}) : /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("input", {
+									value: creativeVideoUrl,
+									onChange: (e) => {
+										setCreativeVideoUrl(e.target.value);
+										setImageFile(null);
+										setPreviewImage(void 0);
+									},
+									placeholder: "Paste YouTube / video link",
+									className: "mb-2 bg-white focus:outline-none w-full p-2 rounded-10"
+								}), /* @__PURE__ */ jsx("p", {
+									className: "text-stone-500 text-xs",
+									children: "Videos are links only (e.g. YouTube). No video upload."
+								})] })
 							]
 						})
 					]
@@ -12613,24 +15052,26 @@ function Onboard() {
 					children: /* @__PURE__ */ jsx(Preview, {
 						previewImage,
 						attachmentType,
-						previewVideo,
+						previewVideo: void 0,
+						externalVideoUrl: attachmentType === "video" ? creativeVideoUrl : void 0,
 						platform,
 						needPlatform: false,
 						needMessage: false,
 						writeup: "",
 						plan,
-						selectedDate
+						selectedDate,
+						durationText
 					})
 				})]
 			}),
 			/* @__PURE__ */ jsx("div", {
 				className: "flex justify-end",
 				children: /* @__PURE__ */ jsx("button", {
-					className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12",
-					children: /* @__PURE__ */ jsx(Link, {
-						to: `/ads/billboard/2/onboard/checkout`,
-						children: "Next"
-					})
+					type: "button",
+					onClick: handleNext,
+					disabled: createBooking.isPending,
+					className: "group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12 disabled:opacity-60",
+					children: createBooking.isPending ? "Saving..." : "Next"
 				})
 			}),
 			/* @__PURE__ */ jsx(Toaster, {
@@ -12905,40 +15346,42 @@ var Checkout$1 = () => {
 var Route$1 = createFileRoute("/_usersauth/ads/influencer/$slug/onboarding/checkout/")({ component: Checkout$1 });
 //#endregion
 //#region app/_usersauth/ads/billboard/$slug/onboard/checkout/index.tsx
-var billboardImage2 = "/del/billboard2.png";
 var cancel = "/icons/usericon/modalCancelBotton.svg";
 var success = "/icons/usericon/checkSuccess.svg";
 var Checkout = () => {
 	const [negotia, setNegotia] = useState(false);
 	const [negotiatedAmount, setNegotiatedAmount] = useState("");
 	const [successfull, setSuccessfull] = useState(false);
-	const [billboard, setBillboard] = useState({
-		id: 2,
-		name: "Adetokunbo Ademola led, victoria island",
-		location: "Along Adetokunbo Ademola Street by Bishop",
-		image: billboardImage2,
-		paid: "no",
-		pricepd: "30000",
-		negotiationCount: 0,
-		Impressions: "40 per day",
-		minimumNegotiableAmount: 26e3,
-		type: "Double faced Gantry LED",
-		duration: "14hrs (6am - 9pm) 6days/week"
-	});
+	const search = useSearch({ strict: false });
+	const bookingId = useMemo(() => Number(search.bookingId), [search.bookingId]);
+	const booking = useBillboardBooking(Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null);
+	const negotiate = useNegotiateBillboardBooking();
+	const b = booking.data;
 	const handleNegotiate = (e) => {
 		setNegotiatedAmount(e.target.value);
 	};
-	const submit = (e) => {
+	const submit = async (e) => {
 		e.preventDefault();
-		setSuccessfull(true);
-		setNegotia(false);
-		setBillboard((prev) => ({
-			...prev,
-			negotiationCount: 1
-		}));
-		setTimeout(() => {
-			setSuccessfull(false);
-		}, 4e3);
+		if (!Number.isFinite(bookingId) || bookingId <= 0) {
+			toast.error("Missing booking id");
+			return;
+		}
+		const amt = Number(negotiatedAmount);
+		if (!Number.isFinite(amt) || amt <= 0) {
+			toast.error("Enter a valid amount");
+			return;
+		}
+		try {
+			await negotiate.mutateAsync({
+				id: bookingId,
+				negotiatedAmount: amt
+			});
+			await booking.refetch();
+			setSuccessfull(true);
+			setNegotia(false);
+			setNegotiatedAmount("");
+			setTimeout(() => setSuccessfull(false), 4e3);
+		} catch {}
 	};
 	return /* @__PURE__ */ jsxs(Fragment, { children: [
 		/* @__PURE__ */ jsxs("section", {
@@ -12949,11 +15392,11 @@ var Checkout = () => {
 					step: 4,
 					text: "#1 - Checkout"
 				}),
-				/* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx("img", {
+				/* @__PURE__ */ jsx("div", { children: b?.listing?.imageUrl ? /* @__PURE__ */ jsx("img", {
 					alt: "billboard",
-					src: billboardImage2,
+					src: b.listing.imageUrl,
 					className: "mx-auto"
-				}) }),
+				}) : null }),
 				/* @__PURE__ */ jsx("div", {
 					className: "w-full overflow-x-auto my-5",
 					children: /* @__PURE__ */ jsxs("table", {
@@ -12993,11 +15436,11 @@ var Checkout = () => {
 						}), /* @__PURE__ */ jsx("tbody", { children: /* @__PURE__ */ jsxs("tr", { children: [
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "Eko hotel LED, Victoria Island"
+								children: b?.listing?.name ?? "-"
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "Along Adetokunbo Ademola Street by Eko Hotels"
+								children: b?.listing ? `${b.listing.address}, ${b.listing.city}, ${b.listing.state}` : "-"
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
@@ -13005,19 +15448,19 @@ var Checkout = () => {
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "1 day(s)"
+								children: b?.durationPlan ?? "-"
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-20"
+								children: b?.campaignStartDate ? String(b.campaignStartDate).slice(0, 10) : "-"
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "2023-05-21"
+								children: b?.campaignEndDate ? String(b.campaignEndDate).slice(0, 10) : "-"
 							}),
 							/* @__PURE__ */ jsx("td", {
 								className: "py-2 px-2 md:px-3 border-b",
-								children: "₦30,000"
+								children: b ? `₦${b.quotedTotal}` : "-"
 							})
 						] }) })]
 					})
@@ -13028,24 +15471,23 @@ var Checkout = () => {
 						className: "bg-[#D0B301]/40 flex justify-between w-full p-5 md:w-1/2 lg:w-1/3",
 						children: [/* @__PURE__ */ jsx("h4", { children: "Total Amount" }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
 							className: "font-bold",
-							children: "₦30,000"
-						}), /* @__PURE__ */ jsx("div", { children: "cost x 1 day(s)" })] })]
+							children: b ? `₦${b.quotedTotal}` : "—"
+						}), /* @__PURE__ */ jsx("div", { children: b?.durationPlan ?? "" })] })]
 					})
 				}),
 				/* @__PURE__ */ jsxs("div", {
 					className: "flex md:justify-end space-x-3 my-3",
 					children: [/* @__PURE__ */ jsx("button", {
-						disabled: billboard.negotiationCount > 0 ? true : false,
+						disabled: !b?.listingWasNegotiable || b?.minimumNegotiableAmount == null || b?.negotiatedAmount != null || negotiate.isPending,
 						onClick: () => setNegotia(true),
-						className: `w-123 h-12 rounded-10 my-2 ${billboard.negotiationCount > 0 ? "bg-ads360yellow-100/50 text-black/50" : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"}`,
+						className: `w-123 h-12 rounded-10 my-2 ${!b?.listingWasNegotiable || b?.negotiatedAmount != null ? "bg-ads360yellow-100/50 text-black/50" : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"}`,
 						children: "Negotiate"
-					}), /* @__PURE__ */ jsx("button", {
-						disabled: billboard.paid === "yes" ? true : false,
-						className: `${billboard.paid === "yes" ? "bg-ads360yellow-100/50 text-black/50" : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"} w-123 h-12 rounded-10 my-2 `,
-						children: /* @__PURE__ */ jsx(Link, {
-							to: `/ads/2`,
-							children: "Pay Now"
-						})
+					}), /* @__PURE__ */ jsx(Link, {
+						to: "/ads/$transaction_id",
+						params: { transaction_id: String(bookingId || "") },
+						disabled: !bookingId || b?.status === "paid",
+						className: "hover:animate-changeColor hover:text-white bg-ads360yellow-100 w-123 h-12 rounded-10 my-2 disabled:opacity-60 flex items-center justify-center",
+						children: "Pay Now"
 					})]
 				})
 			]
@@ -13090,7 +15532,7 @@ var Checkout = () => {
 							className: "my-3",
 							children: [/* @__PURE__ */ jsxs("p", {
 								className: "text-red-700 text-xs",
-								children: ["You cannot negotiat lower than ₦", billboard.minimumNegotiableAmount]
+								children: ["You cannot negotiat lower than ₦", b?.minimumNegotiableAmount ?? 0]
 							}), /* @__PURE__ */ jsx("p", {
 								className: "text-red-700 text-xs",
 								children: "You can only negotiat once"
@@ -13099,9 +15541,9 @@ var Checkout = () => {
 						/* @__PURE__ */ jsx("div", {
 							className: "flex justify-center",
 							children: /* @__PURE__ */ jsx("button", {
-								disabled: negotiatedAmount === "" || parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount ? true : false,
-								className: `${negotiatedAmount === "" || parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount ? "bg-ads360gray-100" : "bg-ads360black-100/95 hover:bg-ads360black-100"} rounded mt-5  text-white  w-5/6 h-10`,
-								children: "Send Request"
+								disabled: negotiatedAmount === "" || b?.minimumNegotiableAmount != null && parseInt(negotiatedAmount) < b.minimumNegotiableAmount || negotiate.isPending,
+								className: `${negotiatedAmount === "" || b?.minimumNegotiableAmount != null && parseInt(negotiatedAmount) < b.minimumNegotiableAmount || negotiate.isPending ? "bg-ads360gray-100" : "bg-ads360black-100/95 hover:bg-ads360black-100"} rounded mt-5  text-white  w-5/6 h-10`,
+								children: negotiate.isPending ? "Sending..." : "Send Request"
 							})
 						})
 					]
@@ -13128,203 +15570,231 @@ var Checkout = () => {
 		})
 	] });
 };
-var Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/checkout/")({ component: Checkout });
+var Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/checkout/")({
+	validateSearch: (search) => ({ bookingId: search.bookingId }),
+	component: Checkout
+});
 //#endregion
 //#region routeTree.gen.ts
-var UsersauthRouteRoute = Route$48.update({
+var UsersauthRouteRoute = Route$53.update({
 	id: "/_usersauth",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var AdminRouteRoute = Route$47.update({
+var AdminRouteRoute = Route$52.update({
 	id: "/_admin",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var IndexRoute = Route$46.update({
+var IndexRoute = Route$51.update({
 	id: "/",
 	path: "/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var VendorsBillboardsRouteRoute = Route$45.update({
+var VendorsBillboardsRouteRoute = Route$50.update({
 	id: "/vendors/billboards",
 	path: "/vendors/billboards",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var UsersauthUsersRouteRoute = Route$44.update({
+var UsersauthUsersRouteRoute = Route$49.update({
 	id: "/users",
 	path: "/users",
 	getParentRoute: () => UsersauthRouteRoute
 });
-var UsersauthAdsRouteRoute = Route$43.update({
+var UsersauthAdsRouteRoute = Route$48.update({
 	id: "/ads",
 	path: "/ads",
 	getParentRoute: () => UsersauthRouteRoute
 });
-var PublicLightnavbarRouteRoute = Route$42.update({
+var PublicLightnavbarRouteRoute = Route$47.update({
 	id: "/_public/_lightnavbar",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var PublicDarknavbarRouteRoute = Route$41.update({
+var PublicDarknavbarRouteRoute = Route$46.update({
 	id: "/_public/_darknavbar",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var AdminAdminRouteRoute = Route$40.update({
+var AdminAdminRouteRoute = Route$45.update({
 	id: "/admin",
 	path: "/admin",
 	getParentRoute: () => AdminRouteRoute
 });
-var VendorsInfluencersIndexRoute = Route$39.update({
+var VendorsInfluencersIndexRoute = Route$44.update({
 	id: "/vendors/influencers/",
 	path: "/vendors/influencers/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var VendorsBillboardsIndexRoute = Route$38.update({
+var VendorsBillboardsIndexRoute = Route$43.update({
 	id: "/",
 	path: "/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var UsersauthUsersIndexRoute = Route$37.update({
+var UsersauthWalletIndexRoute = Route$42.update({
+	id: "/wallet/",
+	path: "/wallet/",
+	getParentRoute: () => UsersauthRouteRoute
+});
+var UsersauthUsersIndexRoute = Route$41.update({
 	id: "/",
 	path: "/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthAdsIndexRoute = Route$36.update({
+var UsersauthAdsIndexRoute = Route$40.update({
 	id: "/",
 	path: "/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var AdminAdminIndexRoute = Route$35.update({
+var AdminAdminIndexRoute = Route$39.update({
 	id: "/",
 	path: "/",
 	getParentRoute: () => AdminAdminRouteRoute
 });
-var AccessSignupIndexRoute = Route$34.update({
+var AccessSignupIndexRoute = Route$38.update({
 	id: "/_access/signup/",
 	path: "/signup/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var AccessSigninIndexRoute = Route$33.update({
+var AccessSigninIndexRoute = Route$37.update({
 	id: "/_access/signin/",
 	path: "/signin/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var AccessEmailVerificationIndexRoute = Route$32.update({
+var AccessEmailVerificationIndexRoute = Route$36.update({
 	id: "/_access/email-verification/",
 	path: "/email-verification/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var VendorsBillboardsWalletIndexRoute = Route$31.update({
+var VendorsBillboardsWalletIndexRoute = Route$35.update({
 	id: "/wallet/",
 	path: "/wallet/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsSettingsIndexRoute = Route$30.update({
+var VendorsBillboardsSettingsIndexRoute = Route$34.update({
 	id: "/settings/",
 	path: "/settings/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsRequestsIndexRoute = Route$29.update({
+var VendorsBillboardsRequestsIndexRoute = Route$33.update({
 	id: "/requests/",
 	path: "/requests/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsListingIndexRoute = Route$28.update({
+var VendorsBillboardsNegotiationsIndexRoute = Route$32.update({
+	id: "/negotiations/",
+	path: "/negotiations/",
+	getParentRoute: () => VendorsBillboardsRouteRoute
+});
+var VendorsBillboardsListingIndexRoute = Route$31.update({
 	id: "/listing/",
 	path: "/listing/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsAddBillboardIndexRoute = Route$27.update({
+var VendorsBillboardsAddBillboardIndexRoute = Route$30.update({
 	id: "/add-billboard/",
 	path: "/add-billboard/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var UsersauthUsersWalletIndexRoute = Route$26.update({
+var UsersauthUsersWalletIndexRoute = Route$29.update({
 	id: "/wallet/",
 	path: "/wallet/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersSettingsIndexRoute = Route$25.update({
+var UsersauthUsersSettingsIndexRoute = Route$28.update({
 	id: "/settings/",
 	path: "/settings/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersCampaignIndexRoute = Route$24.update({
+var UsersauthUsersNegotiationsIndexRoute = Route$27.update({
+	id: "/negotiations/",
+	path: "/negotiations/",
+	getParentRoute: () => UsersauthUsersRouteRoute
+});
+var UsersauthUsersCampaignIndexRoute = Route$26.update({
 	id: "/campaign/",
 	path: "/campaign/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthUsersAnalysisIndexRoute = Route$23.update({
+var UsersauthUsersAnalysisIndexRoute = Route$25.update({
 	id: "/analysis/",
 	path: "/analysis/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
-var UsersauthAdsWhatsappIndexRoute = Route$22.update({
+var UsersauthAdsWhatsappIndexRoute = Route$24.update({
 	id: "/whatsapp/",
 	path: "/whatsapp/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsSmsIndexRoute = Route$21.update({
+var UsersauthAdsSmsIndexRoute = Route$23.update({
 	id: "/sms/",
 	path: "/sms/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsInfluencerIndexRoute = Route$20.update({
+var UsersauthAdsInfluencerIndexRoute = Route$22.update({
 	id: "/influencer/",
 	path: "/influencer/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsDigitalIndexRoute = Route$19.update({
+var UsersauthAdsDigitalIndexRoute = Route$21.update({
 	id: "/digital/",
 	path: "/digital/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsBillboardIndexRoute = Route$18.update({
+var UsersauthAdsBillboardIndexRoute = Route$20.update({
 	id: "/billboard/",
 	path: "/billboard/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var UsersauthAdsTransaction_idIndexRoute = Route$17.update({
+var UsersauthAdsTransaction_idIndexRoute = Route$19.update({
 	id: "/$transaction_id/",
 	path: "/$transaction_id/",
 	getParentRoute: () => UsersauthAdsRouteRoute
 });
-var PublicLightnavbarFaqsIndexRoute = Route$16.update({
+var PublicLightnavbarFaqsIndexRoute = Route$18.update({
 	id: "/faqs/",
 	path: "/faqs/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicLightnavbarContactIndexRoute = Route$15.update({
+var PublicLightnavbarContactIndexRoute = Route$17.update({
 	id: "/contact/",
 	path: "/contact/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicLightnavbarAboutIndexRoute = Route$14.update({
+var PublicLightnavbarAboutIndexRoute = Route$16.update({
 	id: "/about/",
 	path: "/about/",
 	getParentRoute: () => PublicLightnavbarRouteRoute
 });
-var PublicDarknavbarDiscoveryIndexRoute = Route$13.update({
+var PublicDarknavbarDiscoveryIndexRoute = Route$15.update({
 	id: "/discovery/",
 	path: "/discovery/",
 	getParentRoute: () => PublicDarknavbarRouteRoute
 });
-var AccessVendorAccessOnboardingIndexRoute = Route$12.update({
+var AccessVendorAccessOnboardingIndexRoute = Route$14.update({
 	id: "/_access/vendor-access/onboarding/",
 	path: "/vendor-access/onboarding/",
-	getParentRoute: () => Route$49
+	getParentRoute: () => Route$54
 });
-var VendorsBillboardsRequestsSlugIndexRoute = Route$11.update({
+var VendorsBillboardsRequestsSlugIndexRoute = Route$13.update({
 	id: "/requests/$slug/",
 	path: "/requests/$slug/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var VendorsBillboardsListingSlugIndexRoute = Route$10.update({
+var VendorsBillboardsNegotiationsIdIndexRoute = Route$12.update({
+	id: "/negotiations/$id/",
+	path: "/negotiations/$id/",
+	getParentRoute: () => VendorsBillboardsRouteRoute
+});
+var VendorsBillboardsListingSlugIndexRoute = Route$11.update({
 	id: "/listing/$slug/",
 	path: "/listing/$slug/",
 	getParentRoute: () => VendorsBillboardsRouteRoute
 });
-var UsersauthUsersWalletFundwalletIndexRoute = Route$9.update({
+var UsersauthUsersWalletFundwalletIndexRoute = Route$10.update({
 	id: "/wallet/fundwallet/",
 	path: "/wallet/fundwallet/",
+	getParentRoute: () => UsersauthUsersRouteRoute
+});
+var UsersauthUsersNegotiationsIdIndexRoute = Route$9.update({
+	id: "/negotiations/$id/",
+	path: "/negotiations/$id/",
 	getParentRoute: () => UsersauthUsersRouteRoute
 });
 var UsersauthUsersCampaignSlugIndexRoute = Route$8.update({
@@ -13396,14 +15866,17 @@ var UsersauthUsersRouteRouteChildren = {
 	UsersauthUsersIndexRoute,
 	UsersauthUsersAnalysisIndexRoute,
 	UsersauthUsersCampaignIndexRoute,
+	UsersauthUsersNegotiationsIndexRoute,
 	UsersauthUsersSettingsIndexRoute,
 	UsersauthUsersWalletIndexRoute,
 	UsersauthUsersCampaignSlugIndexRoute,
+	UsersauthUsersNegotiationsIdIndexRoute,
 	UsersauthUsersWalletFundwalletIndexRoute
 };
 var UsersauthRouteRouteChildren = {
 	UsersauthAdsRouteRoute: UsersauthAdsRouteRouteWithChildren,
-	UsersauthUsersRouteRoute: UsersauthUsersRouteRoute._addFileChildren(UsersauthUsersRouteRouteChildren)
+	UsersauthUsersRouteRoute: UsersauthUsersRouteRoute._addFileChildren(UsersauthUsersRouteRouteChildren),
+	UsersauthWalletIndexRoute
 };
 var UsersauthRouteRouteWithChildren = UsersauthRouteRoute._addFileChildren(UsersauthRouteRouteChildren);
 var PublicDarknavbarRouteRouteChildren = { PublicDarknavbarDiscoveryIndexRoute };
@@ -13418,10 +15891,12 @@ var VendorsBillboardsRouteRouteChildren = {
 	VendorsBillboardsIndexRoute,
 	VendorsBillboardsAddBillboardIndexRoute,
 	VendorsBillboardsListingIndexRoute,
+	VendorsBillboardsNegotiationsIndexRoute,
 	VendorsBillboardsRequestsIndexRoute,
 	VendorsBillboardsSettingsIndexRoute,
 	VendorsBillboardsWalletIndexRoute,
 	VendorsBillboardsListingSlugIndexRoute,
+	VendorsBillboardsNegotiationsIdIndexRoute,
 	VendorsBillboardsRequestsSlugIndexRoute,
 	VendorsBillboardsListingSlugEditIndexRoute
 };
@@ -13438,7 +15913,7 @@ var rootRouteChildren = {
 	VendorsInfluencersIndexRoute,
 	AccessVendorAccessOnboardingIndexRoute
 };
-var routeTree = Route$49._addFileChildren(rootRouteChildren)._addFileTypes();
+var routeTree = Route$54._addFileChildren(rootRouteChildren)._addFileTypes();
 //#endregion
 //#region router.tsx
 function getRouter() {

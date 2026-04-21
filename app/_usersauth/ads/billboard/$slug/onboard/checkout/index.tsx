@@ -1,43 +1,59 @@
-import { useState } from "react";
-const billboardImage2 = '/del/billboard2.png'
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 const cancel = '/icons/usericon/modalCancelBotton.svg'
-const success = '/icons/usericon/checkSuccess.svg'
-;
 import { Modal } from "@components/modal/modal";
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
 import Steps from "@components/ui/Steps";
 import BackBtn from "@components/buttons/BackBtn";
+import {
+  useBillboardBooking,
+  useNegotiateBillboardBooking,
+} from "@endpoint/billboard/useBillboard";
 
 const Checkout = () => {
   const [negotia, setNegotia] = useState(false);
   const [negotiatedAmount, setNegotiatedAmount] = useState("");
-  const [successfull, setSuccessfull] = useState(false);
-  const [billboard, setBillboard] = useState({
-    id: 2,
-    name: "Adetokunbo Ademola led, victoria island",
-    location: "Along Adetokunbo Ademola Street by Bishop",
-    image: billboardImage2,
-    paid:'no',
-    pricepd: "30000",
-    negotiationCount: 0,
-    Impressions: "40 per day",
-    minimumNegotiableAmount: 26000,
-    type: "Double faced Gantry LED",
-    duration: "14hrs (6am - 9pm) 6days/week",
-  });
+  const navigate = useNavigate();
+  const search = useSearch({
+    strict: false,
+  }) as { bookingId?: number | string };
+  const bookingId = useMemo(() => Number(search.bookingId), [search.bookingId]);
+  const booking = useBillboardBooking(
+    Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null,
+  );
+  const negotiate = useNegotiateBillboardBooking();
+  const b = booking.data;
+
+  const negotiationPayBlocked =
+    Boolean(b?.listingWasNegotiable) &&
+    b?.negotiatedAmount != null &&
+    b?.negotiationPhase !== "agreed";
 
   const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNegotiatedAmount(e.target.value);
   };
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSuccessfull(true);
-    setNegotia(false);
-    setBillboard((prev) => ({ ...prev, negotiationCount: 1 }));
-    setTimeout(() => {
-      setSuccessfull(false);
-    }, 4000);
+    if (!Number.isFinite(bookingId) || bookingId <= 0) {
+      toast.error("Missing booking id");
+      return;
+    }
+    const amt = Number(negotiatedAmount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      toast.error("Enter a valid amount");
+      return;
+    }
+    try {
+      await negotiate.mutateAsync({ id: bookingId, negotiatedAmount: amt });
+      await booking.refetch();
+      setNegotia(false);
+      setNegotiatedAmount("");
+      toast.success("Negotiation request sent");
+      void navigate({ to: "/users/negotiations" });
+    } catch {
+      // toast handled by hook
+    }
   };
 
   return (
@@ -48,10 +64,9 @@ const Checkout = () => {
       <Steps step={4} text="#1 - Checkout"/>
 
         <div>
-          <img alt="billboard"
-            src={billboardImage2}
-            className="mx-auto"
-          />
+          {b?.listing?.imageUrl ? (
+            <img alt="billboard" src={b.listing.imageUrl} className="mx-auto" />
+          ) : null}
         </div>
         <div className="w-full overflow-x-auto my-5">
           <table className="min-w-full bg-white">
@@ -69,16 +84,26 @@ const Checkout = () => {
             <tbody>
               <tr>
                 <td className="py-2 px-2 md:px-3 border-b">
-                  Eko hotel LED, Victoria Island
+                  {b?.listing?.name ?? "-"}
                 </td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                  Along Adetokunbo Ademola Street by Eko Hotels
+                  {b?.listing
+                    ? `${b.listing.address}, ${b.listing.city}, ${b.listing.state}`
+                    : "-"}
                 </td>
                 <td className="py-2 px-2 md:px-3 border-b">4m(H) by 12m(W)</td>
-                <td className="py-2 px-2 md:px-3 border-b">1 day(s)</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-20</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
-                <td className="py-2 px-2 md:px-3 border-b">₦30,000</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                  {b?.durationPlan ?? "-"}
+                </td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                  {b?.campaignStartDate ? String(b.campaignStartDate).slice(0, 10) : "-"}
+                </td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                  {b?.campaignEndDate ? String(b.campaignEndDate).slice(0, 10) : "-"}
+                </td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                  {b ? `₦${b.quotedTotal}` : "-"}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -88,18 +113,23 @@ const Checkout = () => {
           <div className="bg-[#D0B301]/40 flex justify-between w-full p-5 md:w-1/2 lg:w-1/3">
             <h4>Total Amount</h4>
             <div>
-              <div className="font-bold">₦30,000</div>
-              <div>cost x 1 day(s)</div>
+              <div className="font-bold">{b ? `₦${b.quotedTotal}` : "—"}</div>
+              <div>{b?.durationPlan ?? ""}</div>
             </div>
           </div>
         </div>
 
         <div className="flex md:justify-end space-x-3 my-3">
           <button
-            disabled={billboard.negotiationCount > 0 ? true : false}
+            disabled={
+              !b?.listingWasNegotiable ||
+              b?.minimumNegotiableAmount == null ||
+              b?.negotiatedAmount != null ||
+              negotiate.isPending
+            }
             onClick={() => setNegotia(true)}
             className={`w-123 h-12 rounded-10 my-2 ${
-              billboard.negotiationCount > 0
+              !b?.listingWasNegotiable || b?.negotiatedAmount != null
                 ? "bg-ads360yellow-100/50 text-black/50"
                 : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"
             }`}
@@ -107,10 +137,37 @@ const Checkout = () => {
             Negotiate
           </button>
 
-          <button disabled={billboard.paid === 'yes' ? true : false} className={`${billboard.paid === 'yes' ? 'bg-ads360yellow-100/50 text-black/50' : 'hover:animate-changeColor hover:text-white bg-ads360yellow-100'} w-123 h-12 rounded-10 my-2 `}>
-            <Link to={`/ads/${2}`}>Pay Now</Link>
-          </button>
+          {!bookingId || b?.status === "paid" || negotiationPayBlocked ? (
+            <span
+              title={
+                negotiationPayBlocked
+                  ? "Complete negotiation (owner must accept or you accept their counter) before paying."
+                  : undefined
+              }
+              className="inline-flex w-123 cursor-not-allowed items-center justify-center rounded-10 bg-ads360yellow-100/50 px-3 py-3 text-center text-sm text-black/60 my-2"
+            >
+              Pay Now
+            </span>
+          ) : (
+            <Link
+              to="/ads/$transaction_id"
+              params={{ transaction_id: String(bookingId || "") }}
+              className="hover:animate-changeColor hover:text-white bg-ads360yellow-100 w-123 h-12 rounded-10 my-2 flex items-center justify-center"
+            >
+              Pay Now
+            </Link>
+          )}
         </div>
+        {negotiationPayBlocked ? (
+          <p className="max-w-lg text-right text-xs text-amber-900 md:ml-auto">
+            Pay is available after the billboard owner accepts your offer or you
+            accept their counter-offer. Check{" "}
+            <Link to="/users/negotiations" className="underline font-medium">
+              Negotiations
+            </Link>
+            .
+          </p>
+        ) : null}
       </section>
 
       <Modal isOpen={negotia}>
@@ -140,7 +197,7 @@ const Checkout = () => {
             <div className="my-3">
               <p className="text-red-700 text-xs">
                 You cannot negotiat lower than ₦
-                {billboard.minimumNegotiableAmount}
+                {b?.minimumNegotiableAmount ?? 0}
               </p>
               <p className="text-red-700 text-xs">You can only negotiat once</p>
             </div>
@@ -148,35 +205,23 @@ const Checkout = () => {
               <button
                 disabled={
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
-                    ? true
-                    : false
+                  (b?.minimumNegotiableAmount != null &&
+                    parseInt(negotiatedAmount) < b.minimumNegotiableAmount) ||
+                  negotiate.isPending
                 }
                 className={`${
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
+                  (b?.minimumNegotiableAmount != null &&
+                    parseInt(negotiatedAmount) < b.minimumNegotiableAmount) ||
+                  negotiate.isPending
                     ? "bg-ads360gray-100"
                     : "bg-ads360black-100/95 hover:bg-ads360black-100"
                 } rounded mt-5  text-white  w-5/6 h-10`}
               >
-                Send Request
+                {negotiate.isPending ? "Sending..." : "Send Request"}
               </button>
             </div>
           </form>
-        </div>
-      </Modal>
-
-      <Modal isOpen={successfull}>
-        <div className="bg-white px-5 py-10 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10 grid grid-cols-1 content-center">
-          <img alt=""
-            src={success}
-            className="mx-auto w-2/6"
-          />
-          <div>
-            <p className="text-green-500 text-center mt-5 font-semibold">
-              Request Sent <br /> Successfully
-            </p>
-          </div>
         </div>
       </Modal>
     </>
@@ -184,6 +229,9 @@ const Checkout = () => {
 };
 
 export const Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/checkout/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    bookingId: search.bookingId,
+  }),
   component: Checkout,
 })
 

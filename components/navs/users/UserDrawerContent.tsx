@@ -12,6 +12,8 @@ const wallet = '/icons/usericon/whitewallet.svg'
 const onwallet = '/icons/usericon/onwallet.svg'
 const logout = '/icons/usericon/whitelogout.svg'
 const onlogout = '/icons/usericon/onlogout.svg'
+const negotiations = '/icons/usericon/offnegotiation.svg'
+const onnegotiations = '/icons/usericon/onnegotiation.svg'
 
 interface Props {
   toggleDrawer: () => void;
@@ -48,6 +50,12 @@ const UserDrawerContent: React.FC<Props> = ({ toggleDrawer }) => {
       name: "Wallet",
       off: wallet,
       on: onwallet,
+    },
+    {
+      link: "/users/negotiations",
+      name: "Negotiations",
+      off: negotiations,
+      on: onnegotiations,
     },
   ];
 

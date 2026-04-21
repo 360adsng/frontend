@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate, useParams } from '@tanstack/react-router';
 
 //import images
 const card = '/icons/usericon/card.svg'
@@ -9,13 +9,23 @@ const mark = '/icons/mark.svg'
 const cancel = '/icons/usericon/modalCancelBotton.svg'
 
 import { useState } from "react";
-import { useRouter } from "@tanstack/react-router";
 import { Modal } from "@components/modal/modal";
+import { usePayNow, useWallet } from "@endpoint/wallet/useWallet";
+import { useBillboardBooking } from "@endpoint/billboard/useBillboard";
+import { toast } from "sonner";
 
 const Payment = () => {
-  const amount = 27000;
-  const wallet = 0;
-  const router = useRouter();
+  const params = useParams({ strict: false }) as { transaction_id?: string };
+  const bookingId = Number(params.transaction_id);
+  const booking = useBillboardBooking(
+    Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null,
+  );
+  const walletQuery = useWallet();
+  const payNow = usePayNow();
+  const navigate = useNavigate();
+
+  const amount = Number(booking.data?.negotiatedAmount ?? booking.data?.quotedTotal ?? 0);
+  const walletBalance = Number(walletQuery.data?.balance ?? 0);
   const [selected, setSelected] = useState("");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -36,20 +46,15 @@ const Payment = () => {
     {
       image: card,
       link: "ads/",
-      name: "Naira Funding Card",
-    },
-    {
-      image: dollar,
-      link: "ads/",
-      name: "USD Card",
-    },
+      name: "Flutterwave Payment",
+    }
   ];
   return (
     <>
       <section className="px-4 md:px-10 py-24">
         <div className="flex items-center font-bold">
           <button
-            onClick={() => router.history.back()}
+            onClick={() => window.history.back()}
             className="group-hover:translate-x-32 transition bg-ads360black-100 mx-1 w-11  h-11 flex justify-center items-center rounded-[50%] color-white"
           >
             <img src={Arrowleft} alt="arrow" />
@@ -150,7 +155,7 @@ const Payment = () => {
               </div>
             </div>
 
-            {wallet < amount ? (
+            {walletBalance < amount ? (
               <div className="my-3">
                 <p className="text-red-700 text-xs">
                   Not enough money on wallet, please use a different option. or
@@ -161,18 +166,32 @@ const Payment = () => {
 
             <div className="flex justify-center">
               <button
-                disabled={wallet < amount ? true : false}
+                disabled={walletBalance < amount || payNow.isPending || !bookingId}
+                onClick={async () => {
+                  if (!bookingId) return;
+                  try {
+                    await payNow.mutateAsync({
+                      bookingId,
+                      paymentMethod: "wallet",
+                    });
+                    setIsOpen(false);
+                    toast.success("Payment successful");
+                    await navigate({ to: "/users/campaign" });
+                  } catch {
+                    // toast handled by hook
+                  }
+                }}
                 className={`${
-                  wallet < amount
+                  walletBalance < amount
                     ? "bg-ads360gray-100 mt-5"
                     : "bg-ads360black-100/95 hover:bg-ads360black-100 mt-10"
                 } rounded  text-white  w-5/6 h-10`}
               >
-                Proceed
+                {payNow.isPending ? "Processing..." : "Proceed"}
               </button>
             </div>
           </div>
-        ) : selected === "Naira Funding Card" ? (
+        ) : selected === "Flutterwave Payment" ? (
           <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
             <div className="flex justify-between mb-5">
               <h4 className="">Amount</h4>
@@ -194,8 +213,27 @@ const Payment = () => {
 
             <div className="flex justify-center">
               <button
-                className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-10  text-white  w-5/6 h-10">
-                Proceed
+                disabled={payNow.isPending || !bookingId}
+                onClick={async () => {
+                  if (!bookingId) return;
+                  try {
+                    const res = await payNow.mutateAsync({
+                      bookingId,
+                      paymentMethod: "flutterwave",
+                    });
+                    const link = (res as any)?.data?.link;
+                    if (typeof link === "string" && link.length > 0) {
+                      window.location.href = link;
+                      return;
+                    }
+                    toast.error("Payment link not returned");
+                  } catch {
+                    // toast handled by hook
+                  }
+                }}
+                className="bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-10  text-white  w-5/6 h-10 disabled:opacity-60"
+              >
+                {payNow.isPending ? "Starting..." : "Proceed"}
               </button>
             </div>
           </div>

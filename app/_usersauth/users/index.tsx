@@ -9,16 +9,38 @@ import { FiArrowRight } from "react-icons/fi"
 const createcampiagn = '/images/Createacampaign.png'
 const allcampiagn = '/images/allcampaign.png'
 const wishlist = '/images/wishlist.png'
+import { useMe, useUserDashboard } from '@endpoint/users/useUsers'
 
-
-
-
+function formatNgn(amount: number): string {
+  const n = Number(amount)
+  if (!Number.isFinite(n)) return '₦0.00'
+  return `₦${n.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`
+}
 
 function Dashboard() {
+  const me = useMe()
+  const dashboard = useUserDashboard()
+  const stats = dashboard.data?.data
+
+  const name =
+    me.data?.accountType === 'business_user'
+      ? me.data.businessName
+      : me.data?.accountType === 'regular_user'
+        ? `${me.data.firstName} ${me.data.lastName}`.trim()
+        : ''
 
   return (
     <section className="bg-ads360-hash min-h-screen px-4 md:px-10 py-14">
-        <h3 className="text-2xl">Hello Aliyu, what would you like to do?</h3>
+        <h3 className="text-2xl">Hello {name || 'there'}, what would you like to do?</h3>
+
+        {dashboard.isError ? (
+          <p className="mt-4 text-sm text-red-600" role="alert">
+            Could not load dashboard stats. Refresh the page or try again later.
+          </p>
+        ) : null}
 
         <div className="shadow border-ads360yellow-100 bg-white rounded-10 border my-10 overflow-x-auto">
 
@@ -31,7 +53,7 @@ function Dashboard() {
               alt="naira sign"
             />
             <div className="text-sm px-5">
-              ₦500.00
+              {dashboard.isLoading ? '…' : formatNgn(stats?.walletBalance ?? 0)}
               <p className="text-stone-400 text-xs">Available Balance</p>
             </div>
           </div>
@@ -45,7 +67,7 @@ function Dashboard() {
               alt="campiagn sign"
             />
             <div className="text-sm px-5">
-              0
+              {dashboard.isLoading ? '…' : String(stats?.activeBookingsCount ?? 0)}
               <p className="text-stone-400 text-xs">Active Campaigns</p>
             </div>
           </div>
@@ -59,7 +81,7 @@ function Dashboard() {
               alt="cluster points"
             />
             <div className="text-sm px-5">
-              0
+              {dashboard.isLoading ? '…' : String(stats?.whatsAppCluster ?? 0)}
               <p className="text-stone-400 text-xs">Cluster Points</p>
             </div>
           </div>

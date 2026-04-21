@@ -20,6 +20,7 @@ import { Route as PublicDarknavbarRouteRouteImport } from './app/_public/_darkna
 import { Route as AdminAdminRouteRouteImport } from './app/_admin/admin/route'
 import { Route as VendorsInfluencersIndexRouteImport } from './app/vendors/influencers/index'
 import { Route as VendorsBillboardsIndexRouteImport } from './app/vendors/billboards/index'
+import { Route as UsersauthWalletIndexRouteImport } from './app/_usersauth/wallet/index'
 import { Route as UsersauthUsersIndexRouteImport } from './app/_usersauth/users/index'
 import { Route as UsersauthAdsIndexRouteImport } from './app/_usersauth/ads/index'
 import { Route as AdminAdminIndexRouteImport } from './app/_admin/admin/index'
@@ -29,10 +30,13 @@ import { Route as AccessEmailVerificationIndexRouteImport } from './app/_access/
 import { Route as VendorsBillboardsWalletIndexRouteImport } from './app/vendors/billboards/wallet/index'
 import { Route as VendorsBillboardsSettingsIndexRouteImport } from './app/vendors/billboards/settings/index'
 import { Route as VendorsBillboardsRequestsIndexRouteImport } from './app/vendors/billboards/requests/index'
+import { Route as VendorsBillboardsPayoutsIndexRouteImport } from './app/vendors/billboards/payouts/index'
+import { Route as VendorsBillboardsNegotiationsIndexRouteImport } from './app/vendors/billboards/negotiations/index'
 import { Route as VendorsBillboardsListingIndexRouteImport } from './app/vendors/billboards/listing/index'
 import { Route as VendorsBillboardsAddBillboardIndexRouteImport } from './app/vendors/billboards/add-billboard/index'
 import { Route as UsersauthUsersWalletIndexRouteImport } from './app/_usersauth/users/wallet/index'
 import { Route as UsersauthUsersSettingsIndexRouteImport } from './app/_usersauth/users/settings/index'
+import { Route as UsersauthUsersNegotiationsIndexRouteImport } from './app/_usersauth/users/negotiations/index'
 import { Route as UsersauthUsersCampaignIndexRouteImport } from './app/_usersauth/users/campaign/index'
 import { Route as UsersauthUsersAnalysisIndexRouteImport } from './app/_usersauth/users/analysis/index'
 import { Route as UsersauthAdsWhatsappIndexRouteImport } from './app/_usersauth/ads/whatsapp/index'
@@ -47,8 +51,11 @@ import { Route as PublicLightnavbarAboutIndexRouteImport } from './app/_public/_
 import { Route as PublicDarknavbarDiscoveryIndexRouteImport } from './app/_public/_darknavbar/discovery/index'
 import { Route as AccessVendorAccessOnboardingIndexRouteImport } from './app/_access/vendor-access/onboarding/index'
 import { Route as VendorsBillboardsRequestsSlugIndexRouteImport } from './app/vendors/billboards/requests/$slug/index'
+import { Route as VendorsBillboardsPayoutsIdIndexRouteImport } from './app/vendors/billboards/payouts/$id/index'
+import { Route as VendorsBillboardsNegotiationsIdIndexRouteImport } from './app/vendors/billboards/negotiations/$id/index'
 import { Route as VendorsBillboardsListingSlugIndexRouteImport } from './app/vendors/billboards/listing/$slug/index'
 import { Route as UsersauthUsersWalletFundwalletIndexRouteImport } from './app/_usersauth/users/wallet/fundwallet/index'
+import { Route as UsersauthUsersNegotiationsIdIndexRouteImport } from './app/_usersauth/users/negotiations/$id/index'
 import { Route as UsersauthUsersCampaignSlugIndexRouteImport } from './app/_usersauth/users/campaign/$slug/index'
 import { Route as UsersauthAdsSmsCheckoutIndexRouteImport } from './app/_usersauth/ads/sms/checkout/index'
 import { Route as UsersauthAdsInfluencerSlugIndexRouteImport } from './app/_usersauth/ads/influencer/$slug/index'
@@ -110,6 +117,11 @@ const VendorsBillboardsIndexRoute = VendorsBillboardsIndexRouteImport.update({
   path: '/',
   getParentRoute: () => VendorsBillboardsRouteRoute,
 } as any)
+const UsersauthWalletIndexRoute = UsersauthWalletIndexRouteImport.update({
+  id: '/wallet/',
+  path: '/wallet/',
+  getParentRoute: () => UsersauthRouteRoute,
+} as any)
 const UsersauthUsersIndexRoute = UsersauthUsersIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -159,6 +171,18 @@ const VendorsBillboardsRequestsIndexRoute =
     path: '/requests/',
     getParentRoute: () => VendorsBillboardsRouteRoute,
   } as any)
+const VendorsBillboardsPayoutsIndexRoute =
+  VendorsBillboardsPayoutsIndexRouteImport.update({
+    id: '/payouts/',
+    path: '/payouts/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
+const VendorsBillboardsNegotiationsIndexRoute =
+  VendorsBillboardsNegotiationsIndexRouteImport.update({
+    id: '/negotiations/',
+    path: '/negotiations/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
 const VendorsBillboardsListingIndexRoute =
   VendorsBillboardsListingIndexRouteImport.update({
     id: '/listing/',
@@ -181,6 +205,12 @@ const UsersauthUsersSettingsIndexRoute =
   UsersauthUsersSettingsIndexRouteImport.update({
     id: '/settings/',
     path: '/settings/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersNegotiationsIndexRoute =
+  UsersauthUsersNegotiationsIndexRouteImport.update({
+    id: '/negotiations/',
+    path: '/negotiations/',
     getParentRoute: () => UsersauthUsersRouteRoute,
   } as any)
 const UsersauthUsersCampaignIndexRoute =
@@ -266,6 +296,18 @@ const VendorsBillboardsRequestsSlugIndexRoute =
     path: '/requests/$slug/',
     getParentRoute: () => VendorsBillboardsRouteRoute,
   } as any)
+const VendorsBillboardsPayoutsIdIndexRoute =
+  VendorsBillboardsPayoutsIdIndexRouteImport.update({
+    id: '/payouts/$id/',
+    path: '/payouts/$id/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
+const VendorsBillboardsNegotiationsIdIndexRoute =
+  VendorsBillboardsNegotiationsIdIndexRouteImport.update({
+    id: '/negotiations/$id/',
+    path: '/negotiations/$id/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
 const VendorsBillboardsListingSlugIndexRoute =
   VendorsBillboardsListingSlugIndexRouteImport.update({
     id: '/listing/$slug/',
@@ -276,6 +318,12 @@ const UsersauthUsersWalletFundwalletIndexRoute =
   UsersauthUsersWalletFundwalletIndexRouteImport.update({
     id: '/wallet/fundwallet/',
     path: '/wallet/fundwallet/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersNegotiationsIdIndexRoute =
+  UsersauthUsersNegotiationsIdIndexRouteImport.update({
+    id: '/negotiations/$id/',
+    path: '/negotiations/$id/',
     getParentRoute: () => UsersauthUsersRouteRoute,
   } as any)
 const UsersauthUsersCampaignSlugIndexRoute =
@@ -345,6 +393,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminAdminIndexRoute
   '/ads/': typeof UsersauthAdsIndexRoute
   '/users/': typeof UsersauthUsersIndexRoute
+  '/wallet/': typeof UsersauthWalletIndexRoute
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
   '/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
@@ -360,10 +409,13 @@ export interface FileRoutesByFullPath {
   '/ads/whatsapp/': typeof UsersauthAdsWhatsappIndexRoute
   '/users/analysis/': typeof UsersauthUsersAnalysisIndexRoute
   '/users/campaign/': typeof UsersauthUsersCampaignIndexRoute
+  '/users/negotiations/': typeof UsersauthUsersNegotiationsIndexRoute
   '/users/settings/': typeof UsersauthUsersSettingsIndexRoute
   '/users/wallet/': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard/': typeof VendorsBillboardsAddBillboardIndexRoute
   '/vendors/billboards/listing/': typeof VendorsBillboardsListingIndexRoute
+  '/vendors/billboards/negotiations/': typeof VendorsBillboardsNegotiationsIndexRoute
+  '/vendors/billboards/payouts/': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests/': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings/': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet/': typeof VendorsBillboardsWalletIndexRoute
@@ -371,8 +423,11 @@ export interface FileRoutesByFullPath {
   '/ads/influencer/$slug/': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/ads/sms/checkout/': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/users/campaign/$slug/': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/users/negotiations/$id/': typeof UsersauthUsersNegotiationsIdIndexRoute
   '/users/wallet/fundwallet/': typeof UsersauthUsersWalletFundwalletIndexRoute
   '/vendors/billboards/listing/$slug/': typeof VendorsBillboardsListingSlugIndexRoute
+  '/vendors/billboards/negotiations/$id/': typeof VendorsBillboardsNegotiationsIdIndexRoute
+  '/vendors/billboards/payouts/$id/': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug/': typeof VendorsBillboardsRequestsSlugIndexRoute
   '/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
@@ -388,6 +443,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminAdminIndexRoute
   '/ads': typeof UsersauthAdsIndexRoute
   '/users': typeof UsersauthUsersIndexRoute
+  '/wallet': typeof UsersauthWalletIndexRoute
   '/vendors/billboards': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers': typeof VendorsInfluencersIndexRoute
   '/vendor-access/onboarding': typeof AccessVendorAccessOnboardingIndexRoute
@@ -403,10 +459,13 @@ export interface FileRoutesByTo {
   '/ads/whatsapp': typeof UsersauthAdsWhatsappIndexRoute
   '/users/analysis': typeof UsersauthUsersAnalysisIndexRoute
   '/users/campaign': typeof UsersauthUsersCampaignIndexRoute
+  '/users/negotiations': typeof UsersauthUsersNegotiationsIndexRoute
   '/users/settings': typeof UsersauthUsersSettingsIndexRoute
   '/users/wallet': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard': typeof VendorsBillboardsAddBillboardIndexRoute
   '/vendors/billboards/listing': typeof VendorsBillboardsListingIndexRoute
+  '/vendors/billboards/negotiations': typeof VendorsBillboardsNegotiationsIndexRoute
+  '/vendors/billboards/payouts': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet': typeof VendorsBillboardsWalletIndexRoute
@@ -414,8 +473,11 @@ export interface FileRoutesByTo {
   '/ads/influencer/$slug': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/ads/sms/checkout': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/users/campaign/$slug': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/users/negotiations/$id': typeof UsersauthUsersNegotiationsIdIndexRoute
   '/users/wallet/fundwallet': typeof UsersauthUsersWalletFundwalletIndexRoute
   '/vendors/billboards/listing/$slug': typeof VendorsBillboardsListingSlugIndexRoute
+  '/vendors/billboards/negotiations/$id': typeof VendorsBillboardsNegotiationsIdIndexRoute
+  '/vendors/billboards/payouts/$id': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug': typeof VendorsBillboardsRequestsSlugIndexRoute
   '/ads/billboard/$slug/onboard': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/ads/influencer/$slug/onboarding': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
@@ -440,6 +502,7 @@ export interface FileRoutesById {
   '/_admin/admin/': typeof AdminAdminIndexRoute
   '/_usersauth/ads/': typeof UsersauthAdsIndexRoute
   '/_usersauth/users/': typeof UsersauthUsersIndexRoute
+  '/_usersauth/wallet/': typeof UsersauthWalletIndexRoute
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
   '/_access/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
@@ -455,10 +518,13 @@ export interface FileRoutesById {
   '/_usersauth/ads/whatsapp/': typeof UsersauthAdsWhatsappIndexRoute
   '/_usersauth/users/analysis/': typeof UsersauthUsersAnalysisIndexRoute
   '/_usersauth/users/campaign/': typeof UsersauthUsersCampaignIndexRoute
+  '/_usersauth/users/negotiations/': typeof UsersauthUsersNegotiationsIndexRoute
   '/_usersauth/users/settings/': typeof UsersauthUsersSettingsIndexRoute
   '/_usersauth/users/wallet/': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard/': typeof VendorsBillboardsAddBillboardIndexRoute
   '/vendors/billboards/listing/': typeof VendorsBillboardsListingIndexRoute
+  '/vendors/billboards/negotiations/': typeof VendorsBillboardsNegotiationsIndexRoute
+  '/vendors/billboards/payouts/': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests/': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings/': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet/': typeof VendorsBillboardsWalletIndexRoute
@@ -466,8 +532,11 @@ export interface FileRoutesById {
   '/_usersauth/ads/influencer/$slug/': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/_usersauth/ads/sms/checkout/': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/_usersauth/users/campaign/$slug/': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/_usersauth/users/negotiations/$id/': typeof UsersauthUsersNegotiationsIdIndexRoute
   '/_usersauth/users/wallet/fundwallet/': typeof UsersauthUsersWalletFundwalletIndexRoute
   '/vendors/billboards/listing/$slug/': typeof VendorsBillboardsListingSlugIndexRoute
+  '/vendors/billboards/negotiations/$id/': typeof VendorsBillboardsNegotiationsIdIndexRoute
+  '/vendors/billboards/payouts/$id/': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug/': typeof VendorsBillboardsRequestsSlugIndexRoute
   '/_usersauth/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/_usersauth/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
@@ -489,6 +558,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/ads/'
     | '/users/'
+    | '/wallet/'
     | '/vendors/billboards/'
     | '/vendors/influencers/'
     | '/vendor-access/onboarding/'
@@ -504,10 +574,13 @@ export interface FileRouteTypes {
     | '/ads/whatsapp/'
     | '/users/analysis/'
     | '/users/campaign/'
+    | '/users/negotiations/'
     | '/users/settings/'
     | '/users/wallet/'
     | '/vendors/billboards/add-billboard/'
     | '/vendors/billboards/listing/'
+    | '/vendors/billboards/negotiations/'
+    | '/vendors/billboards/payouts/'
     | '/vendors/billboards/requests/'
     | '/vendors/billboards/settings/'
     | '/vendors/billboards/wallet/'
@@ -515,8 +588,11 @@ export interface FileRouteTypes {
     | '/ads/influencer/$slug/'
     | '/ads/sms/checkout/'
     | '/users/campaign/$slug/'
+    | '/users/negotiations/$id/'
     | '/users/wallet/fundwallet/'
     | '/vendors/billboards/listing/$slug/'
+    | '/vendors/billboards/negotiations/$id/'
+    | '/vendors/billboards/payouts/$id/'
     | '/vendors/billboards/requests/$slug/'
     | '/ads/billboard/$slug/onboard/'
     | '/ads/influencer/$slug/onboarding/'
@@ -532,6 +608,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/ads'
     | '/users'
+    | '/wallet'
     | '/vendors/billboards'
     | '/vendors/influencers'
     | '/vendor-access/onboarding'
@@ -547,10 +624,13 @@ export interface FileRouteTypes {
     | '/ads/whatsapp'
     | '/users/analysis'
     | '/users/campaign'
+    | '/users/negotiations'
     | '/users/settings'
     | '/users/wallet'
     | '/vendors/billboards/add-billboard'
     | '/vendors/billboards/listing'
+    | '/vendors/billboards/negotiations'
+    | '/vendors/billboards/payouts'
     | '/vendors/billboards/requests'
     | '/vendors/billboards/settings'
     | '/vendors/billboards/wallet'
@@ -558,8 +638,11 @@ export interface FileRouteTypes {
     | '/ads/influencer/$slug'
     | '/ads/sms/checkout'
     | '/users/campaign/$slug'
+    | '/users/negotiations/$id'
     | '/users/wallet/fundwallet'
     | '/vendors/billboards/listing/$slug'
+    | '/vendors/billboards/negotiations/$id'
+    | '/vendors/billboards/payouts/$id'
     | '/vendors/billboards/requests/$slug'
     | '/ads/billboard/$slug/onboard'
     | '/ads/influencer/$slug/onboarding'
@@ -583,6 +666,7 @@ export interface FileRouteTypes {
     | '/_admin/admin/'
     | '/_usersauth/ads/'
     | '/_usersauth/users/'
+    | '/_usersauth/wallet/'
     | '/vendors/billboards/'
     | '/vendors/influencers/'
     | '/_access/vendor-access/onboarding/'
@@ -598,10 +682,13 @@ export interface FileRouteTypes {
     | '/_usersauth/ads/whatsapp/'
     | '/_usersauth/users/analysis/'
     | '/_usersauth/users/campaign/'
+    | '/_usersauth/users/negotiations/'
     | '/_usersauth/users/settings/'
     | '/_usersauth/users/wallet/'
     | '/vendors/billboards/add-billboard/'
     | '/vendors/billboards/listing/'
+    | '/vendors/billboards/negotiations/'
+    | '/vendors/billboards/payouts/'
     | '/vendors/billboards/requests/'
     | '/vendors/billboards/settings/'
     | '/vendors/billboards/wallet/'
@@ -609,8 +696,11 @@ export interface FileRouteTypes {
     | '/_usersauth/ads/influencer/$slug/'
     | '/_usersauth/ads/sms/checkout/'
     | '/_usersauth/users/campaign/$slug/'
+    | '/_usersauth/users/negotiations/$id/'
     | '/_usersauth/users/wallet/fundwallet/'
     | '/vendors/billboards/listing/$slug/'
+    | '/vendors/billboards/negotiations/$id/'
+    | '/vendors/billboards/payouts/$id/'
     | '/vendors/billboards/requests/$slug/'
     | '/_usersauth/ads/billboard/$slug/onboard/'
     | '/_usersauth/ads/influencer/$slug/onboarding/'
@@ -712,6 +802,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorsBillboardsIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
     }
+    '/_usersauth/wallet/': {
+      id: '/_usersauth/wallet/'
+      path: '/wallet'
+      fullPath: '/wallet/'
+      preLoaderRoute: typeof UsersauthWalletIndexRouteImport
+      parentRoute: typeof UsersauthRouteRoute
+    }
     '/_usersauth/users/': {
       id: '/_usersauth/users/'
       path: '/'
@@ -775,6 +872,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorsBillboardsRequestsIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
     }
+    '/vendors/billboards/payouts/': {
+      id: '/vendors/billboards/payouts/'
+      path: '/payouts'
+      fullPath: '/vendors/billboards/payouts/'
+      preLoaderRoute: typeof VendorsBillboardsPayoutsIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
+    '/vendors/billboards/negotiations/': {
+      id: '/vendors/billboards/negotiations/'
+      path: '/negotiations'
+      fullPath: '/vendors/billboards/negotiations/'
+      preLoaderRoute: typeof VendorsBillboardsNegotiationsIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
     '/vendors/billboards/listing/': {
       id: '/vendors/billboards/listing/'
       path: '/listing'
@@ -801,6 +912,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/users/settings/'
       preLoaderRoute: typeof UsersauthUsersSettingsIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/negotiations/': {
+      id: '/_usersauth/users/negotiations/'
+      path: '/negotiations'
+      fullPath: '/users/negotiations/'
+      preLoaderRoute: typeof UsersauthUsersNegotiationsIndexRouteImport
       parentRoute: typeof UsersauthUsersRouteRoute
     }
     '/_usersauth/users/campaign/': {
@@ -901,6 +1019,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorsBillboardsRequestsSlugIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
     }
+    '/vendors/billboards/payouts/$id/': {
+      id: '/vendors/billboards/payouts/$id/'
+      path: '/payouts/$id'
+      fullPath: '/vendors/billboards/payouts/$id/'
+      preLoaderRoute: typeof VendorsBillboardsPayoutsIdIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
+    '/vendors/billboards/negotiations/$id/': {
+      id: '/vendors/billboards/negotiations/$id/'
+      path: '/negotiations/$id'
+      fullPath: '/vendors/billboards/negotiations/$id/'
+      preLoaderRoute: typeof VendorsBillboardsNegotiationsIdIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
     '/vendors/billboards/listing/$slug/': {
       id: '/vendors/billboards/listing/$slug/'
       path: '/listing/$slug'
@@ -913,6 +1045,13 @@ declare module '@tanstack/react-router' {
       path: '/wallet/fundwallet'
       fullPath: '/users/wallet/fundwallet/'
       preLoaderRoute: typeof UsersauthUsersWalletFundwalletIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/negotiations/$id/': {
+      id: '/_usersauth/users/negotiations/$id/'
+      path: '/negotiations/$id'
+      fullPath: '/users/negotiations/$id/'
+      preLoaderRoute: typeof UsersauthUsersNegotiationsIdIndexRouteImport
       parentRoute: typeof UsersauthUsersRouteRoute
     }
     '/_usersauth/users/campaign/$slug/': {
@@ -1050,9 +1189,11 @@ interface UsersauthUsersRouteRouteChildren {
   UsersauthUsersIndexRoute: typeof UsersauthUsersIndexRoute
   UsersauthUsersAnalysisIndexRoute: typeof UsersauthUsersAnalysisIndexRoute
   UsersauthUsersCampaignIndexRoute: typeof UsersauthUsersCampaignIndexRoute
+  UsersauthUsersNegotiationsIndexRoute: typeof UsersauthUsersNegotiationsIndexRoute
   UsersauthUsersSettingsIndexRoute: typeof UsersauthUsersSettingsIndexRoute
   UsersauthUsersWalletIndexRoute: typeof UsersauthUsersWalletIndexRoute
   UsersauthUsersCampaignSlugIndexRoute: typeof UsersauthUsersCampaignSlugIndexRoute
+  UsersauthUsersNegotiationsIdIndexRoute: typeof UsersauthUsersNegotiationsIdIndexRoute
   UsersauthUsersWalletFundwalletIndexRoute: typeof UsersauthUsersWalletFundwalletIndexRoute
 }
 
@@ -1060,9 +1201,12 @@ const UsersauthUsersRouteRouteChildren: UsersauthUsersRouteRouteChildren = {
   UsersauthUsersIndexRoute: UsersauthUsersIndexRoute,
   UsersauthUsersAnalysisIndexRoute: UsersauthUsersAnalysisIndexRoute,
   UsersauthUsersCampaignIndexRoute: UsersauthUsersCampaignIndexRoute,
+  UsersauthUsersNegotiationsIndexRoute: UsersauthUsersNegotiationsIndexRoute,
   UsersauthUsersSettingsIndexRoute: UsersauthUsersSettingsIndexRoute,
   UsersauthUsersWalletIndexRoute: UsersauthUsersWalletIndexRoute,
   UsersauthUsersCampaignSlugIndexRoute: UsersauthUsersCampaignSlugIndexRoute,
+  UsersauthUsersNegotiationsIdIndexRoute:
+    UsersauthUsersNegotiationsIdIndexRoute,
   UsersauthUsersWalletFundwalletIndexRoute:
     UsersauthUsersWalletFundwalletIndexRoute,
 }
@@ -1073,11 +1217,13 @@ const UsersauthUsersRouteRouteWithChildren =
 interface UsersauthRouteRouteChildren {
   UsersauthAdsRouteRoute: typeof UsersauthAdsRouteRouteWithChildren
   UsersauthUsersRouteRoute: typeof UsersauthUsersRouteRouteWithChildren
+  UsersauthWalletIndexRoute: typeof UsersauthWalletIndexRoute
 }
 
 const UsersauthRouteRouteChildren: UsersauthRouteRouteChildren = {
   UsersauthAdsRouteRoute: UsersauthAdsRouteRouteWithChildren,
   UsersauthUsersRouteRoute: UsersauthUsersRouteRouteWithChildren,
+  UsersauthWalletIndexRoute: UsersauthWalletIndexRoute,
 }
 
 const UsersauthRouteRouteWithChildren = UsersauthRouteRoute._addFileChildren(
@@ -1119,10 +1265,14 @@ interface VendorsBillboardsRouteRouteChildren {
   VendorsBillboardsIndexRoute: typeof VendorsBillboardsIndexRoute
   VendorsBillboardsAddBillboardIndexRoute: typeof VendorsBillboardsAddBillboardIndexRoute
   VendorsBillboardsListingIndexRoute: typeof VendorsBillboardsListingIndexRoute
+  VendorsBillboardsNegotiationsIndexRoute: typeof VendorsBillboardsNegotiationsIndexRoute
+  VendorsBillboardsPayoutsIndexRoute: typeof VendorsBillboardsPayoutsIndexRoute
   VendorsBillboardsRequestsIndexRoute: typeof VendorsBillboardsRequestsIndexRoute
   VendorsBillboardsSettingsIndexRoute: typeof VendorsBillboardsSettingsIndexRoute
   VendorsBillboardsWalletIndexRoute: typeof VendorsBillboardsWalletIndexRoute
   VendorsBillboardsListingSlugIndexRoute: typeof VendorsBillboardsListingSlugIndexRoute
+  VendorsBillboardsNegotiationsIdIndexRoute: typeof VendorsBillboardsNegotiationsIdIndexRoute
+  VendorsBillboardsPayoutsIdIndexRoute: typeof VendorsBillboardsPayoutsIdIndexRoute
   VendorsBillboardsRequestsSlugIndexRoute: typeof VendorsBillboardsRequestsSlugIndexRoute
   VendorsBillboardsListingSlugEditIndexRoute: typeof VendorsBillboardsListingSlugEditIndexRoute
 }
@@ -1133,11 +1283,17 @@ const VendorsBillboardsRouteRouteChildren: VendorsBillboardsRouteRouteChildren =
     VendorsBillboardsAddBillboardIndexRoute:
       VendorsBillboardsAddBillboardIndexRoute,
     VendorsBillboardsListingIndexRoute: VendorsBillboardsListingIndexRoute,
+    VendorsBillboardsNegotiationsIndexRoute:
+      VendorsBillboardsNegotiationsIndexRoute,
+    VendorsBillboardsPayoutsIndexRoute: VendorsBillboardsPayoutsIndexRoute,
     VendorsBillboardsRequestsIndexRoute: VendorsBillboardsRequestsIndexRoute,
     VendorsBillboardsSettingsIndexRoute: VendorsBillboardsSettingsIndexRoute,
     VendorsBillboardsWalletIndexRoute: VendorsBillboardsWalletIndexRoute,
     VendorsBillboardsListingSlugIndexRoute:
       VendorsBillboardsListingSlugIndexRoute,
+    VendorsBillboardsNegotiationsIdIndexRoute:
+      VendorsBillboardsNegotiationsIdIndexRoute,
+    VendorsBillboardsPayoutsIdIndexRoute: VendorsBillboardsPayoutsIdIndexRoute,
     VendorsBillboardsRequestsSlugIndexRoute:
       VendorsBillboardsRequestsSlugIndexRoute,
     VendorsBillboardsListingSlugEditIndexRoute:

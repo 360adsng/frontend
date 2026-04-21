@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "@tanstack/react-router";
 import { getAccountType } from "@endpoint/baseFetch";
 import { hasAccessToken } from "../../lib/auth";
@@ -30,7 +30,7 @@ export function DashboardGate({
   const router = useRouter();
   const [allowed, setAllowed] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const expected = MODE_ALLOWED[mode];
 
     if (!hasAccessToken()) {

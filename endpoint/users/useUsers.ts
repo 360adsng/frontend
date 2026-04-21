@@ -1,7 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ApiError } from "../baseFetch";
-import { changePassword, getMe, updateProfile, uploadProfilePhoto } from "./users";
+import {
+  changePassword,
+  getMe,
+  getUserDashboard,
+  updateProfile,
+  uploadProfilePhoto,
+} from "./users";
 
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.message;
@@ -13,6 +19,13 @@ export function useMe() {
   return useQuery({
     queryKey: ["me"],
     queryFn: getMe,
+  });
+}
+
+export function useUserDashboard() {
+  return useQuery({
+    queryKey: ["users", "dashboard"],
+    queryFn: getUserDashboard,
   });
 }
 

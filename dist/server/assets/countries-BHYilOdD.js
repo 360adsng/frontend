@@ -1,5 +1,8 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 //#region endpoint/baseFetch.ts
 /**
+* https://backend-934c.onrender.com
 * HTTP client for 360backend (Nest). Set `VITE_API_BASE_URL` in `.env` (e.g. http://localhost:3000).
 */
 var DEFAULT_BASE_URL = "http://localhost:3001";
@@ -7,6 +10,11 @@ var DEFAULT_BASE_URL = "http://localhost:3001";
 var ACCESS_TOKEN_STORAGE_KEY = "access_token";
 var REFRESH_TOKEN_STORAGE_KEY = "refresh_token";
 var ACCOUNT_TYPE_STORAGE_KEY = "account_type";
+function hasAccessToken() {
+	if (typeof window === "undefined") return false;
+	const t = localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+	return typeof t === "string" && t.trim().length > 0;
+}
 function getApiBaseUrl() {
 	return ((void 0)?.trim() || DEFAULT_BASE_URL).replace(/\/$/, "");
 }
@@ -112,6 +120,7 @@ async function refreshSessionTokens() {
 					accessToken: data.accessToken,
 					refreshToken: data.refreshToken
 				});
+				if (typeof data.accountType === "string" && data.accountType.length > 0) saveAccountType(data.accountType);
 				return true;
 			}
 			clearAuthTokens();
@@ -245,6 +254,81 @@ addRequestInterceptor((ctx) => {
 	};
 });
 //#endregion
+//#region endpoint/users/users.ts
+function getMe() {
+	return baseFetchJson("/users/me", { method: "GET" });
+}
+function updateProfile(payload) {
+	return baseFetchJson("/users/profile", {
+		method: "PATCH",
+		body: payload
+	});
+}
+function changePassword(payload) {
+	return baseFetchJson("/users/password", {
+		method: "PATCH",
+		body: payload
+	});
+}
+async function uploadProfilePhoto(file) {
+	const form = new FormData();
+	form.append("file", file);
+	return baseFetchJson("/users/profile/photo", {
+		method: "POST",
+		body: form
+	});
+}
+//#endregion
+//#region endpoint/users/useUsers.ts
+function errorMessage(error) {
+	if (error instanceof ApiError) return error.message;
+	if (error instanceof Error) return error.message;
+	return "Something went wrong. Please try again.";
+}
+function useMe() {
+	return useQuery({
+		queryKey: ["me"],
+		queryFn: getMe
+	});
+}
+function useUpdateProfile() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: updateProfile,
+		onSuccess: async (data) => {
+			toast.success(data?.message ?? "Profile updated.");
+			await qc.invalidateQueries({ queryKey: ["me"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage(error));
+		}
+	});
+}
+function useChangePassword() {
+	return useMutation({
+		mutationFn: changePassword,
+		onSuccess: (data) => {
+			toast.success(data?.message ?? "Password changed.");
+		},
+		onError: (error) => {
+			toast.error(errorMessage(error));
+		}
+	});
+}
+function useUploadProfilePhoto() {
+	const qc = useQueryClient();
+	return useMutation({
+		mutationFn: uploadProfilePhoto,
+		onSuccess: async (data) => {
+			toast.success(data?.message ?? "Photo uploaded.");
+			await qc.invalidateQueries({ queryKey: ["me"] });
+		},
+		onError: (error) => {
+			toast.error(errorMessage(error));
+		}
+	});
+}
+//#endregion
 //#region lib/countries.ts
 /**
 * Seed list (add more later).
@@ -277,4 +361,4 @@ var COUNTRIES = [
 	}
 ];
 //#endregion
-export { clearAuthTokens as a, saveAuthTokens as c, baseFetchJson as i, ACCESS_TOKEN_STORAGE_KEY as n, getAccountType as o, ApiError as r, saveAccountType as s, COUNTRIES as t };
+export { useUploadProfilePhoto as a, baseFetchJson as c, hasAccessToken as d, saveAccountType as f, useUpdateProfile as i, clearAuthTokens as l, useChangePassword as n, ACCESS_TOKEN_STORAGE_KEY as o, saveAuthTokens as p, useMe as r, ApiError as s, COUNTRIES as t, getAccountType as u };

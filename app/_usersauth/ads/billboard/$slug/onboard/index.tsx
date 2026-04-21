@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useParams, createFileRoute } from '@tanstack/react-router';
+import { useMemo, useState } from "react";
+import { useNavigate, useParams, createFileRoute } from '@tanstack/react-router';
 import { Value } from "react-calendar/dist/cjs/shared/types";
 import { Toaster, toast } from "sonner";
 
@@ -10,8 +10,30 @@ import CalenderBox from "@components/inputs/CalenderBox";
 import Preview from "@components/ui/Preview";
 import BackBtn from "@components/buttons/BackBtn";
 import Steps from "@components/ui/Steps";
+import { useCreateBillboardBooking } from "@endpoint/billboard/useBillboard";
+
+function isoDateOnly(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function isPastDateOnly(dateOnly: string): boolean {
+  if (!dateOnly) return false;
+  const d = new Date(`${dateOnly}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return false;
+  return d.getTime() < startOfToday().getTime();
+}
 
 function Onboard() {
+  const { data } = Route.useSearch();
   const [plan, setPlan] = useState("");
   const [startWeek, setStartWeek] = useState<Duration>({
     startday: "",
@@ -25,9 +47,31 @@ function Onboard() {
   const [selectedDate, setSelectedDate] = useState<valuePiece[]>([]);
   const [attachmentType, setAttachmentType] = useState("image");
   const [previewImage, setPreviewImage] = useState<Preview>();
-  const [previewVideo, setPreviewVideo] = useState<Preview>();
   const params = useParams({ strict: false }) as { slug?: string };
   const selectedbillboard = params.slug;
+  const listingId = useMemo(() => Number(selectedbillboard), [selectedbillboard]);
+  const navigate = useNavigate();
+  const createBooking = useCreateBillboardBooking();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [creativeVideoUrl, setCreativeVideoUrl] = useState("");
+  const durationText = useMemo(() => {
+    if (plan === "Weeks") {
+      const n = Number(startWeek.duration);
+      if (startWeek.startday && Number.isFinite(n) && n > 0) {
+        return `This ad will run for ${n} week(s) from ${startWeek.startday}.`;
+      }
+      return "";
+    }
+    if (plan === "Months") {
+      const n = Number(startMonth.duration);
+      if (startMonth.startday && Number.isFinite(n) && n > 0) {
+        return `This ad will run for ${n} month(s) from ${startMonth.startday}.`;
+      }
+      return "";
+    }
+    return "";
+  }, [plan, startWeek.duration, startWeek.startday, startMonth.duration, startMonth.startday]);
+
 
   const handlePlan = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
@@ -56,27 +100,16 @@ function Onboard() {
     setSelectedDate(updateDate);
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: string
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    if (type !== "image") return;
     const file = e.target.files;
     if (file !== null && file.length > 0) {
       const objectUrl = URL.createObjectURL(file[0]);
-
-      if (type === "image") {
-        setPreviewVideo(undefined);
-        setPreviewImage({
-          src: objectUrl,
-          name: file[0].name,
-        });
-      } else {
-        setPreviewImage(undefined);
-        setPreviewVideo({
-          src: objectUrl,
-          name: file[0].name,
-        });
-      }
+      setImageFile(file[0]);
+      setPreviewImage({
+        src: objectUrl,
+        name: file[0].name,
+      });
     }
   };
 
@@ -100,6 +133,98 @@ function Onboard() {
       });
     }
     setSelectedDate([]);
+  };
+
+  const handleNext = async () => {
+    if (!Number.isFinite(listingId) || listingId <= 0) {
+      toast.error("Invalid billboard id");
+      return;
+    }
+
+    const durationPlan =
+      plan === "Immediate"
+        ? "immediate"
+        : plan === "Days"
+          ? "days"
+          : plan === "Weeks"
+            ? "weeks"
+            : plan === "Months"
+              ? "months"
+              : null;
+
+    if (!durationPlan) {
+      toast.error("kindly selete a duration plan");
+      return;
+    }
+
+    const selectedDates =
+      durationPlan === "days"
+        ? selectedDate
+            .filter((d) => d instanceof Date)
+            .map((d) => isoDateOnly(d as Date))
+        : undefined;
+
+    const periodStart =
+      durationPlan === "weeks"
+        ? startWeek.startday || undefined
+        : durationPlan === "months"
+          ? startMonth.startday || undefined
+          : undefined;
+
+    const periodDurationCount =
+      durationPlan === "weeks"
+        ? Number(startWeek.duration)
+        : durationPlan === "months"
+          ? Number(startMonth.duration)
+          : undefined;
+
+    const creativeKind = attachmentType === "image" ? "image" : "video";
+    const payload = {
+      durationPlan,
+      selectedDates,
+      periodStart,
+      periodDurationCount:
+        periodDurationCount != null && Number.isFinite(periodDurationCount)
+          ? periodDurationCount
+          : undefined,
+      creativeKind,
+      creativeVideoUrl:
+        creativeKind === "video"
+          ? creativeVideoUrl.trim() || undefined
+          : undefined,
+    } as const;
+
+    if (creativeKind === "image" && !imageFile) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (creativeKind === "video" && !payload.creativeVideoUrl) {
+      toast.error("Please paste a video link");
+      return;
+    }
+
+    if (selectedDates?.some((d) => isPastDateOnly(d))) {
+      toast.error("You cannot select a past date");
+      return;
+    }
+    if (periodStart && isPastDateOnly(periodStart)) {
+      toast.error("Start date cannot be in the past");
+      return;
+    }
+
+    try {
+      const res = await createBooking.mutateAsync({
+        listingId,
+        payload,
+        imageFile: imageFile ?? undefined,
+      });
+      await navigate({
+        to: `/ads/billboard/${listingId}/onboard/checkout`,
+        search: { bookingId: res.id },
+      });
+    } catch {
+      // toast handled by hook
+    }
   };
 
 
@@ -139,6 +264,7 @@ function Onboard() {
                 <p>Start day</p>
                 <input
                   type="date"
+                  min={isoDateOnly(startOfToday())}
                   value={startWeek?.startday}
                   name="startday"
                   onChange={(e) => handleDuration(e, "week")}
@@ -165,6 +291,7 @@ function Onboard() {
                   name="startday"
                   onChange={(e) => handleDuration(e, "month")}
                   type="date"
+                  min={isoDateOnly(startOfToday())}
                   className="w-full bg-white rounded-10 p-2 focus:outline-none"
                 />
               </div>
@@ -207,15 +334,24 @@ function Onboard() {
                 previewName={previewImage?.name as string}
                 accept="image"
                 handleChange={handleChange}
-                warning="Required billboard image dimension: 496(H) by 800(W)"
+                warning={`Required billboard image dimension: ${data?.width}px by ${data?.height}px (W x H)`}
               />
             ) : (
-              <FilesInput
-                previewName={previewVideo?.name as string}
-                accept="video"
-                handleChange={handleChange}
-                warning="Required billboard video dimension: 496(H) by 800(W)"
-              />
+              <div>
+                <input
+                  value={creativeVideoUrl}
+                  onChange={(e) => {
+                    setCreativeVideoUrl(e.target.value);
+                    setImageFile(null);
+                    setPreviewImage(undefined);
+                  }}
+                  placeholder="Paste YouTube / video link"
+                  className="mb-2 bg-white focus:outline-none w-full p-2 rounded-10"
+                />
+                <p className="text-stone-500 text-xs">
+                  Videos are links only (e.g. YouTube). No video upload.
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -224,20 +360,27 @@ function Onboard() {
           <Preview
             previewImage={previewImage as Preview}
             attachmentType={attachmentType}
-            previewVideo={previewVideo as Preview}
+            previewVideo={undefined}
+            externalVideoUrl={attachmentType === "video" ? creativeVideoUrl : undefined}
             platform={platform}
             needPlatform={false}
             needMessage={false}
             writeup={''}
             plan={plan}
             selectedDate={selectedDate}
+            durationText={durationText}
           />
         </div>
       </section>
 
       <div className="flex justify-end">
-        <button className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12">
-          <Link to={`/ads/billboard/${2}/onboard/checkout`}>Next</Link>
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={createBooking.isPending}
+          className="group rounded-10 hover:animate-changeColor text-white bg-ads360yellow-100 w-123 h-12 disabled:opacity-60"
+        >
+          {createBooking.isPending ? "Saving..." : "Next"}
         </button>
       </div>
 

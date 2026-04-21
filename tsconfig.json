@@ -20,7 +20,8 @@
       "@endpoint/*": ["./endpoint/*"],
       "@public/*": ["./public/*"],
       "@styles/*": ["./styles/*"],
-      "@utils/*": ["./utils/*"]
+      "@utils/*": ["./utils/*"],
+      "@lib/*": ["./lib/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"]

@@ -1,146 +1,143 @@
-const naira = '/icons/naira.svg'
-const filter = '/icons/filter.svg'
-const makepayment = '/icons/makepayment.svg'
-const whatsAppPoint = '/icons/usericon/whatsappPoint.svg'
-import { Link, createFileRoute } from '@tanstack/react-router'
+const naira = "/icons/naira.svg";
+const filter = "/icons/filter.svg";
+const makepayment = "/icons/makepayment.svg";
+const whatsAppPoint = "/icons/usericon/whatsappPoint.svg";
 
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { useMe } from "@endpoint/users/useUsers";
+import type { MeResponse } from "@endpoint/users/types";
+import { useWallet, useWalletTransactions } from "@endpoint/wallet/useWallet";
+import { FundWalletModal } from "@components/wallet/FundWalletModal";
+import { TransactionsTable } from "@components/ui/TransactionsTable";
+
+function formatMoney(n: number, currency: string) {
+  return `${currency === "NGN" ? "₦" : `${currency} `}${new Intl.NumberFormat(
+    "en-NG",
+    { minimumFractionDigits: 2, maximumFractionDigits: 2 },
+  ).format(n)}`;
+}
+
+function accountDisplayName(me: MeResponse | undefined): string {
+  if (!me) return "—";
+  if (me.accountType === "business_user") {
+    return me.businessName || me.contactName || me.email;
+  }
+  if (me.accountType === "regular_user") {
+    return `${me.firstName} ${me.lastName}`.trim() || me.email;
+  }
+  return me.email;
+}
 
 const WalletSection = () => {
+  const { data: me } = useMe();
+  const { data: wallet, isPending: walletLoading, isError: walletError } =
+    useWallet();
+  const {
+    data: transactions = [],
+    isPending: txLoading,
+    isError: txError,
+    refetch: refetchTx,
+  } = useWalletTransactions(100);
+
+  const [fundOpen, setFundOpen] = useState(false);
+
+  const displayName = accountDisplayName(me);
+
   return (
-    <section className='min-h-screen bg-ads360-hash px-4 md:px-10 py-14'>
+    <section className="min-h-screen bg-ads360-hash px-4 md:px-10 py-14">
       <div className="container mx-auto">
         <h2 className="text-2xl">My Wallet</h2>
-        <p className="text-stone-400">View billing history and current balance here</p>
+        <p className="text-stone-400">
+          View billing history and current balance here
+        </p>
 
-
-        <div className="md:flex my-10 justify-around bg-white p-5 shadow-md rounded-10 border border-ads360yellow-100">
+        <div className="md:flex my-10 justify-around items-start gap-6 bg-white p-5 shadow-md rounded-10 border border-ads360yellow-100">
           <div>
-          <h3>Account Name</h3>
-          <p className="text-stone-400 text-xl my-4">Ayomike Charles</p>
+            <h3>Account Name</h3>
+            <p className="text-stone-400 text-xl my-4">{displayName}</p>
 
-          <div>
-          <p className="my-3">Balance</p>
-          <div className="flex">
-            <img alt="naira"
-              src={naira}
-              className="w-14 h-14"
-            />
-            <div className="px-3">
-              <p className="text-2xl">₦1000000.00</p>
-              <h3 className="text-stone-400 text-sm">Available Balance</h3>
-            </div>
+            <div>
+              <p className="my-3">Balance</p>
+              <div className="flex">
+                <img alt="" src={naira} className="w-14 h-14" />
+                <div className="px-3">
+                  {walletLoading ? (
+                    <p className="text-2xl text-stone-400">…</p>
+                  ) : walletError ? (
+                    <p className="text-sm text-red-600">Could not load balance</p>
+                  ) : (
+                    <p className="text-2xl">
+                      {formatMoney(wallet?.balance ?? 0, wallet?.currency ?? "NGN")}
+                    </p>
+                  )}
+                  <h3 className="text-stone-400 text-sm">Available Balance</h3>
+                </div>
+              </div>
             </div>
           </div>
-          </div>
 
-
-          <div>
-          <h3 className="mt-5 md:my-0">360ads Wallet ID</h3>
-          <p className="text-xl text-ads360yellow-100 my-4">3211711562</p>
-
-          <div>
+          <div className="mt-5 md:mt-0">
             <p className="my-3">WhatsApp Point</p>
-          <div className="flex">
-            <img alt="naira"
-              src={whatsAppPoint}
-              className="w-14 h-14"
-            />
-            
-            <div className="px-3">
-              <p className="text-2xl">0</p>
-              <h3 className="text-stone-400 text-sm">Available Balance</h3>
-            </div>
+            <div className="flex">
+              <img alt="" src={whatsAppPoint} className="w-14 h-14" />
+              <div className="px-3">
+                <p className="text-2xl">0</p>
+                <h3 className="text-stone-400 text-sm">Available Balance</h3>
+              </div>
             </div>
           </div>
-          </div>
 
-
-          <div className="">
-            <Link to='wallet/fundwallet' className="flex px-10 space-x-5 py-5 my-5 md:my-0 rounded border text-ads360light-100 bg-ads360black-100/95 hover:bg-ads360black-100">
-                <img alt="make payment icon"
-                  src={makepayment}
-                  className="w-5 h-5"
-                />
-                <span>
-                  Fund Wallet  
-                </span>             
-            </Link>
-          </div>
-        </div>
-
-
-        <div className="group">
-          <div className="flex justify-end">
-            <button className="flex space-x-2 bg-[#E4E4E4] p-1 rounded-full px-5">
-            <img src={filter} alt="filter" className="py-2" width={20} height={20}/>
-            <span>filter</span> 
+          <div className="shrink-0">
+            <button
+              type="button"
+              onClick={() => setFundOpen(true)}
+              className="flex px-10 space-x-5 py-5 my-5 md:my-0 rounded border text-ads360light-100 bg-ads360black-100/95 hover:bg-ads360black-100"
+            >
+              <img alt="" src={makepayment} className="w-5 h-5" />
+              <span>Fund Wallet</span>
             </button>
           </div>
-
-
-          {/* <div className="flex justify-end">
-          <div className="">
-            <select defaultValue='select' className="rounded mx-2 p-2 focus:outline-none bg-ads360light-100">
-              <option disabled>select</option>
-              <option>funded wallet</option>
-              <option>debited wallet</option>
-            </select>
-          </div>
-          <div className="flex">
-            <input type="date" className="rounded p-2 focus:outline-none bg-ads360light-100"/>
-          </div>
-        </div> */}
         </div>
 
-
-
-
-
         <div className="bg-white p-4 shadow-md my-3 rounded-10 border border-ads360yellow-100">
-            <h3 className="text-lg mb-2">Transaction History</h3>
-            <ul>
-              <li className="mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded">
-                <div>
-                  <p className="font-bold">funded wallet</p>
-                  <p>June 1, 2023</p>
-                </div> 
-                <div className="text-green-500"> 
-                  +₦5000.00
-                </div>
-              </li>
-
-
-              <li className="mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded">
-                <div>
-                  <p className="font-bold">debited wallet</p>
-                  <p>June 6, 2023</p>
-                </div> 
-                <div className="text-red-500"> 
-                  +₦3000.00
-                </div>
-              </li>
-
-
-              <li className="mb-2 flex justify-between bg-[#f1f1f1] p-2 rounded">
-                <div>
-                  <p className="font-bold">funded wallet</p>
-                  <p>June 8, 2023</p>
-                </div> 
-                <div className="text-green-500"> 
-                  +₦8000.00
-                </div>
-              </li>
-            </ul>
-
-            {/* <div className="my-3 text-right text-ads360yellow-100"><Link to=''>view all</Link></div> */}
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h3 className="text-lg">Transaction History</h3>
+            {txError ? (
+              <button
+                type="button"
+                onClick={() => refetchTx()}
+                className="text-sm text-ads360yellow-100 underline"
+              >
+                Retry
+              </button>
+            ) : null}
           </div>
+
+          {txLoading ? (
+            <p className="text-stone-500 text-sm py-4">Loading transactions…</p>
+          ) : txError ? (
+            <p className="text-red-600 text-sm py-4">
+              Could not load transactions.
+            </p>
+          ) : (
+            <TransactionsTable
+              rows={transactions}
+              isLoading={txLoading}
+              isError={txError}
+              emptyText="No transactions found"
+            />
+          )}
+        </div>
       </div>
+
+      <FundWalletModal isOpen={fundOpen} onClose={() => setFundOpen(false)} />
     </section>
-  )
-}
+  );
+};
 
 export const Route = createFileRoute("/_usersauth/users/wallet/")({
   component: WalletSection,
-})
+});
 
-export default WalletSection
+export default WalletSection;

@@ -1,214 +1,223 @@
-"use client"
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-const cancel = '/icons/usericon/modalCancelBotton.svg'
-const billboardImage2 = '/del/billboard2.png'
-import { Modal } from '@components/modal/modal'
+"use client";
 
+import { createFileRoute, Link } from "@tanstack/react-router";
+import {
+  useBillboardBooking,
+  useCompleteBillboardBooking,
+} from "@endpoint/billboard/useBillboard";
+import CreativeMedia from "@components/ui/CreativeMedia";
+import {
+  CampaignPaymentStatusBadge,
+  CampaignStatusBadge,
+  formatCampaignMoney,
+  formatDateRange,
+  InfoCard,
+  MediaFrame,
+  personDisplayName,
+  SectionLabel,
+} from "@components/campaign/CampaignDetailShared";
+import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
 
+const CampaignDetail = () => {
+  const { slug } = Route.useParams();
+  const id = Number(slug);
+  const booking = useBillboardBooking(
+    Number.isFinite(id) && id > 0 ? id : null,
+  );
+  const complete = useCompleteBillboardBooking();
+  const b = booking.data;
 
-const Checkout = ({params}:{params:{slug:string}}) => {
-
-
-const [negotia, setNegotia] = useState(false);
-  const [negotiatedAmount, setNegotiatedAmount] = useState("");
-  const [successfull, setSuccessfull] = useState(false);
-  const [billboard, setBillboard] = useState({
-    id: 2,
-    name: "Adetokunbo Ademola led, victoria island",
-    location: "Along Adetokunbo Ademola Street by Bishop",
-    image: billboardImage2,
-    status:params.slug === '1' ? 'completed': params.slug === '2' ? 'negotiating' : 'ongoing',
-    pricepd: "30000",
-    negotiationCount: 1,
-    feedback:'rejected',
-    finalprice:'29500',
-    yourPrice:'28000',
-    Impressions: "40 per day",
-    minimumNegotiableAmount: 26000,
-    type: "Double faced Gantry LED",
-    duration: "14hrs (6am - 9pm) 6days/week",
-  });
-
-  const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNegotiatedAmount(e.target.value);
-  };
-
-
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSuccessfull(true);
-    setNegotia(false);
-    setBillboard((prev) => ({ ...prev, negotiationCount: 1 }));
-    setTimeout(() => {
-      setSuccessfull(false);
-    }, 4000);
-  };
-
-  
-
+  const isPaid = b?.paymentStatus === "paid" || b?.status === "paid";
+  const canComplete =
+    Boolean(b) &&
+    isPaid &&
+    b?.paymentStatus !== "refunded" &&
+    b?.status === "active";
 
   return (
-    <section className='px-4 md:px-10 py-14   min-h-screen bg-ads360-hash'>
+    <section className="min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12">
+      <div className="mx-auto max-w-3xl">
+        {booking.isLoading && (
+          <p className="text-center text-stone-600">Loading…</p>
+        )}
+        {booking.isError && (
+          <p className="text-center text-red-600">Unable to load campaign</p>
+        )}
 
-      <div className='my-5 font-bold'>
-      </div>
-        
-        <div>
-          <img alt='billboard'
-            src={billboardImage2}
-            className='mx-auto'
-          />
-        </div>
-        <div className="w-full overflow-x-auto my-5">
-          <table className="min-w-full bg-white">
-            <thead className='bg-[#D0B301]/40'>
-              <tr>
-                <th className="py-2 px-2 md:px-3 border-b">Name</th>
-                <th className="py-2 px-2 md:px-3 border-b">Location</th>
-                <th className="py-2 px-2 md:px-3 border-b">Size</th>
-                <th className="py-2 px-2 md:px-3 border-b">Duration</th>
-                <th className="py-2 px-2 md:px-3 border-b">Start Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">End Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">Cost/day</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="py-2 px-2 md:px-3 border-b">Eko hotel LED, Victoria Island</td>
-                <td className="py-2 px-2 md:px-3 border-b">Along Adetokunbo Ademola Street by Eko Hotels</td>
-                <td className="py-2 px-2 md:px-3 border-b">4m(H) by 12m(W)</td>
-                <td className="py-2 px-2 md:px-3 border-b">1 day(s)</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-20</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
-                <td className="py-2 px-2 md:px-3 border-b">₦30,000</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className='md:flex md:space-x-2 justify-end'>
-        {billboard.status === 'negotiating' &&
-
-        <div className='bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3 my-5 md:my-0'>
-
-        
-              <div className=''>
-                <h4 className='basis-1/2'>Remark</h4>
-                <div className='font-bold basis-1/2'>
-                  {billboard.feedback === 'rejected'?`the billboard owner has rejected your request, and their final price is ${billboard.finalprice}`:'the billboard owner has accepted your request, you can proceed to make payment'}
-                </div>
+        {!booking.isLoading && !booking.isError && b && (
+          <div className="overflow-hidden rounded-2xl border border-amber-200/40 bg-white shadow-sm">
+            <header className="flex flex-col gap-3 border-b border-stone-100 px-5 pt-6 pb-4 sm:flex-row sm:items-start sm:justify-between sm:px-7">
+              <div>
+                <h1 className="font-serif text-2xl font-medium tracking-tight text-stone-900 md:text-3xl">
+                  Campaign details
+                </h1>
+                <p className="mt-1.5 text-sm text-stone-500">
+                  ID: NG#{b.id} · {formatDateRange(b.campaignStartDate, b.campaignEndDate)}
+                </p>
               </div>
-          
-          
-          </div>
-            }
-          <div className='bg-[#D0B301]/40  w-full p-5 md:w-1/2 lg:w-1/3'>
-            
-            <div className='flex'>
-              <h4 className='basis-1/2'>Status</h4>
-              <div className='font-bold basis-1/2'>
-                {billboard.status}
+              <div className="flex flex-wrap items-center gap-2 self-end sm:self-start sm:justify-end">
+                <CampaignStatusBadge status={b.status} />
+                <CampaignPaymentStatusBadge paymentStatus={b.paymentStatus} />
+                <Link
+                  to="/users/campaign"
+                  className="text-xl leading-none text-stone-400 transition hover:text-stone-700"
+                  aria-label="Back to campaigns"
+                >
+                  ×
+                </Link>
+              </div>
+            </header>
+
+            <div className="px-5 pt-5 sm:px-7">
+              <h2 className="font-serif text-xl text-stone-900 md:text-2xl">
+                {b.listing?.name ?? "Billboard campaign"}
+              </h2>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700">
+                  Billboard
+                </span>
+                <span className="rounded-full border border-stone-200 bg-white px-2.5 py-0.5 text-xs text-stone-600">
+                  {b.status}
+                </span>
               </div>
             </div>
 
-            <div className='flex'>
-              <h4 className='basis-1/2'>Total Amount</h4>
-              <div className='basis-1/2'>
-                <div className='font-bold'>
-                   {billboard.finalprice !== '' && billboard.feedback === 'rejected' ? billboard.finalprice : billboard.feedback === 'accepted' ? billboard.yourPrice : '₦30,000'}
-                </div>
-                <div>cost x 1 day(s)</div>
+            {!isPaid && (
+              <div className="mx-5 my-4 rounded-xl border border-amber-200/50 bg-amber-50/50 p-4 text-sm text-stone-700 sm:mx-7">
+                This booking is not paid yet. Unpaid and negotiating bookings
+                are under{" "}
+                <Link
+                  to="/users/negotiations"
+                  className="font-medium text-ads360yellow-100 underline"
+                >
+                  Negotiations
+                </Link>
+                .
               </div>
-            </div>
-          </div>
-        </div>
+            )}
 
-
-        {
-           billboard.status === 'negotiating' &&
-          <div className='flex md:justify-end space-x-3 my-3'> 
-          {
-            billboard.negotiationCount > 1 && billboard.feedback === 'rejected' &&
-            <button onClick={()=>setNegotia(true)} className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-              Negotiat
-            </button> 
-          }
-          
-
-                    
-
-          <button className="group rounded-10 my-2 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 w-123 h-12">
-            Pay Now
-          </button>
-        </div>
-        
-        }
-
-
-<Modal isOpen={negotia}>
-        <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
-          <div className="flex justify-between mb-5">
-            <h4 className="">Input Amount</h4>
-            <button onClick={() => setNegotia(false)}>
-              <img
-                src={cancel} alt="modal cancel botton"
-                className="w-5"
+            <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7">
+              <InfoCard
+                label="Total budget"
+                icon={<NairaIcon />}
+                value={formatCampaignMoney(
+                  b.negotiatedAmount ?? b.quotedTotal,
+                  b.currency,
+                )}
+                sub="Agreed price for this placement"
               />
-            </button>
-          </div>
-          <form onSubmit={submit}>
-            <div className="flex">
-              <div className="bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-1/5 content-center text-black/50">
-                {" "}
-                ₦{" "}
-              </div>
-              <input
-                type="number"
-                value={negotiatedAmount}
-                onChange={handleNegotiate}
-                className="p-2 focus:outline-none w-full border rounded-r"
+              <InfoCard
+                label="Campaign duration"
+                icon={<CalendarDays />}
+                value={formatDateRange(b.campaignStartDate, b.campaignEndDate)}
+                sub={b.durationPlan ? `Plan: ${b.durationPlan}` : undefined}
               />
             </div>
-            <div className="my-3">
-              <p className="text-red-700 text-xs">
-                You cannot negotiat lower than ₦
-                {billboard.minimumNegotiableAmount}
-              </p>
-              <p className="text-red-700 text-xs">You can only negotiat once</p>
+
+            <div className="px-5 pb-6 sm:px-7">
+              <div className="rounded-2xl border border-stone-200/80 bg-[#F7F7F5] p-5">
+                <SectionLabel>Billboard owner</SectionLabel>
+                {b.billboardOwner ? (
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-ads360yellow-100 text-lg font-serif text-white">
+                      {personDisplayName(b.billboardOwner)
+                        .slice(0, 1)
+                        .toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-stone-900">
+                        {personDisplayName(b.billboardOwner)}
+                      </p>
+                      <p className="text-sm text-stone-600">
+                        {b.billboardOwner.email}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-stone-500">No owner details</p>
+                )}
+              </div>
             </div>
-            <div className="flex justify-center">
-              <button
-                disabled={
-                  negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
-                    ? true
-                    : false
-                }
-                className={`${
-                  negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < billboard.minimumNegotiableAmount
-                    ? "bg-ads360gray-100"
-                    : "bg-ads360black-100/95 hover:bg-ads360black-100"
-                } rounded mt-5  text-white  w-5/6 h-10`}
+
+            <div className="grid gap-4 px-5 pb-6 sm:grid-cols-3 sm:px-7">
+              <MediaFrame title="Campaign creative">
+                {b.creativeImageUrl || b.creativeVideoUrl ? (
+                  <CreativeMedia
+                    creativeKind={b.creativeKind}
+                    creativeImageUrl={b.creativeImageUrl}
+                    creativeVideoUrl={b.creativeVideoUrl}
+                    hideActions
+                    className="w-full"
+                  />
+                ) : (
+                  <p className="py-8 text-center text-sm text-stone-500">
+                    No creative uploaded yet
+                  </p>
+                )}
+              </MediaFrame>
+
+              <MediaFrame title="Billboard">
+                {b.listing?.imageUrl ? (
+                  <img
+                    src={b.listing.imageUrl}
+                    alt={b.listing.name ?? "Billboard"}
+                    className="max-h-52 w-full rounded-lg object-contain"
+                  />
+                ) : (
+                  <p className="py-8 text-center text-sm text-stone-500">
+                    No image
+                  </p>
+                )}
+              </MediaFrame>
+
+              <MediaFrame title="Active proof">
+                {b.activeProofImageUrl ? (
+                  <img
+                    src={b.activeProofImageUrl}
+                    alt="Proof of activation"
+                    className="max-h-52 w-full rounded-lg object-contain"
+                  />
+                ) : (
+                  <p className="py-8 text-center text-sm text-stone-500">
+                    The owner has not uploaded activation proof yet
+                  </p>
+                )}
+              </MediaFrame>
+            </div>
+
+            {canComplete && (
+              <div className="flex justify-end border-t border-stone-100 px-5 py-5 sm:px-7">
+                <button
+                  type="button"
+                  disabled={complete.isPending}
+                  onClick={() => {
+                    if (!Number.isFinite(id) || id <= 0) return;
+                    void complete.mutateAsync(id);
+                  }}
+                  className="rounded-xl border-2 border-stone-900 bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-stone-800 disabled:opacity-50"
+                >
+                  {complete.isPending ? "Completing…" : "Complete campaign"}
+                </button>
+              </div>
+            )}
+
+            <div className="px-5 pb-6 sm:px-7">
+              <Link
+                to="/users/campaign"
+                className="text-sm font-medium text-ads360yellow-100"
               >
-                Send Request
-              </button>
+                ← Back to campaigns
+              </Link>
             </div>
-          </form>
-        </div>
-      </Modal>
-        
-
-
-
-      
+          </div>
+        )}
+      </div>
     </section>
-  )
-}
+  );
+};
 
 export const Route = createFileRoute("/_usersauth/users/campaign/$slug/")({
-  component: Checkout,
-})
+  component: CampaignDetail,
+});
 
-export default Checkout
+export default CampaignDetail;

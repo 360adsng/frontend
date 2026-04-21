@@ -16,6 +16,8 @@ const add = '/icons/usericon/add.svg'
 const list = '/icons/usericon/list.svg'
 const onlist = '/icons/usericon/yellowlist.svg'
 const onAdd = '/icons/usericon/addyellow.svg'
+const negotiations = '/icons/usericon/whitecampaign.svg'
+const onnegotiations = '/icons/usericon/oncampaign.svg'
 
 interface Props {
     toggleDrawer: ()=>void
@@ -49,6 +51,12 @@ const BillBoardDrawerContent : React.FC<Props> = ({toggleDrawer}) => {
             off:campaign,
             on:oncampaign
 
+        },
+        {
+            link:'/vendors/billboards/negotiations',
+            name:'Negotiations',
+            off:negotiations,
+            on:onnegotiations
         },
         {
             link:'/vendors/billboards/listing',

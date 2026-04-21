@@ -45,6 +45,40 @@ export type {
 export { changePassword, getMe, updateProfile } from './users/users';
 export { changePassword, getMe, updateProfile, uploadProfilePhoto } from './users/users';
 export { useChangePassword, useMe, useUpdateProfile, useUploadProfilePhoto } from './users/useUsers';
+export {
+  createBillboardListing,
+  getBrowseBillboardListings,
+  getMyBillboardListings,
+  type CreateBillboardListingPayload,
+  type CreateBillboardListingResponse,
+  type PublicBillboardListing,
+} from './billboard/billboard';
+export {
+  useBrowseBillboardListings,
+  useCreateBillboardListing,
+  useMyBillboardListings,
+} from './billboard/useBillboard';
+export {
+  getSavedPaymentCards,
+  getWallet,
+  getWalletTransactions,
+  postWalletDeposit,
+  type SavedPaymentCardDto,
+  type TransactionDto,
+  type TransactionStatus,
+  type TransactionType,
+  type WalletDepositPayload,
+  type WalletDepositResponse,
+  type WalletDto,
+} from './wallet/wallet';
+export {
+  useInvalidateWalletQueries,
+  useSavedPaymentCards,
+  useWallet,
+  useWalletDeposit,
+  useWalletTransactions,
+} from './wallet/useWallet';
+export type { CreateBillboardListingVariables } from './billboard/useBillboard';
 export type {
   ChangePasswordPayload,
   MeResponse,

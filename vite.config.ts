@@ -29,6 +29,7 @@ export default defineConfig({
       '@public': path.resolve(__dirname, 'public'),
       '@styles': path.resolve(__dirname, 'styles'),
       '@utils': path.resolve(__dirname, 'utils'),
+      '@lib': path.resolve(__dirname, 'lib'),
     },
   },
   plugins: [
