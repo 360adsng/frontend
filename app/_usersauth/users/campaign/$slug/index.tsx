@@ -1,21 +1,28 @@
 "use client";
 
+import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   useBillboardBooking,
   useCompleteBillboardBooking,
+  useDisputeBillboardBooking,
 } from "@endpoint/billboard/useBillboard";
 import CreativeMedia from "@components/ui/CreativeMedia";
 import {
+  CampaignDisputeNotice,
   CampaignPaymentStatusBadge,
   CampaignStatusBadge,
+  disputeNoticeChatLinkClassNames,
+  disputeNoticeHeaderPillClassNames,
   formatCampaignMoney,
   formatDateRange,
   InfoCard,
   MediaFrame,
   personDisplayName,
+  resolveDisputeNoticePhase,
   SectionLabel,
 } from "@components/campaign/CampaignDetailShared";
+import { CampaignDisputeModal } from "@components/campaign/CampaignDisputeModal";
 import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
 
 const CampaignDetail = () => {
@@ -25,6 +32,8 @@ const CampaignDetail = () => {
     Number.isFinite(id) && id > 0 ? id : null,
   );
   const complete = useCompleteBillboardBooking();
+  const disputeBooking = useDisputeBillboardBooking();
+  const [disputeOpen, setDisputeOpen] = useState(false);
   const b = booking.data;
 
   const isPaid = b?.paymentStatus === "paid" || b?.status === "paid";
@@ -33,6 +42,17 @@ const CampaignDetail = () => {
     isPaid &&
     b?.paymentStatus !== "refunded" &&
     b?.status === "active";
+
+  const disputePhase = b
+    ? resolveDisputeNoticePhase({
+        bookingStatus: b.status ?? null,
+        paymentStatus: b.paymentStatus ?? null,
+        disputedAt: b.disputedAt ?? null,
+        disputeReason: b.disputeReason ?? null,
+        disputeChatHasThread: b.disputeChatHasThread ? true : false,
+      })
+    : null;
+  const showDisputeBanner = disputePhase !== null;
 
   return (
     <section className="min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12">
@@ -58,6 +78,17 @@ const CampaignDetail = () => {
               <div className="flex flex-wrap items-center gap-2 self-end sm:self-start sm:justify-end">
                 <CampaignStatusBadge status={b.status} />
                 <CampaignPaymentStatusBadge paymentStatus={b.paymentStatus} />
+                {showDisputeBanner ? (
+                  <Link
+                    to="/users/campaign/$slug/dispute-chat"
+                    params={{ slug: String(b.id) }}
+                    className={`${disputeNoticeHeaderPillClassNames(disputePhase)}`}
+                  >
+                    {disputePhase === "active"
+                      ? "Open dispute chat"
+                      : "View dispute chat"}
+                  </Link>
+                ) : null}
                 <Link
                   to="/users/campaign"
                   className="text-xl leading-none text-stone-400 transition hover:text-stone-700"
@@ -81,20 +112,6 @@ const CampaignDetail = () => {
                 </span>
               </div>
             </div>
-
-            {!isPaid && (
-              <div className="mx-5 my-4 rounded-xl border border-amber-200/50 bg-amber-50/50 p-4 text-sm text-stone-700 sm:mx-7">
-                This booking is not paid yet. Unpaid and negotiating bookings
-                are under{" "}
-                <Link
-                  to="/users/negotiations"
-                  className="font-medium text-ads360yellow-100 underline"
-                >
-                  Negotiations
-                </Link>
-                .
-              </div>
-            )}
 
             <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7">
               <InfoCard
@@ -185,8 +202,39 @@ const CampaignDetail = () => {
               </MediaFrame>
             </div>
 
+            {showDisputeBanner && disputePhase !== null ? (
+              <div className="px-5 pb-4 sm:px-7">
+                <CampaignDisputeNotice
+                  disputeReason={b.disputeReason ?? null}
+                  disputedAt={b.disputedAt ?? null}
+                  bookingStatus={b.status ?? null}
+                  paymentStatus={b.paymentStatus ?? null}
+                  disputeChatHasThread={b.disputeChatHasThread}
+                  chatLink={
+                    <Link
+                      to="/users/campaign/$slug/dispute-chat"
+                      params={{ slug: String(id) }}
+                      className={disputeNoticeChatLinkClassNames(disputePhase)}
+                    >
+                      {disputePhase === "active"
+                        ? "Open dispute chat"
+                        : "View dispute chat"}
+                    </Link>
+                  }
+                />
+              </div>
+            ) : null}
+
             {canComplete && (
-              <div className="flex justify-end border-t border-stone-100 px-5 py-5 sm:px-7">
+              <div className="flex flex-wrap justify-end gap-3 border-t border-stone-100 px-5 py-5 sm:px-7">
+                <button
+                  type="button"
+                  disabled={disputeBooking.isPending}
+                  onClick={() => setDisputeOpen(true)}
+                  className="rounded-xl border-2 border-orange-800 bg-white px-5 py-2.5 text-sm font-semibold text-orange-950 transition hover:bg-orange-50 disabled:opacity-50"
+                >
+                  Dispute
+                </button>
                 <button
                   type="button"
                   disabled={complete.isPending}
@@ -200,6 +248,18 @@ const CampaignDetail = () => {
                 </button>
               </div>
             )}
+
+            <CampaignDisputeModal
+              isOpen={disputeOpen}
+              onClose={() => setDisputeOpen(false)}
+              isSubmitting={disputeBooking.isPending}
+              title="Dispute billboard campaign"
+              onSubmit={async (reason) => {
+                if (!Number.isFinite(id) || id <= 0) return;
+                await disputeBooking.mutateAsync({ bookingId: id, reason });
+                setDisputeOpen(false);
+              }}
+            />
 
             <div className="px-5 pb-6 sm:px-7">
               <Link

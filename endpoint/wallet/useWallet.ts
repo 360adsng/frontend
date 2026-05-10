@@ -59,8 +59,20 @@ export function useWalletDeposit() {
 }
 
 export function usePayNow() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: PayNowPayload) => postPayNow(body),
+    onSuccess: async (_data, variables) => {
+      await qc.invalidateQueries({ queryKey: ["wallet"] });
+      await qc.invalidateQueries({ queryKey: ["wallet", "transactions"] });
+      if (variables.bookingKind === "influencer") {
+        await qc.invalidateQueries({ queryKey: ["ads", "influencer-booking"] });
+        await qc.invalidateQueries({ queryKey: ["influencer", "bookings", "mine"] });
+      } else {
+        await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+        await qc.invalidateQueries({ queryKey: ["billboard", "bookings", "mine"] });
+      }
+    },
     onError: (error) => {
       toast.error(depositErrorMessage(error));
     },

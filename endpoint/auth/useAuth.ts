@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
   ApiError,
@@ -6,6 +6,10 @@ import {
   saveAccountType,
   saveAuthTokens,
 } from "../baseFetch";
+import {
+  invalidateSessionAfterLogin,
+  removeSessionQueriesOnLogout,
+} from "../query/sessionScopedQueries";
 import { login, logout, register, vendorOnboarding } from "./auth";
 import type { LoginResponse } from "./types";
 
@@ -28,14 +32,16 @@ export function useRegister() {
 }
 
 export function useLogin() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: login,
-    onSuccess: (data: LoginResponse) => {
+    onSuccess: async (data: LoginResponse) => {
       saveAuthTokens({
         accessToken: data.accessToken,
         refreshToken: data.refreshToken,
       });
       saveAccountType(data.accountType);
+      await invalidateSessionAfterLogin(queryClient);
       toast.success("Logged in successfully.");
     },
     onError: (error) => {
@@ -45,14 +51,17 @@ export function useLogin() {
 }
 
 export function useLogout() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: logout,
-    onSuccess: () => {
+    onSuccess: async () => {
+      await removeSessionQueriesOnLogout(queryClient);
       clearAuthTokens();
       toast.success("Logged out.");
     },
-    onError: (error) => {
+    onError: async (error) => {
       // Even if the backend fails (expired token), we still clear locally.
+      await removeSessionQueriesOnLogout(queryClient);
       clearAuthTokens();
       toast.error(errorMessage(error));
     },

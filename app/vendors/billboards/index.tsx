@@ -131,6 +131,7 @@ const BillBoardDashboard = () => {
               { value: "all", label: "All" },
               { value: "pending", label: "Pending" },
               { value: "active", label: "Active" },
+              { value: "dispute", label: "Dispute" },
               { value: "rejected", label: "Rejected" },
               { value: "completed", label: "Completed" },
             ]}

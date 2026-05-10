@@ -2,9 +2,20 @@ export type AccountType =
   | "regular_user"
   | "business_user"
   | "billboard_owner"
+  | "influencer"
   | "admin";
 
 export type MeResponse =
+  | {
+      id: number;
+      email: string;
+      phone: string;
+      accountType: "admin";
+      firstName: string;
+      lastName: string;
+      alternatePhoneNumber?: string | null;
+      roles: string[];
+    }
   | {
       id: number;
       email: string;
@@ -27,6 +38,37 @@ export type MeResponse =
       businessDescription?: string | null;
       alternatePhoneNumber?: string | null;
       profileImage?: string | null;
+    }
+  | {
+      id: number;
+      email: string;
+      phone: string;
+      accountType: "billboard_owner";
+      businessName: string | null;
+      contactName: string | null;
+      businessDescription?: string | null;
+      address?: string | null;
+      alternatePhoneNumber?: string | null;
+      businessWebsite?: string | null;
+      contactPersonEmail?: string | null;
+      contactPersonPosition?: string | null;
+      billboardCoverage?: Array<{ state: string; lga: string[] }>;
+      profileImage?: string | null;
+    }
+  | {
+      id: number;
+      email: string;
+      phone: string;
+      accountType: "influencer";
+      firstName: string;
+      lastName: string;
+      mediaName: string | null;
+      influencerType?: string | null;
+      address?: string | null;
+      alternatePhoneNumber?: string | null;
+      bio?: string | null;
+      allowNegotiation?: boolean;
+      profileImage?: string | null;
     };
 
 export type UpdateProfilePayload = Partial<{
@@ -37,8 +79,17 @@ export type UpdateProfilePayload = Partial<{
   address: string;
   alternatePhoneNumber: string;
   // business
+  businessName: string;
   contactName: string;
   businessDescription: string;
+  businessWebsite: string;
+  contactPersonEmail: string;
+  contactPersonPosition: string;
+  billboardCoverage: Array<{ state: string; lga: string[] }>;
+  // influencer
+  mediaName: string;
+  bio: string;
+  allowNegotiation: boolean;
 }>;
 
 export type ChangePasswordPayload = {
@@ -47,6 +98,9 @@ export type ChangePasswordPayload = {
 };
 
 export type SimpleMessageResponse = { message: string };
+
+export type BillboardCoverageRow = { state: string; lga: string[] };
+export type MyBillboardCoverageResponse = { billboardCoverage: BillboardCoverageRow[] };
 
 export type UserDashboardData = {
   walletBalance: number;

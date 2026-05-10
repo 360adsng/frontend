@@ -36,6 +36,7 @@ export type LoginResponse = {
     | "regular_user"
     | "business_user"
     | "billboard_owner"
+    | "influencer"
     | "admin";
   phoneNumber: string;
   isEmailVerified: string | null;
@@ -52,7 +53,8 @@ export type VendorInviteAccountType =
   | "admin"
   | "regular_user"
   | "business_user"
-  | "billboard_owner";
+  | "billboard_owner"
+  | "influencer";
 
 export type BillboardCoverageDto = { state: string; lga: string[] };
 
@@ -84,9 +86,10 @@ export type VendorOnboardingResponse =
   | {
       email: string;
       accountType: VendorInviteAccountType;
-      step: "account" | "business" | "contact" | "fix";
+      step: "account" | "business" | "contact" | "fix" | "profile" | "platforms";
       user: VendorOnboardingUser | null;
       business: PublicBillboardBusiness | null;
+      profile?: PublicInfluencerProfile | null;
       onboardingProgress?: number;
     }
   | {
@@ -94,7 +97,77 @@ export type VendorOnboardingResponse =
       accountType: VendorInviteAccountType;
       status: "submitted";
       businessStatus: string | null;
+      user?: VendorOnboardingUser | null;
+      profile?: PublicInfluencerProfile | null;
     };
+
+export type PublicInfluencerPlatform = {
+  id: number;
+  name: string;
+  platformUrl: string;
+  username: string;
+  numberOfFollowers: number;
+  estimatedImpressions: number;
+  amountRate: number;
+};
+
+export type PublicInfluencerProfile = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  mediaName: string;
+  influencerType?: string | null;
+  profilePicture?: string | null;
+  alternativePhone?: string | null;
+  address: string;
+  bio?: string | null;
+  allowNegotiation?: boolean;
+  userId: number;
+  platforms: PublicInfluencerPlatform[];
+};
+
+export type InfluencerSignupPayload =
+  | {
+      inviteToken: string;
+      step: 1;
+      phoneNumber: string;
+      password: string;
+    }
+  | {
+      inviteToken: string;
+      step: 2;
+      firstName: string;
+      lastName: string;
+      mediaName: string;
+      alternativePhone?: string;
+      address: string;
+      bio?: string;
+      allowNegotiation?: boolean;
+      influencerType?: string;
+      profilePictureDataUrl?: string;
+      profilePictureUrl?: string;
+    }
+  | {
+      inviteToken: string;
+      step: 3;
+      platforms: Array<{
+        name: string;
+        platformUrl: string;
+        username: string;
+        numberOfFollowers: number;
+        estimatedImpressions: number;
+        amountRate: number;
+      }>;
+    };
+
+export type InfluencerSignupResponse = {
+  step: number;
+  message: string;
+  onboardingProgress?: number;
+  user?: VendorOnboardingUser;
+  profile?: PublicInfluencerProfile | null;
+  status?: "submitted";
+};
 
 export type BillboardOwnerSignupPayload =
   | {

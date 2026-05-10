@@ -9,6 +9,7 @@ type VendorRequestsFilter =
   | "abandoned"
   | "pending"
   | "active"
+  | "dispute"
   | "rejected"
   | "completed";
 
@@ -72,6 +73,7 @@ const Requests = () => {
               <option value="abandoned">Abandoned (unpaid 4+ days)</option>
               <option value="pending">Pending</option>
               <option value="active">Active</option>
+              <option value="dispute">Dispute</option>
               <option value="rejected">Rejected</option>
               <option value="completed">Completed</option>
             </select>
@@ -97,6 +99,7 @@ const Requests = () => {
               { value: "abandoned", label: "Abandoned (unpaid 4+ days)" },
               { value: "pending", label: "Pending" },
               { value: "active", label: "Active" },
+              { value: "dispute", label: "Dispute" },
               { value: "rejected", label: "Rejected" },
               { value: "completed", label: "Completed" },
             ]}

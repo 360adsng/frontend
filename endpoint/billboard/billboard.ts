@@ -68,9 +68,52 @@ export type PublicBillboardListing = {
   illumination: string | null;
   facingDirection: string | null;
   imageUrl: string;
+  ownerCompanyName?: string | null;
   createdAt: string;
   updatedAt: string;
 };
+
+export type SetListingAvailabilityPayload = { isAvailable: boolean };
+export type SetListingAvailabilityResponse = {
+  message: string;
+  listing: PublicBillboardListing;
+};
+
+export function setMyBillboardListingAvailability(
+  id: number,
+  payload: SetListingAvailabilityPayload,
+): Promise<SetListingAvailabilityResponse> {
+  return baseFetchJson<SetListingAvailabilityResponse>(
+    `/billboard/listings/mine/${id}/availability`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export type UpdateBillboardListingResponse = {
+  message: string;
+  listing: PublicBillboardListing;
+};
+
+export function updateMyBillboardListing(
+  id: number,
+  payload: CreateBillboardListingPayload,
+  imageFile?: File | null,
+): Promise<UpdateBillboardListingResponse> {
+  const form = new FormData();
+  form.append("payload", JSON.stringify(payload));
+  if (imageFile) form.append("file", imageFile);
+  return baseFetchJson<UpdateBillboardListingResponse>(
+    `/billboard/listings/mine/${id}`,
+    {
+      method: "PATCH",
+      body: form,
+    },
+  );
+}
 
 export type BillboardListQueryParams = {
   page?: number;
@@ -132,6 +175,9 @@ export type BillboardBooking = {
   activeAt?: string | null;
   rejectedAt?: string | null;
   completedAt?: string | null;
+  disputeReason?: string | null;
+  disputedAt?: string | null;
+  disputeChatHasThread?: boolean;
   listing: {
     id: number;
     name: string;
@@ -347,6 +393,9 @@ export type VendorDashboardCampaign = {
   amount: number;
   status: string;
   paymentStatus: string;
+  disputeReason?: string | null;
+  disputedAt?: string | null;
+  disputeChatHasThread?: boolean;
 };
 
 export type BillboardOwnerDashboardResponse = {
@@ -429,6 +478,22 @@ export function completeBillboardBooking(
 }> {
   return baseFetchJson(`/billboard/bookings/${bookingId}/complete`, {
     method: "POST",
+  });
+}
+
+export function disputeBillboardBooking(
+  bookingId: number,
+  payload: { reason: string },
+): Promise<{
+  bookingId: number;
+  status: string;
+  paymentStatus?: string;
+  disputeReason: string | null;
+  disputedAt: string | null;
+}> {
+  return baseFetchJson(`/billboard/bookings/${bookingId}/dispute`, {
+    method: "POST",
+    body: payload,
   });
 }
 

@@ -17,8 +17,12 @@ import {
   postVendorBillboardNegotiation,
   markVendorBookingActive,
   completeBillboardBooking,
+  disputeBillboardBooking,
   rejectVendorBillboardBooking,
   getBillboardOwnerDashboard,
+  setMyBillboardListingAvailability,
+  updateMyBillboardListing,
+  type SetListingAvailabilityPayload,
   type BillboardBookingListItem,
   type BillboardBookingsQueryParams,
   type BillboardListQueryParams,
@@ -26,6 +30,7 @@ import {
   type BookerNegotiationResponsePayload,
   type CreateBillboardBookingPayload,
   type CreateBillboardListingPayload,
+  type UpdateBillboardListingResponse,
   type VendorNegotiationPayload,
   type BillboardOwnerDashboardResponse,
 } from "./billboard";
@@ -73,6 +78,22 @@ export function useMyBillboardListing(id: number | null) {
   });
 }
 
+export function useSetMyBillboardListingAvailability() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { id: number; payload: SetListingAvailabilityPayload }) =>
+      setMyBillboardListingAvailability(vars.id, vars.payload),
+    onSuccess: async (data) => {
+      toast.success(data?.message ?? "Updated");
+      await qc.invalidateQueries({ queryKey: ["billboard", "listing"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "listings"] });
+    },
+    onError: (error) => {
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
 export function useCreateBillboardListing() {
   const qc = useQueryClient();
   return useMutation({
@@ -80,6 +101,28 @@ export function useCreateBillboardListing() {
       createBillboardListing(payload, imageFile),
     onSuccess: async (data) => {
       toast.success(data?.message ?? "Billboard listing created.");
+      await qc.invalidateQueries({ queryKey: ["billboard", "listings"] });
+    },
+    onError: (error) => {
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+export type UpdateBillboardListingVariables = {
+  id: number;
+  payload: CreateBillboardListingPayload;
+  imageFile?: File | null;
+};
+
+export function useUpdateMyBillboardListing() {
+  const qc = useQueryClient();
+  return useMutation<UpdateBillboardListingResponse, unknown, UpdateBillboardListingVariables>({
+    mutationFn: ({ id, payload, imageFile }) =>
+      updateMyBillboardListing(id, payload, imageFile),
+    onSuccess: async (data) => {
+      toast.success(data?.message ?? "Billboard listing updated.");
+      await qc.invalidateQueries({ queryKey: ["billboard", "listing"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "listings"] });
     },
     onError: (error) => {
@@ -120,6 +163,7 @@ export function useNegotiateBillboardBooking() {
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));
@@ -138,6 +182,7 @@ export function useVendorBillboardNegotiation() {
       toast.success(data?.message ?? "Updated");
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));
@@ -156,6 +201,7 @@ export function useBookerNegotiationResponse() {
       toast.success(data?.message ?? "Updated");
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));
@@ -221,6 +267,7 @@ export function useMarkVendorBookingActive() {
       toast.success("Campaign accepted and marked active");
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));
@@ -236,6 +283,24 @@ export function useCompleteBillboardBooking() {
       toast.success("Campaign completed");
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
+    },
+    onError: (error) => {
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+export function useDisputeBillboardBooking() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (vars: { bookingId: number; reason: string }) =>
+      disputeBillboardBooking(vars.bookingId, { reason: vars.reason.trim() }),
+    onSuccess: async () => {
+      toast.success("Dispute recorded. Support may follow up if needed.");
+      await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));
@@ -252,6 +317,7 @@ export function useRejectVendorBillboardBooking() {
       toast.success("Campaign rejected; refund processed where applicable");
       await qc.invalidateQueries({ queryKey: ["billboard", "bookings"] });
       await qc.invalidateQueries({ queryKey: ["billboard", "booking"] });
+      await qc.invalidateQueries({ queryKey: ["billboard", "dashboard", "owner"] });
     },
     onError: (error) => {
       toast.error(errorMessage(error));

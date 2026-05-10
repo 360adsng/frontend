@@ -12,6 +12,7 @@ const onanalysis = '/icons/usericon/onanalysis.svg'
 const negotiations = '/icons/usericon/offnegotiation.svg'
 const onnegotiations = '/icons/usericon/onnegotiation.svg'
 import { Link, useRouterState } from "@tanstack/react-router"
+import { FiHelpCircle } from "react-icons/fi"
 // import cluster from '@public/icons/usericon/whitecluster.svg'
 
 
@@ -64,7 +65,12 @@ function UserSideNav() {
             off:settings,
             on:onsettings
 
-        }
+        },
+        {
+            link:'/users/help-support',
+            name:'Help & support',
+            kind: 'help' as const,
+        },
     ]
 
 
@@ -113,26 +119,43 @@ function UserSideNav() {
             {
                 navItem2.map((items, i)=>(
                     <li key={i}>
-                        {pathname === items.link?
+                        {'kind' in items && items.kind === 'help' ? (
+                            pathname.startsWith(items.link) ? (
+                                <Link to={items.link} className='border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex items-center'>
+                                    <FiHelpCircle className='w-6 h-6 shrink-0 text-ads360yellow-100' aria-hidden />
+                                    <span className='hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
+                                        {items.name}
+                                    </span>
+                                </Link>
+                            ) : (
+                                <Link to={items.link} className='py-2 px-4 flex items-center'>
+                                    <FiHelpCircle className='w-6 h-6 shrink-0 text-white' aria-hidden />
+                                    <span className='hidden group-hover:block px-2 xl:px-4 hover:font-bold'>
+                                        {items.name}
+                                    </span>
+                                </Link>
+                            )
+                        ) : (
+                            pathname === items.link ?
 
-                        <Link to={items.link} className='border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
-                            <img src={items.on}
-                                alt={items.name}
-                            />
-                            <span className='hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
-                                {items.name}
-                            </span>
-                        </Link>
-                        :
-                        <Link to={items.link} className='py-2 px-4 flex'>
-                            <img src={items.off}
-                                alt={items.name}
-                            />
-                            <span className='hidden group-hover:block px-2 xl:px-4 hover:font-bold'>
-                                {items.name}
-                            </span>
-                        </Link>
-                        }
+                            <Link to={items.link} className='border-l-2 border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
+                                <img src={items.on}
+                                    alt={items.name}
+                                />
+                                <span className='hidden group-hover:block text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
+                                    {items.name}
+                                </span>
+                            </Link>
+                            :
+                            <Link to={items.link} className='py-2 px-4 flex'>
+                                <img src={items.off}
+                                    alt={items.name}
+                                />
+                                <span className='hidden group-hover:block px-2 xl:px-4 hover:font-bold'>
+                                    {items.name}
+                                </span>
+                            </Link>
+                        )}
                     </li>
                 ))
             }

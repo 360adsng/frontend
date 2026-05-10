@@ -6,11 +6,13 @@ export const ACCOUNT_TYPE = {
   REGULAR_USER: "regular_user",
   BUSINESS_USER: "business_user",
   BILLBOARD_OWNER: "billboard_owner",
+  INFLUENCER: "influencer",
   ADMIN: "admin",
 } as const;
 
 const USER_DASHBOARD = "/users";
 const BILLBOARD_DASHBOARD = "/vendors/billboards";
+const INFLUENCER_DASHBOARD = "/vendors/influencers";
 const ADMIN_DASHBOARD = "/admin";
 const SIGN_IN = "/signin";
 
@@ -24,6 +26,8 @@ export function getDashboardPathForAccountType(
       return USER_DASHBOARD;
     case ACCOUNT_TYPE.BILLBOARD_OWNER:
       return BILLBOARD_DASHBOARD;
+    case ACCOUNT_TYPE.INFLUENCER:
+      return INFLUENCER_DASHBOARD;
     case ACCOUNT_TYPE.ADMIN:
       return ADMIN_DASHBOARD;
     default:

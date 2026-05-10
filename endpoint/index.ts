@@ -4,7 +4,6 @@ export {
   addResponseInterceptor,
   addResponseErrorInterceptor,
   ApiError,
-  AuthTokensPayload,
   baseFetch,
   baseFetchJson,
   clearAuthTokens,
@@ -21,6 +20,7 @@ export {
   type ResponseErrorInterceptor,
   type ResponseInterceptor,
 } from './baseFetch';
+export type { AuthTokensPayload } from './baseFetch';
 
 export {
   billboardOwnerSignup,
@@ -42,8 +42,12 @@ export type {
   VendorOnboardingResponse,
 } from './auth/types';
 
-export { changePassword, getMe, updateProfile } from './users/users';
-export { changePassword, getMe, updateProfile, uploadProfilePhoto } from './users/users';
+export {
+  changePassword,
+  getMe,
+  updateProfile,
+  uploadProfilePhoto,
+} from './users/users';
 export { useChangePassword, useMe, useUpdateProfile, useUploadProfilePhoto } from './users/useUsers';
 export {
   createBillboardListing,
@@ -79,6 +83,24 @@ export {
   useWalletTransactions,
 } from './wallet/useWallet';
 export type { CreateBillboardListingVariables } from './billboard/useBillboard';
+
+export {
+  getMySupportTickets,
+  getSupportTicket,
+  createSupportTicket,
+  addSupportMessage,
+  parseSupportTicketId,
+  type SupportTicketSummary,
+  type SupportTicketDetail,
+  type SupportMessageDto,
+} from './support/support';
+export {
+  supportQueryKeys,
+  useMySupportTickets,
+  useSupportTicket,
+  useCreateSupportTicket,
+  useAddSupportMessage,
+} from './support/useSupport';
 export type {
   ChangePasswordPayload,
   MeResponse,

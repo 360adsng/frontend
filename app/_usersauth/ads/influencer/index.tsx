@@ -1,26 +1,23 @@
 ;
 import { Link, createFileRoute } from '@tanstack/react-router';
-
-//import images
-
-const angleDown = '/icons/angledown.svg'
-const inf = '/del/team.jpg'
-const inf2 = '/del/dav.png'
-const inf3 = '/del/girl.jpg'
-const mark = '/icons/mark.svg'
-const Arrowleft = '/icons/Arrowleft.svg'
-const cancel = '/icons/usericon/modalCancelBotton.svg'
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { BsSuitHeart, BsSuitHeartFill } from "react-icons/bs";
 
 import { Modal } from "@components/modal/modal";
 import BackBtn from "@components/buttons/BackBtn";
 import Steps from "@components/ui/Steps";
+import { useInfluencerDirectory } from "@endpoint/influencer/useInfluencer";
+
+const FALLBACK_PHOTO = "/icons/user.png";
 
 function Influencer() {
-  const [filter, setFilter] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const [wishlist, setWishlist] = useState([4, 8, 2, 9]);
+  const [q, setQ] = useState("");
+  const [influencerType, setInfluencerType] = useState<string>("");
+  const [allowNegotiation, setAllowNegotiation] = useState<string>("");
+  const [page, setPage] = useState(1);
+  const limit = 12;
   
   const handleWishlist = (influencerId: number) => {
     if (wishlist.includes(influencerId)) {
@@ -30,146 +27,27 @@ function Influencer() {
     }
   };
 
-  const influencers = [
-    {
-      id: 1,
-      name: "Pankeeroy",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf,
-      reach: "180K",
-    },
-    {
-      id: 2,
-      name: "Kraks Tv",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    {
-      id: 3,
-      name: "Pankeeroy",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 4,
-      name: "Pankeeroy",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf,
-      reach: "180K",
-    },
-    {
-      id: 5,
-      name: "Rodney",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    {
-      id: 6,
-      name: "SplufikNg",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 7,
-      name: "Tiwalola",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf,
-      reach: "180K",
-    },
-    {
-      id: 8,
-      name: "Egbami",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    {
-      id: 9,
-      name: "SplufikNg",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 10,
-      name: "SplufikNg",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 11,
-      name: "Tiwalola",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf,
-      reach: "180K",
-    },
-    {
-      id: 12,
-      name: "Egbami",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    {
-      id: 13,
-      name: "Egbami",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    {
-      id: 14,
-      name: "SplufikNg",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 15,
-      name: "SplufikNg",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf3,
-      reach: "170K",
-    },
-    {
-      id: 16,
-      name: "Tiwalola",
-      occupation: "influencer",
-      negotiable: "no",
-      image: inf,
-      reach: "180K",
-    },
-    {
-      id: 17,
-      name: "Egbami",
-      occupation: "influencer",
-      negotiable: "yes",
-      image: inf2,
-      reach: "190K",
-    },
-    
-    
-  ];
+  const query = useMemo(() => {
+    const allow =
+      allowNegotiation === "" ? undefined : allowNegotiation === "true";
+    return {
+      page,
+      limit,
+      q: q.trim() || undefined,
+      influencerType: influencerType || undefined,
+      allowNegotiation: allow,
+    };
+  }, [allowNegotiation, influencerType, limit, page, q]);
+
+  const dir = useInfluencerDirectory(query);
+  const influencers = dir.data?.items ?? [];
+  const totalPages = dir.data?.totalPages ?? 1;
+
+  const fmtFollowers = (n: number) => {
+    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+    return String(n);
+  };
 
   return (
     <>
@@ -181,8 +59,28 @@ function Influencer() {
 
 
         <section className="lg:flex my-5">
-          <div className="gap-5 md:px-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 basis-4/5">
-            {influencers.map((influencer) => (
+          <div className="basis-4/5">
+            <div className="md:px-5 mb-4">
+              <input
+                value={q}
+                onChange={(e) => {
+                  setQ(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search influencer by media name..."
+                className="w-full md:w-1/2 rounded border bg-white p-2 focus:outline-none"
+              />
+            </div>
+
+            {dir.isLoading ? (
+              <div className="md:px-5 text-sm text-gray-600">Loading...</div>
+            ) : dir.isError ? (
+              <div className="md:px-5 text-sm text-red-600">
+                Could not load influencers.
+              </div>
+            ) : (
+              <div className="gap-5 md:px-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                {influencers.map((influencer) => (
           
               <div
                 key={influencer.id}
@@ -190,18 +88,23 @@ function Influencer() {
               >
                 <div className="p-1">
                 <Link to={`/ads/influencer/${influencer.id}`}>
-                  <img alt="" src={influencer.image} className="w-full h-32 rounded-10"/>
+                  <img
+                    alt=""
+                    src={influencer.photo || FALLBACK_PHOTO}
+                    className="w-full h-32 rounded-10 object-cover"
+                  />
                   </Link>
                 </div>
                 <div className="relative grid grid-cols-1 content-center">
-   
-                  {
-                    influencer.negotiable === 'yes' && <p className="text-xs rounded-tr-10 text-ads360light-100 p-1 bg-ads360yellow-100 absolute top-0 right-0">Negotiable</p>
-                  }
-                  <h2 className="font-bold truncate ...">{influencer.name}</h2>
+                  {influencer.allowNegotiation ? (
+                    <p className="text-xs rounded-tr-10 text-ads360light-100 p-1 bg-ads360yellow-100 absolute top-0 right-0">
+                      Negotiable
+                    </p>
+                  ) : null}
+                  <h2 className="font-bold truncate ...">{influencer.mediaName}</h2>
                   <div className="text-sm text-gray-400">
-                  <p>{influencer.occupation}</p>
-                  <p>{influencer.reach}</p>
+                  <p>Influencer</p>
+                  <p>{fmtFollowers(influencer.followers)} followers</p>
                   </div>
                   <div className="font-semibold text-ads360yellowBtn-100 hover:bg-ads360yellowBtn-100/30 hover:rounded-full flex justify-center w-8 h-8 p-2">
                     {
@@ -215,7 +118,29 @@ function Influencer() {
                 </div>
               </div>
          
-            ))}
+                ))}
+              </div>
+            )}
+
+            <div className="md:px-5 mt-6 flex items-center justify-between">
+              <button
+                className="rounded border bg-white px-3 py-2 text-sm disabled:opacity-50"
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Prev
+              </button>
+              <div className="text-sm text-gray-600">
+                Page {page} of {totalPages}
+              </div>
+              <button
+                className="rounded border bg-white px-3 py-2 text-sm disabled:opacity-50"
+                disabled={page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </button>
+            </div>
           </div>
 
 
@@ -225,49 +150,64 @@ function Influencer() {
 
               <div className="my-2">
                 <p>influencer Type</p>
-                <select className="p-2 w-full border focus:outline-none rounded">
-                  <option>select</option>
-                  <option>Double faced Gantry LED</option>
-                  <option>Single faced Gantry LED</option>
-                  <option>Double faced Gantry LED</option>
+                <select
+                  className="p-2 w-full border focus:outline-none rounded"
+                  value={influencerType}
+                  onChange={(e) => {
+                    setInfluencerType(e.target.value);
+                    setPage(1);
+                  }}
+                >
+                  <option value="">All</option>
+                  <option value="influencer">Influencer</option>
+                  <option value="content creator">Content creator</option>
+                  <option value="brand">Brand</option>
+                  <option value="agency">Agency</option>
+                  <option value="advertiser">Advertiser</option>
+                  <option value="marketing agency">Marketing agency</option>
+                  <option value="ad network">Ad network</option>
+                  <option value="actor">Actor</option>
+                  <option value="actress">Actress</option>
+                  <option value="model">Model</option>
+                  <option value="musician">Musician</option>
+                  <option value="dancer">Dancer</option>
+                  <option value="comedian">Comedian</option>
+                  <option value="writer">Writer</option>
+                  <option value="director">Director</option>
+                  <option value="producer">Producer</option>
+                  <option value="editor">Editor</option>
+                  <option value="photographer">Photographer</option>
+                  <option value="videographer">Videographer</option>
+                  <option value="graphic designer">Graphic designer</option>
+                  <option value="seo specialist">SEO specialist</option>
+                  <option value="social media manager">Social media manager</option>
+                  <option value="social media specialist">Social media specialist</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
-
-              <div className="my-2">
-                <p>Price Range</p>
-                <div className="flex justify-between space-x-1">
-                  <div className="basis-1/2">
-                    <label>from:</label>
-                    <input
-                      type="number"
-                      className="rounded w-full border focus:outline-none p-2"
-                    />
-                  </div>
-
-                  <div className="basis-1/2">
-                    <label>to:</label>
-                    <input
-                      type="number"
-                      className="rounded w-full border focus:outline-none p-2"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              
 
               <div className="my-2">
                 <p>Status</p>
-                <select className="p-2 w-full border focus:outline-none rounded">
-                  <option>Negotiable</option>
-                  <option>Non Negotiable</option>
+                <select
+                  className="p-2 w-full border focus:outline-none rounded"
+                  value={allowNegotiation}
+                  onChange={(e) => {
+                    setAllowNegotiation(e.target.value);
+                    setPage(1);
+                  }}
+                >
+                  <option value="">All</option>
+                  <option value="true">Negotiable</option>
+                  <option value="false">Non Negotiable</option>
                 </select>
               </div>
 
-              <button 
-              className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3  text-white  w-2/6 h-10'>
-              Search
-          </button>
+              <button
+                className='bg-ads360black-100/95 hover:bg-ads360black-100 rounded mt-3 text-white w-full h-10'
+                onClick={() => setPage(1)}
+              >
+                Apply
+              </button>
             </div>
           </div>
         </section>

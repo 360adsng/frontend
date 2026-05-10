@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './app/__root'
 import { Route as UsersauthRouteRouteImport } from './app/_usersauth/route'
 import { Route as AdminRouteRouteImport } from './app/_admin/route'
 import { Route as IndexRouteImport } from './app/index'
+import { Route as VendorsInfluencersRouteRouteImport } from './app/vendors/influencers/route'
 import { Route as VendorsBillboardsRouteRouteImport } from './app/vendors/billboards/route'
 import { Route as UsersauthUsersRouteRouteImport } from './app/_usersauth/users/route'
 import { Route as UsersauthAdsRouteRouteImport } from './app/_usersauth/ads/route'
@@ -27,16 +28,28 @@ import { Route as AdminAdminIndexRouteImport } from './app/_admin/admin/index'
 import { Route as AccessSignupIndexRouteImport } from './app/_access/signup/index'
 import { Route as AccessSigninIndexRouteImport } from './app/_access/signin/index'
 import { Route as AccessEmailVerificationIndexRouteImport } from './app/_access/email-verification/index'
+import { Route as VendorsInfluencersHelpSupportRouteRouteImport } from './app/vendors/influencers/help-support/route'
+import { Route as VendorsBillboardsHelpSupportRouteRouteImport } from './app/vendors/billboards/help-support/route'
+import { Route as UsersauthUsersHelpSupportRouteRouteImport } from './app/_usersauth/users/help-support/route'
+import { Route as VendorsInfluencersWalletIndexRouteImport } from './app/vendors/influencers/wallet/index'
+import { Route as VendorsInfluencersSettingsIndexRouteImport } from './app/vendors/influencers/settings/index'
+import { Route as VendorsInfluencersRequestsIndexRouteImport } from './app/vendors/influencers/requests/index'
+import { Route as VendorsInfluencersRateCardIndexRouteImport } from './app/vendors/influencers/rate-card/index'
+import { Route as VendorsInfluencersPayoutsIndexRouteImport } from './app/vendors/influencers/payouts/index'
+import { Route as VendorsInfluencersNegotiationsIndexRouteImport } from './app/vendors/influencers/negotiations/index'
+import { Route as VendorsInfluencersHelpSupportIndexRouteImport } from './app/vendors/influencers/help-support/index'
 import { Route as VendorsBillboardsWalletIndexRouteImport } from './app/vendors/billboards/wallet/index'
 import { Route as VendorsBillboardsSettingsIndexRouteImport } from './app/vendors/billboards/settings/index'
 import { Route as VendorsBillboardsRequestsIndexRouteImport } from './app/vendors/billboards/requests/index'
 import { Route as VendorsBillboardsPayoutsIndexRouteImport } from './app/vendors/billboards/payouts/index'
 import { Route as VendorsBillboardsNegotiationsIndexRouteImport } from './app/vendors/billboards/negotiations/index'
 import { Route as VendorsBillboardsListingIndexRouteImport } from './app/vendors/billboards/listing/index'
+import { Route as VendorsBillboardsHelpSupportIndexRouteImport } from './app/vendors/billboards/help-support/index'
 import { Route as VendorsBillboardsAddBillboardIndexRouteImport } from './app/vendors/billboards/add-billboard/index'
 import { Route as UsersauthUsersWalletIndexRouteImport } from './app/_usersauth/users/wallet/index'
 import { Route as UsersauthUsersSettingsIndexRouteImport } from './app/_usersauth/users/settings/index'
 import { Route as UsersauthUsersNegotiationsIndexRouteImport } from './app/_usersauth/users/negotiations/index'
+import { Route as UsersauthUsersHelpSupportIndexRouteImport } from './app/_usersauth/users/help-support/index'
 import { Route as UsersauthUsersCampaignIndexRouteImport } from './app/_usersauth/users/campaign/index'
 import { Route as UsersauthUsersAnalysisIndexRouteImport } from './app/_usersauth/users/analysis/index'
 import { Route as UsersauthAdsWhatsappIndexRouteImport } from './app/_usersauth/ads/whatsapp/index'
@@ -49,22 +62,58 @@ import { Route as PublicLightnavbarFaqsIndexRouteImport } from './app/_public/_l
 import { Route as PublicLightnavbarContactIndexRouteImport } from './app/_public/_lightnavbar/contact/index'
 import { Route as PublicLightnavbarAboutIndexRouteImport } from './app/_public/_lightnavbar/about/index'
 import { Route as PublicDarknavbarDiscoveryIndexRouteImport } from './app/_public/_darknavbar/discovery/index'
+import { Route as AdminAdminWalletIndexRouteImport } from './app/_admin/admin/wallet/index'
+import { Route as AdminAdminVendorsIndexRouteImport } from './app/_admin/admin/vendors/index'
+import { Route as AdminAdminUsersIndexRouteImport } from './app/_admin/admin/users/index'
+import { Route as AdminAdminSupportIndexRouteImport } from './app/_admin/admin/support/index'
+import { Route as AdminAdminSettingsIndexRouteImport } from './app/_admin/admin/settings/index'
+import { Route as AdminAdminRequestIndexRouteImport } from './app/_admin/admin/request/index'
+import { Route as AdminAdminPayoutIndexRouteImport } from './app/_admin/admin/payout/index'
+import { Route as AdminAdminInviteLinksIndexRouteImport } from './app/_admin/admin/invite-links/index'
+import { Route as AdminAdminCreateAdminIndexRouteImport } from './app/_admin/admin/create-admin/index'
+import { Route as AdminAdminAdminsIndexRouteImport } from './app/_admin/admin/admins/index'
+import { Route as AdminAdminActivityLogsIndexRouteImport } from './app/_admin/admin/activity-logs/index'
 import { Route as AccessVendorAccessOnboardingIndexRouteImport } from './app/_access/vendor-access/onboarding/index'
+import { Route as VendorsInfluencersRequestsSlugIndexRouteImport } from './app/vendors/influencers/requests/$slug/index'
+import { Route as VendorsInfluencersRateCardAddIndexRouteImport } from './app/vendors/influencers/rate-card/add/index'
+import { Route as VendorsInfluencersPayoutsIdIndexRouteImport } from './app/vendors/influencers/payouts/$id/index'
+import { Route as VendorsInfluencersNegotiationsIdIndexRouteImport } from './app/vendors/influencers/negotiations/$id/index'
+import { Route as VendorsInfluencersHelpSupportIdIndexRouteImport } from './app/vendors/influencers/help-support/$id/index'
+import { Route as VendorsBillboardsSettingsCoverageIndexRouteImport } from './app/vendors/billboards/settings/coverage/index'
 import { Route as VendorsBillboardsRequestsSlugIndexRouteImport } from './app/vendors/billboards/requests/$slug/index'
 import { Route as VendorsBillboardsPayoutsIdIndexRouteImport } from './app/vendors/billboards/payouts/$id/index'
 import { Route as VendorsBillboardsNegotiationsIdIndexRouteImport } from './app/vendors/billboards/negotiations/$id/index'
 import { Route as VendorsBillboardsListingSlugIndexRouteImport } from './app/vendors/billboards/listing/$slug/index'
+import { Route as VendorsBillboardsHelpSupportIdIndexRouteImport } from './app/vendors/billboards/help-support/$id/index'
 import { Route as UsersauthUsersWalletFundwalletIndexRouteImport } from './app/_usersauth/users/wallet/fundwallet/index'
+import { Route as UsersauthUsersNegotiationsInfluencersIndexRouteImport } from './app/_usersauth/users/negotiations/influencers/index'
 import { Route as UsersauthUsersNegotiationsIdIndexRouteImport } from './app/_usersauth/users/negotiations/$id/index'
+import { Route as UsersauthUsersHelpSupportIdIndexRouteImport } from './app/_usersauth/users/help-support/$id/index'
 import { Route as UsersauthUsersCampaignSlugIndexRouteImport } from './app/_usersauth/users/campaign/$slug/index'
 import { Route as UsersauthAdsSmsCheckoutIndexRouteImport } from './app/_usersauth/ads/sms/checkout/index'
 import { Route as UsersauthAdsInfluencerSlugIndexRouteImport } from './app/_usersauth/ads/influencer/$slug/index'
 import { Route as UsersauthAdsBillboardSlugIndexRouteImport } from './app/_usersauth/ads/billboard/$slug/index'
+import { Route as AdminAdminWalletTransactionsIndexRouteImport } from './app/_admin/admin/wallet/transactions/index'
+import { Route as AdminAdminUsersIdIndexRouteImport } from './app/_admin/admin/users/$id/index'
+import { Route as AdminAdminSupportIdIndexRouteImport } from './app/_admin/admin/support/$id/index'
+import { Route as AdminAdminPayoutIdIndexRouteImport } from './app/_admin/admin/payout/$id/index'
+import { Route as VendorsInfluencersRequestsSlugDisputeChatIndexRouteImport } from './app/vendors/influencers/requests/$slug/dispute-chat/index'
+import { Route as VendorsInfluencersRateCardIdEditIndexRouteImport } from './app/vendors/influencers/rate-card/$id/edit/index'
+import { Route as VendorsBillboardsRequestsSlugDisputeChatIndexRouteImport } from './app/vendors/billboards/requests/$slug/dispute-chat/index'
 import { Route as VendorsBillboardsListingSlugEditIndexRouteImport } from './app/vendors/billboards/listing/$slug/edit/index'
+import { Route as UsersauthUsersNegotiationsInfluencersIdIndexRouteImport } from './app/_usersauth/users/negotiations/influencers/$id/index'
+import { Route as UsersauthUsersCampaignInfluencerIdIndexRouteImport } from './app/_usersauth/users/campaign/influencer/$id/index'
+import { Route as UsersauthUsersCampaignSlugDisputeChatIndexRouteImport } from './app/_usersauth/users/campaign/$slug/dispute-chat/index'
 import { Route as UsersauthAdsInfluencerSlugOnboardingIndexRouteImport } from './app/_usersauth/ads/influencer/$slug/onboarding/index'
 import { Route as UsersauthAdsBillboardSlugOnboardIndexRouteImport } from './app/_usersauth/ads/billboard/$slug/onboard/index'
+import { Route as AdminAdminUsersIdBillboardsIndexRouteImport } from './app/_admin/admin/users/$id/billboards/index'
+import { Route as AdminAdminRequestInfluencerIdIndexRouteImport } from './app/_admin/admin/request/influencer/$id/index'
+import { Route as AdminAdminRequestBillboardIdIndexRouteImport } from './app/_admin/admin/request/billboard/$id/index'
+import { Route as UsersauthUsersCampaignInfluencerIdDisputeChatIndexRouteImport } from './app/_usersauth/users/campaign/influencer/$id/dispute-chat/index'
 import { Route as UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRouteImport } from './app/_usersauth/ads/influencer/$slug/onboarding/checkout/index'
 import { Route as UsersauthAdsBillboardSlugOnboardCheckoutIndexRouteImport } from './app/_usersauth/ads/billboard/$slug/onboard/checkout/index'
+import { Route as AdminAdminRequestInfluencerIdDisputeChatIndexRouteImport } from './app/_admin/admin/request/influencer/$id/dispute-chat/index'
+import { Route as AdminAdminRequestBillboardIdDisputeChatIndexRouteImport } from './app/_admin/admin/request/billboard/$id/dispute-chat/index'
 
 const UsersauthRouteRoute = UsersauthRouteRouteImport.update({
   id: '/_usersauth',
@@ -77,6 +126,11 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VendorsInfluencersRouteRoute = VendorsInfluencersRouteRouteImport.update({
+  id: '/vendors/influencers',
+  path: '/vendors/influencers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VendorsBillboardsRouteRoute = VendorsBillboardsRouteRouteImport.update({
@@ -108,9 +162,9 @@ const AdminAdminRouteRoute = AdminAdminRouteRouteImport.update({
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const VendorsInfluencersIndexRoute = VendorsInfluencersIndexRouteImport.update({
-  id: '/vendors/influencers/',
-  path: '/vendors/influencers/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => VendorsInfluencersRouteRoute,
 } as any)
 const VendorsBillboardsIndexRoute = VendorsBillboardsIndexRouteImport.update({
   id: '/',
@@ -153,6 +207,66 @@ const AccessEmailVerificationIndexRoute =
     path: '/email-verification/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const VendorsInfluencersHelpSupportRouteRoute =
+  VendorsInfluencersHelpSupportRouteRouteImport.update({
+    id: '/help-support',
+    path: '/help-support',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsBillboardsHelpSupportRouteRoute =
+  VendorsBillboardsHelpSupportRouteRouteImport.update({
+    id: '/help-support',
+    path: '/help-support',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
+const UsersauthUsersHelpSupportRouteRoute =
+  UsersauthUsersHelpSupportRouteRouteImport.update({
+    id: '/help-support',
+    path: '/help-support',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const VendorsInfluencersWalletIndexRoute =
+  VendorsInfluencersWalletIndexRouteImport.update({
+    id: '/wallet/',
+    path: '/wallet/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersSettingsIndexRoute =
+  VendorsInfluencersSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersRequestsIndexRoute =
+  VendorsInfluencersRequestsIndexRouteImport.update({
+    id: '/requests/',
+    path: '/requests/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersRateCardIndexRoute =
+  VendorsInfluencersRateCardIndexRouteImport.update({
+    id: '/rate-card/',
+    path: '/rate-card/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersPayoutsIndexRoute =
+  VendorsInfluencersPayoutsIndexRouteImport.update({
+    id: '/payouts/',
+    path: '/payouts/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersNegotiationsIndexRoute =
+  VendorsInfluencersNegotiationsIndexRouteImport.update({
+    id: '/negotiations/',
+    path: '/negotiations/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersHelpSupportIndexRoute =
+  VendorsInfluencersHelpSupportIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => VendorsInfluencersHelpSupportRouteRoute,
+  } as any)
 const VendorsBillboardsWalletIndexRoute =
   VendorsBillboardsWalletIndexRouteImport.update({
     id: '/wallet/',
@@ -189,6 +303,12 @@ const VendorsBillboardsListingIndexRoute =
     path: '/listing/',
     getParentRoute: () => VendorsBillboardsRouteRoute,
   } as any)
+const VendorsBillboardsHelpSupportIndexRoute =
+  VendorsBillboardsHelpSupportIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => VendorsBillboardsHelpSupportRouteRoute,
+  } as any)
 const VendorsBillboardsAddBillboardIndexRoute =
   VendorsBillboardsAddBillboardIndexRouteImport.update({
     id: '/add-billboard/',
@@ -212,6 +332,12 @@ const UsersauthUsersNegotiationsIndexRoute =
     id: '/negotiations/',
     path: '/negotiations/',
     getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersHelpSupportIndexRoute =
+  UsersauthUsersHelpSupportIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => UsersauthUsersHelpSupportRouteRoute,
   } as any)
 const UsersauthUsersCampaignIndexRoute =
   UsersauthUsersCampaignIndexRouteImport.update({
@@ -284,11 +410,105 @@ const PublicDarknavbarDiscoveryIndexRoute =
     path: '/discovery/',
     getParentRoute: () => PublicDarknavbarRouteRoute,
   } as any)
+const AdminAdminWalletIndexRoute = AdminAdminWalletIndexRouteImport.update({
+  id: '/wallet/',
+  path: '/wallet/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminVendorsIndexRoute = AdminAdminVendorsIndexRouteImport.update({
+  id: '/vendors/',
+  path: '/vendors/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminUsersIndexRoute = AdminAdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminSupportIndexRoute = AdminAdminSupportIndexRouteImport.update({
+  id: '/support/',
+  path: '/support/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminSettingsIndexRoute = AdminAdminSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminRequestIndexRoute = AdminAdminRequestIndexRouteImport.update({
+  id: '/request/',
+  path: '/request/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminPayoutIndexRoute = AdminAdminPayoutIndexRouteImport.update({
+  id: '/payout/',
+  path: '/payout/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminInviteLinksIndexRoute =
+  AdminAdminInviteLinksIndexRouteImport.update({
+    id: '/invite-links/',
+    path: '/invite-links/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminCreateAdminIndexRoute =
+  AdminAdminCreateAdminIndexRouteImport.update({
+    id: '/create-admin/',
+    path: '/create-admin/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminAdminsIndexRoute = AdminAdminAdminsIndexRouteImport.update({
+  id: '/admins/',
+  path: '/admins/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminActivityLogsIndexRoute =
+  AdminAdminActivityLogsIndexRouteImport.update({
+    id: '/activity-logs/',
+    path: '/activity-logs/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 const AccessVendorAccessOnboardingIndexRoute =
   AccessVendorAccessOnboardingIndexRouteImport.update({
     id: '/_access/vendor-access/onboarding/',
     path: '/vendor-access/onboarding/',
     getParentRoute: () => rootRouteImport,
+  } as any)
+const VendorsInfluencersRequestsSlugIndexRoute =
+  VendorsInfluencersRequestsSlugIndexRouteImport.update({
+    id: '/requests/$slug/',
+    path: '/requests/$slug/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersRateCardAddIndexRoute =
+  VendorsInfluencersRateCardAddIndexRouteImport.update({
+    id: '/rate-card/add/',
+    path: '/rate-card/add/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersPayoutsIdIndexRoute =
+  VendorsInfluencersPayoutsIdIndexRouteImport.update({
+    id: '/payouts/$id/',
+    path: '/payouts/$id/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersNegotiationsIdIndexRoute =
+  VendorsInfluencersNegotiationsIdIndexRouteImport.update({
+    id: '/negotiations/$id/',
+    path: '/negotiations/$id/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersHelpSupportIdIndexRoute =
+  VendorsInfluencersHelpSupportIdIndexRouteImport.update({
+    id: '/$id/',
+    path: '/$id/',
+    getParentRoute: () => VendorsInfluencersHelpSupportRouteRoute,
+  } as any)
+const VendorsBillboardsSettingsCoverageIndexRoute =
+  VendorsBillboardsSettingsCoverageIndexRouteImport.update({
+    id: '/settings/coverage/',
+    path: '/settings/coverage/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
   } as any)
 const VendorsBillboardsRequestsSlugIndexRoute =
   VendorsBillboardsRequestsSlugIndexRouteImport.update({
@@ -314,10 +534,22 @@ const VendorsBillboardsListingSlugIndexRoute =
     path: '/listing/$slug/',
     getParentRoute: () => VendorsBillboardsRouteRoute,
   } as any)
+const VendorsBillboardsHelpSupportIdIndexRoute =
+  VendorsBillboardsHelpSupportIdIndexRouteImport.update({
+    id: '/$id/',
+    path: '/$id/',
+    getParentRoute: () => VendorsBillboardsHelpSupportRouteRoute,
+  } as any)
 const UsersauthUsersWalletFundwalletIndexRoute =
   UsersauthUsersWalletFundwalletIndexRouteImport.update({
     id: '/wallet/fundwallet/',
     path: '/wallet/fundwallet/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersNegotiationsInfluencersIndexRoute =
+  UsersauthUsersNegotiationsInfluencersIndexRouteImport.update({
+    id: '/negotiations/influencers/',
+    path: '/negotiations/influencers/',
     getParentRoute: () => UsersauthUsersRouteRoute,
   } as any)
 const UsersauthUsersNegotiationsIdIndexRoute =
@@ -325,6 +557,12 @@ const UsersauthUsersNegotiationsIdIndexRoute =
     id: '/negotiations/$id/',
     path: '/negotiations/$id/',
     getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersHelpSupportIdIndexRoute =
+  UsersauthUsersHelpSupportIdIndexRouteImport.update({
+    id: '/$id/',
+    path: '/$id/',
+    getParentRoute: () => UsersauthUsersHelpSupportRouteRoute,
   } as any)
 const UsersauthUsersCampaignSlugIndexRoute =
   UsersauthUsersCampaignSlugIndexRouteImport.update({
@@ -350,11 +588,69 @@ const UsersauthAdsBillboardSlugIndexRoute =
     path: '/billboard/$slug/',
     getParentRoute: () => UsersauthAdsRouteRoute,
   } as any)
+const AdminAdminWalletTransactionsIndexRoute =
+  AdminAdminWalletTransactionsIndexRouteImport.update({
+    id: '/wallet/transactions/',
+    path: '/wallet/transactions/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminUsersIdIndexRoute = AdminAdminUsersIdIndexRouteImport.update({
+  id: '/users/$id/',
+  path: '/users/$id/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminSupportIdIndexRoute =
+  AdminAdminSupportIdIndexRouteImport.update({
+    id: '/support/$id/',
+    path: '/support/$id/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminPayoutIdIndexRoute = AdminAdminPayoutIdIndexRouteImport.update({
+  id: '/payout/$id/',
+  path: '/payout/$id/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const VendorsInfluencersRequestsSlugDisputeChatIndexRoute =
+  VendorsInfluencersRequestsSlugDisputeChatIndexRouteImport.update({
+    id: '/requests/$slug/dispute-chat/',
+    path: '/requests/$slug/dispute-chat/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsInfluencersRateCardIdEditIndexRoute =
+  VendorsInfluencersRateCardIdEditIndexRouteImport.update({
+    id: '/rate-card/$id/edit/',
+    path: '/rate-card/$id/edit/',
+    getParentRoute: () => VendorsInfluencersRouteRoute,
+  } as any)
+const VendorsBillboardsRequestsSlugDisputeChatIndexRoute =
+  VendorsBillboardsRequestsSlugDisputeChatIndexRouteImport.update({
+    id: '/requests/$slug/dispute-chat/',
+    path: '/requests/$slug/dispute-chat/',
+    getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
 const VendorsBillboardsListingSlugEditIndexRoute =
   VendorsBillboardsListingSlugEditIndexRouteImport.update({
     id: '/listing/$slug/edit/',
     path: '/listing/$slug/edit/',
     getParentRoute: () => VendorsBillboardsRouteRoute,
+  } as any)
+const UsersauthUsersNegotiationsInfluencersIdIndexRoute =
+  UsersauthUsersNegotiationsInfluencersIdIndexRouteImport.update({
+    id: '/negotiations/influencers/$id/',
+    path: '/negotiations/influencers/$id/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersCampaignInfluencerIdIndexRoute =
+  UsersauthUsersCampaignInfluencerIdIndexRouteImport.update({
+    id: '/campaign/influencer/$id/',
+    path: '/campaign/influencer/$id/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
+const UsersauthUsersCampaignSlugDisputeChatIndexRoute =
+  UsersauthUsersCampaignSlugDisputeChatIndexRouteImport.update({
+    id: '/campaign/$slug/dispute-chat/',
+    path: '/campaign/$slug/dispute-chat/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
   } as any)
 const UsersauthAdsInfluencerSlugOnboardingIndexRoute =
   UsersauthAdsInfluencerSlugOnboardingIndexRouteImport.update({
@@ -368,6 +664,30 @@ const UsersauthAdsBillboardSlugOnboardIndexRoute =
     path: '/billboard/$slug/onboard/',
     getParentRoute: () => UsersauthAdsRouteRoute,
   } as any)
+const AdminAdminUsersIdBillboardsIndexRoute =
+  AdminAdminUsersIdBillboardsIndexRouteImport.update({
+    id: '/users/$id/billboards/',
+    path: '/users/$id/billboards/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminRequestInfluencerIdIndexRoute =
+  AdminAdminRequestInfluencerIdIndexRouteImport.update({
+    id: '/request/influencer/$id/',
+    path: '/request/influencer/$id/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminRequestBillboardIdIndexRoute =
+  AdminAdminRequestBillboardIdIndexRouteImport.update({
+    id: '/request/billboard/$id/',
+    path: '/request/billboard/$id/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute =
+  UsersauthUsersCampaignInfluencerIdDisputeChatIndexRouteImport.update({
+    id: '/campaign/influencer/$id/dispute-chat/',
+    path: '/campaign/influencer/$id/dispute-chat/',
+    getParentRoute: () => UsersauthUsersRouteRoute,
+  } as any)
 const UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute =
   UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRouteImport.update({
     id: '/influencer/$slug/onboarding/checkout/',
@@ -380,6 +700,18 @@ const UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute =
     path: '/billboard/$slug/onboard/checkout/',
     getParentRoute: () => UsersauthAdsRouteRoute,
   } as any)
+const AdminAdminRequestInfluencerIdDisputeChatIndexRoute =
+  AdminAdminRequestInfluencerIdDisputeChatIndexRouteImport.update({
+    id: '/request/influencer/$id/dispute-chat/',
+    path: '/request/influencer/$id/dispute-chat/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
+const AdminAdminRequestBillboardIdDisputeChatIndexRoute =
+  AdminAdminRequestBillboardIdDisputeChatIndexRouteImport.update({
+    id: '/request/billboard/$id/dispute-chat/',
+    path: '/request/billboard/$id/dispute-chat/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -387,6 +719,10 @@ export interface FileRoutesByFullPath {
   '/ads': typeof UsersauthAdsRouteRouteWithChildren
   '/users': typeof UsersauthUsersRouteRouteWithChildren
   '/vendors/billboards': typeof VendorsBillboardsRouteRouteWithChildren
+  '/vendors/influencers': typeof VendorsInfluencersRouteRouteWithChildren
+  '/users/help-support': typeof UsersauthUsersHelpSupportRouteRouteWithChildren
+  '/vendors/billboards/help-support': typeof VendorsBillboardsHelpSupportRouteRouteWithChildren
+  '/vendors/influencers/help-support': typeof VendorsInfluencersHelpSupportRouteRouteWithChildren
   '/email-verification/': typeof AccessEmailVerificationIndexRoute
   '/signin/': typeof AccessSigninIndexRoute
   '/signup/': typeof AccessSignupIndexRoute
@@ -397,6 +733,17 @@ export interface FileRoutesByFullPath {
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
   '/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
+  '/admin/activity-logs/': typeof AdminAdminActivityLogsIndexRoute
+  '/admin/admins/': typeof AdminAdminAdminsIndexRoute
+  '/admin/create-admin/': typeof AdminAdminCreateAdminIndexRoute
+  '/admin/invite-links/': typeof AdminAdminInviteLinksIndexRoute
+  '/admin/payout/': typeof AdminAdminPayoutIndexRoute
+  '/admin/request/': typeof AdminAdminRequestIndexRoute
+  '/admin/settings/': typeof AdminAdminSettingsIndexRoute
+  '/admin/support/': typeof AdminAdminSupportIndexRoute
+  '/admin/users/': typeof AdminAdminUsersIndexRoute
+  '/admin/vendors/': typeof AdminAdminVendorsIndexRoute
+  '/admin/wallet/': typeof AdminAdminWalletIndexRoute
   '/discovery/': typeof PublicDarknavbarDiscoveryIndexRoute
   '/about/': typeof PublicLightnavbarAboutIndexRoute
   '/contact/': typeof PublicLightnavbarContactIndexRoute
@@ -409,31 +756,65 @@ export interface FileRoutesByFullPath {
   '/ads/whatsapp/': typeof UsersauthAdsWhatsappIndexRoute
   '/users/analysis/': typeof UsersauthUsersAnalysisIndexRoute
   '/users/campaign/': typeof UsersauthUsersCampaignIndexRoute
+  '/users/help-support/': typeof UsersauthUsersHelpSupportIndexRoute
   '/users/negotiations/': typeof UsersauthUsersNegotiationsIndexRoute
   '/users/settings/': typeof UsersauthUsersSettingsIndexRoute
   '/users/wallet/': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard/': typeof VendorsBillboardsAddBillboardIndexRoute
+  '/vendors/billboards/help-support/': typeof VendorsBillboardsHelpSupportIndexRoute
   '/vendors/billboards/listing/': typeof VendorsBillboardsListingIndexRoute
   '/vendors/billboards/negotiations/': typeof VendorsBillboardsNegotiationsIndexRoute
   '/vendors/billboards/payouts/': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests/': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings/': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet/': typeof VendorsBillboardsWalletIndexRoute
+  '/vendors/influencers/help-support/': typeof VendorsInfluencersHelpSupportIndexRoute
+  '/vendors/influencers/negotiations/': typeof VendorsInfluencersNegotiationsIndexRoute
+  '/vendors/influencers/payouts/': typeof VendorsInfluencersPayoutsIndexRoute
+  '/vendors/influencers/rate-card/': typeof VendorsInfluencersRateCardIndexRoute
+  '/vendors/influencers/requests/': typeof VendorsInfluencersRequestsIndexRoute
+  '/vendors/influencers/settings/': typeof VendorsInfluencersSettingsIndexRoute
+  '/vendors/influencers/wallet/': typeof VendorsInfluencersWalletIndexRoute
+  '/admin/payout/$id/': typeof AdminAdminPayoutIdIndexRoute
+  '/admin/support/$id/': typeof AdminAdminSupportIdIndexRoute
+  '/admin/users/$id/': typeof AdminAdminUsersIdIndexRoute
+  '/admin/wallet/transactions/': typeof AdminAdminWalletTransactionsIndexRoute
   '/ads/billboard/$slug/': typeof UsersauthAdsBillboardSlugIndexRoute
   '/ads/influencer/$slug/': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/ads/sms/checkout/': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/users/campaign/$slug/': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/users/help-support/$id/': typeof UsersauthUsersHelpSupportIdIndexRoute
   '/users/negotiations/$id/': typeof UsersauthUsersNegotiationsIdIndexRoute
+  '/users/negotiations/influencers/': typeof UsersauthUsersNegotiationsInfluencersIndexRoute
   '/users/wallet/fundwallet/': typeof UsersauthUsersWalletFundwalletIndexRoute
+  '/vendors/billboards/help-support/$id/': typeof VendorsBillboardsHelpSupportIdIndexRoute
   '/vendors/billboards/listing/$slug/': typeof VendorsBillboardsListingSlugIndexRoute
   '/vendors/billboards/negotiations/$id/': typeof VendorsBillboardsNegotiationsIdIndexRoute
   '/vendors/billboards/payouts/$id/': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug/': typeof VendorsBillboardsRequestsSlugIndexRoute
+  '/vendors/billboards/settings/coverage/': typeof VendorsBillboardsSettingsCoverageIndexRoute
+  '/vendors/influencers/help-support/$id/': typeof VendorsInfluencersHelpSupportIdIndexRoute
+  '/vendors/influencers/negotiations/$id/': typeof VendorsInfluencersNegotiationsIdIndexRoute
+  '/vendors/influencers/payouts/$id/': typeof VendorsInfluencersPayoutsIdIndexRoute
+  '/vendors/influencers/rate-card/add/': typeof VendorsInfluencersRateCardAddIndexRoute
+  '/vendors/influencers/requests/$slug/': typeof VendorsInfluencersRequestsSlugIndexRoute
+  '/admin/request/billboard/$id/': typeof AdminAdminRequestBillboardIdIndexRoute
+  '/admin/request/influencer/$id/': typeof AdminAdminRequestInfluencerIdIndexRoute
+  '/admin/users/$id/billboards/': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
+  '/users/campaign/$slug/dispute-chat/': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
+  '/users/campaign/influencer/$id/': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
+  '/users/negotiations/influencers/$id/': typeof UsersauthUsersNegotiationsInfluencersIdIndexRoute
   '/vendors/billboards/listing/$slug/edit/': typeof VendorsBillboardsListingSlugEditIndexRoute
+  '/vendors/billboards/requests/$slug/dispute-chat/': typeof VendorsBillboardsRequestsSlugDisputeChatIndexRoute
+  '/vendors/influencers/rate-card/$id/edit/': typeof VendorsInfluencersRateCardIdEditIndexRoute
+  '/vendors/influencers/requests/$slug/dispute-chat/': typeof VendorsInfluencersRequestsSlugDisputeChatIndexRoute
+  '/admin/request/billboard/$id/dispute-chat/': typeof AdminAdminRequestBillboardIdDisputeChatIndexRoute
+  '/admin/request/influencer/$id/dispute-chat/': typeof AdminAdminRequestInfluencerIdDisputeChatIndexRoute
   '/ads/billboard/$slug/onboard/checkout/': typeof UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute
   '/ads/influencer/$slug/onboarding/checkout/': typeof UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute
+  '/users/campaign/influencer/$id/dispute-chat/': typeof UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -447,6 +828,17 @@ export interface FileRoutesByTo {
   '/vendors/billboards': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers': typeof VendorsInfluencersIndexRoute
   '/vendor-access/onboarding': typeof AccessVendorAccessOnboardingIndexRoute
+  '/admin/activity-logs': typeof AdminAdminActivityLogsIndexRoute
+  '/admin/admins': typeof AdminAdminAdminsIndexRoute
+  '/admin/create-admin': typeof AdminAdminCreateAdminIndexRoute
+  '/admin/invite-links': typeof AdminAdminInviteLinksIndexRoute
+  '/admin/payout': typeof AdminAdminPayoutIndexRoute
+  '/admin/request': typeof AdminAdminRequestIndexRoute
+  '/admin/settings': typeof AdminAdminSettingsIndexRoute
+  '/admin/support': typeof AdminAdminSupportIndexRoute
+  '/admin/users': typeof AdminAdminUsersIndexRoute
+  '/admin/vendors': typeof AdminAdminVendorsIndexRoute
+  '/admin/wallet': typeof AdminAdminWalletIndexRoute
   '/discovery': typeof PublicDarknavbarDiscoveryIndexRoute
   '/about': typeof PublicLightnavbarAboutIndexRoute
   '/contact': typeof PublicLightnavbarContactIndexRoute
@@ -459,31 +851,65 @@ export interface FileRoutesByTo {
   '/ads/whatsapp': typeof UsersauthAdsWhatsappIndexRoute
   '/users/analysis': typeof UsersauthUsersAnalysisIndexRoute
   '/users/campaign': typeof UsersauthUsersCampaignIndexRoute
+  '/users/help-support': typeof UsersauthUsersHelpSupportIndexRoute
   '/users/negotiations': typeof UsersauthUsersNegotiationsIndexRoute
   '/users/settings': typeof UsersauthUsersSettingsIndexRoute
   '/users/wallet': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard': typeof VendorsBillboardsAddBillboardIndexRoute
+  '/vendors/billboards/help-support': typeof VendorsBillboardsHelpSupportIndexRoute
   '/vendors/billboards/listing': typeof VendorsBillboardsListingIndexRoute
   '/vendors/billboards/negotiations': typeof VendorsBillboardsNegotiationsIndexRoute
   '/vendors/billboards/payouts': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet': typeof VendorsBillboardsWalletIndexRoute
+  '/vendors/influencers/help-support': typeof VendorsInfluencersHelpSupportIndexRoute
+  '/vendors/influencers/negotiations': typeof VendorsInfluencersNegotiationsIndexRoute
+  '/vendors/influencers/payouts': typeof VendorsInfluencersPayoutsIndexRoute
+  '/vendors/influencers/rate-card': typeof VendorsInfluencersRateCardIndexRoute
+  '/vendors/influencers/requests': typeof VendorsInfluencersRequestsIndexRoute
+  '/vendors/influencers/settings': typeof VendorsInfluencersSettingsIndexRoute
+  '/vendors/influencers/wallet': typeof VendorsInfluencersWalletIndexRoute
+  '/admin/payout/$id': typeof AdminAdminPayoutIdIndexRoute
+  '/admin/support/$id': typeof AdminAdminSupportIdIndexRoute
+  '/admin/users/$id': typeof AdminAdminUsersIdIndexRoute
+  '/admin/wallet/transactions': typeof AdminAdminWalletTransactionsIndexRoute
   '/ads/billboard/$slug': typeof UsersauthAdsBillboardSlugIndexRoute
   '/ads/influencer/$slug': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/ads/sms/checkout': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/users/campaign/$slug': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/users/help-support/$id': typeof UsersauthUsersHelpSupportIdIndexRoute
   '/users/negotiations/$id': typeof UsersauthUsersNegotiationsIdIndexRoute
+  '/users/negotiations/influencers': typeof UsersauthUsersNegotiationsInfluencersIndexRoute
   '/users/wallet/fundwallet': typeof UsersauthUsersWalletFundwalletIndexRoute
+  '/vendors/billboards/help-support/$id': typeof VendorsBillboardsHelpSupportIdIndexRoute
   '/vendors/billboards/listing/$slug': typeof VendorsBillboardsListingSlugIndexRoute
   '/vendors/billboards/negotiations/$id': typeof VendorsBillboardsNegotiationsIdIndexRoute
   '/vendors/billboards/payouts/$id': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug': typeof VendorsBillboardsRequestsSlugIndexRoute
+  '/vendors/billboards/settings/coverage': typeof VendorsBillboardsSettingsCoverageIndexRoute
+  '/vendors/influencers/help-support/$id': typeof VendorsInfluencersHelpSupportIdIndexRoute
+  '/vendors/influencers/negotiations/$id': typeof VendorsInfluencersNegotiationsIdIndexRoute
+  '/vendors/influencers/payouts/$id': typeof VendorsInfluencersPayoutsIdIndexRoute
+  '/vendors/influencers/rate-card/add': typeof VendorsInfluencersRateCardAddIndexRoute
+  '/vendors/influencers/requests/$slug': typeof VendorsInfluencersRequestsSlugIndexRoute
+  '/admin/request/billboard/$id': typeof AdminAdminRequestBillboardIdIndexRoute
+  '/admin/request/influencer/$id': typeof AdminAdminRequestInfluencerIdIndexRoute
+  '/admin/users/$id/billboards': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/ads/billboard/$slug/onboard': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/ads/influencer/$slug/onboarding': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
+  '/users/campaign/$slug/dispute-chat': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
+  '/users/campaign/influencer/$id': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
+  '/users/negotiations/influencers/$id': typeof UsersauthUsersNegotiationsInfluencersIdIndexRoute
   '/vendors/billboards/listing/$slug/edit': typeof VendorsBillboardsListingSlugEditIndexRoute
+  '/vendors/billboards/requests/$slug/dispute-chat': typeof VendorsBillboardsRequestsSlugDisputeChatIndexRoute
+  '/vendors/influencers/rate-card/$id/edit': typeof VendorsInfluencersRateCardIdEditIndexRoute
+  '/vendors/influencers/requests/$slug/dispute-chat': typeof VendorsInfluencersRequestsSlugDisputeChatIndexRoute
+  '/admin/request/billboard/$id/dispute-chat': typeof AdminAdminRequestBillboardIdDisputeChatIndexRoute
+  '/admin/request/influencer/$id/dispute-chat': typeof AdminAdminRequestInfluencerIdDisputeChatIndexRoute
   '/ads/billboard/$slug/onboard/checkout': typeof UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute
   '/ads/influencer/$slug/onboarding/checkout': typeof UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute
+  '/users/campaign/influencer/$id/dispute-chat': typeof UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -496,6 +922,10 @@ export interface FileRoutesById {
   '/_usersauth/ads': typeof UsersauthAdsRouteRouteWithChildren
   '/_usersauth/users': typeof UsersauthUsersRouteRouteWithChildren
   '/vendors/billboards': typeof VendorsBillboardsRouteRouteWithChildren
+  '/vendors/influencers': typeof VendorsInfluencersRouteRouteWithChildren
+  '/_usersauth/users/help-support': typeof UsersauthUsersHelpSupportRouteRouteWithChildren
+  '/vendors/billboards/help-support': typeof VendorsBillboardsHelpSupportRouteRouteWithChildren
+  '/vendors/influencers/help-support': typeof VendorsInfluencersHelpSupportRouteRouteWithChildren
   '/_access/email-verification/': typeof AccessEmailVerificationIndexRoute
   '/_access/signin/': typeof AccessSigninIndexRoute
   '/_access/signup/': typeof AccessSignupIndexRoute
@@ -506,6 +936,17 @@ export interface FileRoutesById {
   '/vendors/billboards/': typeof VendorsBillboardsIndexRoute
   '/vendors/influencers/': typeof VendorsInfluencersIndexRoute
   '/_access/vendor-access/onboarding/': typeof AccessVendorAccessOnboardingIndexRoute
+  '/_admin/admin/activity-logs/': typeof AdminAdminActivityLogsIndexRoute
+  '/_admin/admin/admins/': typeof AdminAdminAdminsIndexRoute
+  '/_admin/admin/create-admin/': typeof AdminAdminCreateAdminIndexRoute
+  '/_admin/admin/invite-links/': typeof AdminAdminInviteLinksIndexRoute
+  '/_admin/admin/payout/': typeof AdminAdminPayoutIndexRoute
+  '/_admin/admin/request/': typeof AdminAdminRequestIndexRoute
+  '/_admin/admin/settings/': typeof AdminAdminSettingsIndexRoute
+  '/_admin/admin/support/': typeof AdminAdminSupportIndexRoute
+  '/_admin/admin/users/': typeof AdminAdminUsersIndexRoute
+  '/_admin/admin/vendors/': typeof AdminAdminVendorsIndexRoute
+  '/_admin/admin/wallet/': typeof AdminAdminWalletIndexRoute
   '/_public/_darknavbar/discovery/': typeof PublicDarknavbarDiscoveryIndexRoute
   '/_public/_lightnavbar/about/': typeof PublicLightnavbarAboutIndexRoute
   '/_public/_lightnavbar/contact/': typeof PublicLightnavbarContactIndexRoute
@@ -518,31 +959,65 @@ export interface FileRoutesById {
   '/_usersauth/ads/whatsapp/': typeof UsersauthAdsWhatsappIndexRoute
   '/_usersauth/users/analysis/': typeof UsersauthUsersAnalysisIndexRoute
   '/_usersauth/users/campaign/': typeof UsersauthUsersCampaignIndexRoute
+  '/_usersauth/users/help-support/': typeof UsersauthUsersHelpSupportIndexRoute
   '/_usersauth/users/negotiations/': typeof UsersauthUsersNegotiationsIndexRoute
   '/_usersauth/users/settings/': typeof UsersauthUsersSettingsIndexRoute
   '/_usersauth/users/wallet/': typeof UsersauthUsersWalletIndexRoute
   '/vendors/billboards/add-billboard/': typeof VendorsBillboardsAddBillboardIndexRoute
+  '/vendors/billboards/help-support/': typeof VendorsBillboardsHelpSupportIndexRoute
   '/vendors/billboards/listing/': typeof VendorsBillboardsListingIndexRoute
   '/vendors/billboards/negotiations/': typeof VendorsBillboardsNegotiationsIndexRoute
   '/vendors/billboards/payouts/': typeof VendorsBillboardsPayoutsIndexRoute
   '/vendors/billboards/requests/': typeof VendorsBillboardsRequestsIndexRoute
   '/vendors/billboards/settings/': typeof VendorsBillboardsSettingsIndexRoute
   '/vendors/billboards/wallet/': typeof VendorsBillboardsWalletIndexRoute
+  '/vendors/influencers/help-support/': typeof VendorsInfluencersHelpSupportIndexRoute
+  '/vendors/influencers/negotiations/': typeof VendorsInfluencersNegotiationsIndexRoute
+  '/vendors/influencers/payouts/': typeof VendorsInfluencersPayoutsIndexRoute
+  '/vendors/influencers/rate-card/': typeof VendorsInfluencersRateCardIndexRoute
+  '/vendors/influencers/requests/': typeof VendorsInfluencersRequestsIndexRoute
+  '/vendors/influencers/settings/': typeof VendorsInfluencersSettingsIndexRoute
+  '/vendors/influencers/wallet/': typeof VendorsInfluencersWalletIndexRoute
+  '/_admin/admin/payout/$id/': typeof AdminAdminPayoutIdIndexRoute
+  '/_admin/admin/support/$id/': typeof AdminAdminSupportIdIndexRoute
+  '/_admin/admin/users/$id/': typeof AdminAdminUsersIdIndexRoute
+  '/_admin/admin/wallet/transactions/': typeof AdminAdminWalletTransactionsIndexRoute
   '/_usersauth/ads/billboard/$slug/': typeof UsersauthAdsBillboardSlugIndexRoute
   '/_usersauth/ads/influencer/$slug/': typeof UsersauthAdsInfluencerSlugIndexRoute
   '/_usersauth/ads/sms/checkout/': typeof UsersauthAdsSmsCheckoutIndexRoute
   '/_usersauth/users/campaign/$slug/': typeof UsersauthUsersCampaignSlugIndexRoute
+  '/_usersauth/users/help-support/$id/': typeof UsersauthUsersHelpSupportIdIndexRoute
   '/_usersauth/users/negotiations/$id/': typeof UsersauthUsersNegotiationsIdIndexRoute
+  '/_usersauth/users/negotiations/influencers/': typeof UsersauthUsersNegotiationsInfluencersIndexRoute
   '/_usersauth/users/wallet/fundwallet/': typeof UsersauthUsersWalletFundwalletIndexRoute
+  '/vendors/billboards/help-support/$id/': typeof VendorsBillboardsHelpSupportIdIndexRoute
   '/vendors/billboards/listing/$slug/': typeof VendorsBillboardsListingSlugIndexRoute
   '/vendors/billboards/negotiations/$id/': typeof VendorsBillboardsNegotiationsIdIndexRoute
   '/vendors/billboards/payouts/$id/': typeof VendorsBillboardsPayoutsIdIndexRoute
   '/vendors/billboards/requests/$slug/': typeof VendorsBillboardsRequestsSlugIndexRoute
+  '/vendors/billboards/settings/coverage/': typeof VendorsBillboardsSettingsCoverageIndexRoute
+  '/vendors/influencers/help-support/$id/': typeof VendorsInfluencersHelpSupportIdIndexRoute
+  '/vendors/influencers/negotiations/$id/': typeof VendorsInfluencersNegotiationsIdIndexRoute
+  '/vendors/influencers/payouts/$id/': typeof VendorsInfluencersPayoutsIdIndexRoute
+  '/vendors/influencers/rate-card/add/': typeof VendorsInfluencersRateCardAddIndexRoute
+  '/vendors/influencers/requests/$slug/': typeof VendorsInfluencersRequestsSlugIndexRoute
+  '/_admin/admin/request/billboard/$id/': typeof AdminAdminRequestBillboardIdIndexRoute
+  '/_admin/admin/request/influencer/$id/': typeof AdminAdminRequestInfluencerIdIndexRoute
+  '/_admin/admin/users/$id/billboards/': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/_usersauth/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
   '/_usersauth/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
+  '/_usersauth/users/campaign/$slug/dispute-chat/': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
+  '/_usersauth/users/campaign/influencer/$id/': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
+  '/_usersauth/users/negotiations/influencers/$id/': typeof UsersauthUsersNegotiationsInfluencersIdIndexRoute
   '/vendors/billboards/listing/$slug/edit/': typeof VendorsBillboardsListingSlugEditIndexRoute
+  '/vendors/billboards/requests/$slug/dispute-chat/': typeof VendorsBillboardsRequestsSlugDisputeChatIndexRoute
+  '/vendors/influencers/rate-card/$id/edit/': typeof VendorsInfluencersRateCardIdEditIndexRoute
+  '/vendors/influencers/requests/$slug/dispute-chat/': typeof VendorsInfluencersRequestsSlugDisputeChatIndexRoute
+  '/_admin/admin/request/billboard/$id/dispute-chat/': typeof AdminAdminRequestBillboardIdDisputeChatIndexRoute
+  '/_admin/admin/request/influencer/$id/dispute-chat/': typeof AdminAdminRequestInfluencerIdDisputeChatIndexRoute
   '/_usersauth/ads/billboard/$slug/onboard/checkout/': typeof UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute
   '/_usersauth/ads/influencer/$slug/onboarding/checkout/': typeof UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute
+  '/_usersauth/users/campaign/influencer/$id/dispute-chat/': typeof UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -552,6 +1027,10 @@ export interface FileRouteTypes {
     | '/ads'
     | '/users'
     | '/vendors/billboards'
+    | '/vendors/influencers'
+    | '/users/help-support'
+    | '/vendors/billboards/help-support'
+    | '/vendors/influencers/help-support'
     | '/email-verification/'
     | '/signin/'
     | '/signup/'
@@ -562,6 +1041,17 @@ export interface FileRouteTypes {
     | '/vendors/billboards/'
     | '/vendors/influencers/'
     | '/vendor-access/onboarding/'
+    | '/admin/activity-logs/'
+    | '/admin/admins/'
+    | '/admin/create-admin/'
+    | '/admin/invite-links/'
+    | '/admin/payout/'
+    | '/admin/request/'
+    | '/admin/settings/'
+    | '/admin/support/'
+    | '/admin/users/'
+    | '/admin/vendors/'
+    | '/admin/wallet/'
     | '/discovery/'
     | '/about/'
     | '/contact/'
@@ -574,31 +1064,65 @@ export interface FileRouteTypes {
     | '/ads/whatsapp/'
     | '/users/analysis/'
     | '/users/campaign/'
+    | '/users/help-support/'
     | '/users/negotiations/'
     | '/users/settings/'
     | '/users/wallet/'
     | '/vendors/billboards/add-billboard/'
+    | '/vendors/billboards/help-support/'
     | '/vendors/billboards/listing/'
     | '/vendors/billboards/negotiations/'
     | '/vendors/billboards/payouts/'
     | '/vendors/billboards/requests/'
     | '/vendors/billboards/settings/'
     | '/vendors/billboards/wallet/'
+    | '/vendors/influencers/help-support/'
+    | '/vendors/influencers/negotiations/'
+    | '/vendors/influencers/payouts/'
+    | '/vendors/influencers/rate-card/'
+    | '/vendors/influencers/requests/'
+    | '/vendors/influencers/settings/'
+    | '/vendors/influencers/wallet/'
+    | '/admin/payout/$id/'
+    | '/admin/support/$id/'
+    | '/admin/users/$id/'
+    | '/admin/wallet/transactions/'
     | '/ads/billboard/$slug/'
     | '/ads/influencer/$slug/'
     | '/ads/sms/checkout/'
     | '/users/campaign/$slug/'
+    | '/users/help-support/$id/'
     | '/users/negotiations/$id/'
+    | '/users/negotiations/influencers/'
     | '/users/wallet/fundwallet/'
+    | '/vendors/billboards/help-support/$id/'
     | '/vendors/billboards/listing/$slug/'
     | '/vendors/billboards/negotiations/$id/'
     | '/vendors/billboards/payouts/$id/'
     | '/vendors/billboards/requests/$slug/'
+    | '/vendors/billboards/settings/coverage/'
+    | '/vendors/influencers/help-support/$id/'
+    | '/vendors/influencers/negotiations/$id/'
+    | '/vendors/influencers/payouts/$id/'
+    | '/vendors/influencers/rate-card/add/'
+    | '/vendors/influencers/requests/$slug/'
+    | '/admin/request/billboard/$id/'
+    | '/admin/request/influencer/$id/'
+    | '/admin/users/$id/billboards/'
     | '/ads/billboard/$slug/onboard/'
     | '/ads/influencer/$slug/onboarding/'
+    | '/users/campaign/$slug/dispute-chat/'
+    | '/users/campaign/influencer/$id/'
+    | '/users/negotiations/influencers/$id/'
     | '/vendors/billboards/listing/$slug/edit/'
+    | '/vendors/billboards/requests/$slug/dispute-chat/'
+    | '/vendors/influencers/rate-card/$id/edit/'
+    | '/vendors/influencers/requests/$slug/dispute-chat/'
+    | '/admin/request/billboard/$id/dispute-chat/'
+    | '/admin/request/influencer/$id/dispute-chat/'
     | '/ads/billboard/$slug/onboard/checkout/'
     | '/ads/influencer/$slug/onboarding/checkout/'
+    | '/users/campaign/influencer/$id/dispute-chat/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -612,6 +1136,17 @@ export interface FileRouteTypes {
     | '/vendors/billboards'
     | '/vendors/influencers'
     | '/vendor-access/onboarding'
+    | '/admin/activity-logs'
+    | '/admin/admins'
+    | '/admin/create-admin'
+    | '/admin/invite-links'
+    | '/admin/payout'
+    | '/admin/request'
+    | '/admin/settings'
+    | '/admin/support'
+    | '/admin/users'
+    | '/admin/vendors'
+    | '/admin/wallet'
     | '/discovery'
     | '/about'
     | '/contact'
@@ -624,31 +1159,65 @@ export interface FileRouteTypes {
     | '/ads/whatsapp'
     | '/users/analysis'
     | '/users/campaign'
+    | '/users/help-support'
     | '/users/negotiations'
     | '/users/settings'
     | '/users/wallet'
     | '/vendors/billboards/add-billboard'
+    | '/vendors/billboards/help-support'
     | '/vendors/billboards/listing'
     | '/vendors/billboards/negotiations'
     | '/vendors/billboards/payouts'
     | '/vendors/billboards/requests'
     | '/vendors/billboards/settings'
     | '/vendors/billboards/wallet'
+    | '/vendors/influencers/help-support'
+    | '/vendors/influencers/negotiations'
+    | '/vendors/influencers/payouts'
+    | '/vendors/influencers/rate-card'
+    | '/vendors/influencers/requests'
+    | '/vendors/influencers/settings'
+    | '/vendors/influencers/wallet'
+    | '/admin/payout/$id'
+    | '/admin/support/$id'
+    | '/admin/users/$id'
+    | '/admin/wallet/transactions'
     | '/ads/billboard/$slug'
     | '/ads/influencer/$slug'
     | '/ads/sms/checkout'
     | '/users/campaign/$slug'
+    | '/users/help-support/$id'
     | '/users/negotiations/$id'
+    | '/users/negotiations/influencers'
     | '/users/wallet/fundwallet'
+    | '/vendors/billboards/help-support/$id'
     | '/vendors/billboards/listing/$slug'
     | '/vendors/billboards/negotiations/$id'
     | '/vendors/billboards/payouts/$id'
     | '/vendors/billboards/requests/$slug'
+    | '/vendors/billboards/settings/coverage'
+    | '/vendors/influencers/help-support/$id'
+    | '/vendors/influencers/negotiations/$id'
+    | '/vendors/influencers/payouts/$id'
+    | '/vendors/influencers/rate-card/add'
+    | '/vendors/influencers/requests/$slug'
+    | '/admin/request/billboard/$id'
+    | '/admin/request/influencer/$id'
+    | '/admin/users/$id/billboards'
     | '/ads/billboard/$slug/onboard'
     | '/ads/influencer/$slug/onboarding'
+    | '/users/campaign/$slug/dispute-chat'
+    | '/users/campaign/influencer/$id'
+    | '/users/negotiations/influencers/$id'
     | '/vendors/billboards/listing/$slug/edit'
+    | '/vendors/billboards/requests/$slug/dispute-chat'
+    | '/vendors/influencers/rate-card/$id/edit'
+    | '/vendors/influencers/requests/$slug/dispute-chat'
+    | '/admin/request/billboard/$id/dispute-chat'
+    | '/admin/request/influencer/$id/dispute-chat'
     | '/ads/billboard/$slug/onboard/checkout'
     | '/ads/influencer/$slug/onboarding/checkout'
+    | '/users/campaign/influencer/$id/dispute-chat'
   id:
     | '__root__'
     | '/'
@@ -660,6 +1229,10 @@ export interface FileRouteTypes {
     | '/_usersauth/ads'
     | '/_usersauth/users'
     | '/vendors/billboards'
+    | '/vendors/influencers'
+    | '/_usersauth/users/help-support'
+    | '/vendors/billboards/help-support'
+    | '/vendors/influencers/help-support'
     | '/_access/email-verification/'
     | '/_access/signin/'
     | '/_access/signup/'
@@ -670,6 +1243,17 @@ export interface FileRouteTypes {
     | '/vendors/billboards/'
     | '/vendors/influencers/'
     | '/_access/vendor-access/onboarding/'
+    | '/_admin/admin/activity-logs/'
+    | '/_admin/admin/admins/'
+    | '/_admin/admin/create-admin/'
+    | '/_admin/admin/invite-links/'
+    | '/_admin/admin/payout/'
+    | '/_admin/admin/request/'
+    | '/_admin/admin/settings/'
+    | '/_admin/admin/support/'
+    | '/_admin/admin/users/'
+    | '/_admin/admin/vendors/'
+    | '/_admin/admin/wallet/'
     | '/_public/_darknavbar/discovery/'
     | '/_public/_lightnavbar/about/'
     | '/_public/_lightnavbar/contact/'
@@ -682,31 +1266,65 @@ export interface FileRouteTypes {
     | '/_usersauth/ads/whatsapp/'
     | '/_usersauth/users/analysis/'
     | '/_usersauth/users/campaign/'
+    | '/_usersauth/users/help-support/'
     | '/_usersauth/users/negotiations/'
     | '/_usersauth/users/settings/'
     | '/_usersauth/users/wallet/'
     | '/vendors/billboards/add-billboard/'
+    | '/vendors/billboards/help-support/'
     | '/vendors/billboards/listing/'
     | '/vendors/billboards/negotiations/'
     | '/vendors/billboards/payouts/'
     | '/vendors/billboards/requests/'
     | '/vendors/billboards/settings/'
     | '/vendors/billboards/wallet/'
+    | '/vendors/influencers/help-support/'
+    | '/vendors/influencers/negotiations/'
+    | '/vendors/influencers/payouts/'
+    | '/vendors/influencers/rate-card/'
+    | '/vendors/influencers/requests/'
+    | '/vendors/influencers/settings/'
+    | '/vendors/influencers/wallet/'
+    | '/_admin/admin/payout/$id/'
+    | '/_admin/admin/support/$id/'
+    | '/_admin/admin/users/$id/'
+    | '/_admin/admin/wallet/transactions/'
     | '/_usersauth/ads/billboard/$slug/'
     | '/_usersauth/ads/influencer/$slug/'
     | '/_usersauth/ads/sms/checkout/'
     | '/_usersauth/users/campaign/$slug/'
+    | '/_usersauth/users/help-support/$id/'
     | '/_usersauth/users/negotiations/$id/'
+    | '/_usersauth/users/negotiations/influencers/'
     | '/_usersauth/users/wallet/fundwallet/'
+    | '/vendors/billboards/help-support/$id/'
     | '/vendors/billboards/listing/$slug/'
     | '/vendors/billboards/negotiations/$id/'
     | '/vendors/billboards/payouts/$id/'
     | '/vendors/billboards/requests/$slug/'
+    | '/vendors/billboards/settings/coverage/'
+    | '/vendors/influencers/help-support/$id/'
+    | '/vendors/influencers/negotiations/$id/'
+    | '/vendors/influencers/payouts/$id/'
+    | '/vendors/influencers/rate-card/add/'
+    | '/vendors/influencers/requests/$slug/'
+    | '/_admin/admin/request/billboard/$id/'
+    | '/_admin/admin/request/influencer/$id/'
+    | '/_admin/admin/users/$id/billboards/'
     | '/_usersauth/ads/billboard/$slug/onboard/'
     | '/_usersauth/ads/influencer/$slug/onboarding/'
+    | '/_usersauth/users/campaign/$slug/dispute-chat/'
+    | '/_usersauth/users/campaign/influencer/$id/'
+    | '/_usersauth/users/negotiations/influencers/$id/'
     | '/vendors/billboards/listing/$slug/edit/'
+    | '/vendors/billboards/requests/$slug/dispute-chat/'
+    | '/vendors/influencers/rate-card/$id/edit/'
+    | '/vendors/influencers/requests/$slug/dispute-chat/'
+    | '/_admin/admin/request/billboard/$id/dispute-chat/'
+    | '/_admin/admin/request/influencer/$id/dispute-chat/'
     | '/_usersauth/ads/billboard/$slug/onboard/checkout/'
     | '/_usersauth/ads/influencer/$slug/onboarding/checkout/'
+    | '/_usersauth/users/campaign/influencer/$id/dispute-chat/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -716,10 +1334,10 @@ export interface RootRouteChildren {
   PublicDarknavbarRouteRoute: typeof PublicDarknavbarRouteRouteWithChildren
   PublicLightnavbarRouteRoute: typeof PublicLightnavbarRouteRouteWithChildren
   VendorsBillboardsRouteRoute: typeof VendorsBillboardsRouteRouteWithChildren
+  VendorsInfluencersRouteRoute: typeof VendorsInfluencersRouteRouteWithChildren
   AccessEmailVerificationIndexRoute: typeof AccessEmailVerificationIndexRoute
   AccessSigninIndexRoute: typeof AccessSigninIndexRoute
   AccessSignupIndexRoute: typeof AccessSignupIndexRoute
-  VendorsInfluencersIndexRoute: typeof VendorsInfluencersIndexRoute
   AccessVendorAccessOnboardingIndexRoute: typeof AccessVendorAccessOnboardingIndexRoute
 }
 
@@ -744,6 +1362,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vendors/influencers': {
+      id: '/vendors/influencers'
+      path: '/vendors/influencers'
+      fullPath: '/vendors/influencers'
+      preLoaderRoute: typeof VendorsInfluencersRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/vendors/billboards': {
@@ -790,10 +1415,10 @@ declare module '@tanstack/react-router' {
     }
     '/vendors/influencers/': {
       id: '/vendors/influencers/'
-      path: '/vendors/influencers'
+      path: '/'
       fullPath: '/vendors/influencers/'
       preLoaderRoute: typeof VendorsInfluencersIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
     }
     '/vendors/billboards/': {
       id: '/vendors/billboards/'
@@ -851,6 +1476,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccessEmailVerificationIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vendors/influencers/help-support': {
+      id: '/vendors/influencers/help-support'
+      path: '/help-support'
+      fullPath: '/vendors/influencers/help-support'
+      preLoaderRoute: typeof VendorsInfluencersHelpSupportRouteRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/billboards/help-support': {
+      id: '/vendors/billboards/help-support'
+      path: '/help-support'
+      fullPath: '/vendors/billboards/help-support'
+      preLoaderRoute: typeof VendorsBillboardsHelpSupportRouteRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
+    '/_usersauth/users/help-support': {
+      id: '/_usersauth/users/help-support'
+      path: '/help-support'
+      fullPath: '/users/help-support'
+      preLoaderRoute: typeof UsersauthUsersHelpSupportRouteRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/vendors/influencers/wallet/': {
+      id: '/vendors/influencers/wallet/'
+      path: '/wallet'
+      fullPath: '/vendors/influencers/wallet/'
+      preLoaderRoute: typeof VendorsInfluencersWalletIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/settings/': {
+      id: '/vendors/influencers/settings/'
+      path: '/settings'
+      fullPath: '/vendors/influencers/settings/'
+      preLoaderRoute: typeof VendorsInfluencersSettingsIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/requests/': {
+      id: '/vendors/influencers/requests/'
+      path: '/requests'
+      fullPath: '/vendors/influencers/requests/'
+      preLoaderRoute: typeof VendorsInfluencersRequestsIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/rate-card/': {
+      id: '/vendors/influencers/rate-card/'
+      path: '/rate-card'
+      fullPath: '/vendors/influencers/rate-card/'
+      preLoaderRoute: typeof VendorsInfluencersRateCardIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/payouts/': {
+      id: '/vendors/influencers/payouts/'
+      path: '/payouts'
+      fullPath: '/vendors/influencers/payouts/'
+      preLoaderRoute: typeof VendorsInfluencersPayoutsIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/negotiations/': {
+      id: '/vendors/influencers/negotiations/'
+      path: '/negotiations'
+      fullPath: '/vendors/influencers/negotiations/'
+      preLoaderRoute: typeof VendorsInfluencersNegotiationsIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/help-support/': {
+      id: '/vendors/influencers/help-support/'
+      path: '/'
+      fullPath: '/vendors/influencers/help-support/'
+      preLoaderRoute: typeof VendorsInfluencersHelpSupportIndexRouteImport
+      parentRoute: typeof VendorsInfluencersHelpSupportRouteRoute
+    }
     '/vendors/billboards/wallet/': {
       id: '/vendors/billboards/wallet/'
       path: '/wallet'
@@ -893,6 +1588,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorsBillboardsListingIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
     }
+    '/vendors/billboards/help-support/': {
+      id: '/vendors/billboards/help-support/'
+      path: '/'
+      fullPath: '/vendors/billboards/help-support/'
+      preLoaderRoute: typeof VendorsBillboardsHelpSupportIndexRouteImport
+      parentRoute: typeof VendorsBillboardsHelpSupportRouteRoute
+    }
     '/vendors/billboards/add-billboard/': {
       id: '/vendors/billboards/add-billboard/'
       path: '/add-billboard'
@@ -920,6 +1622,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/users/negotiations/'
       preLoaderRoute: typeof UsersauthUsersNegotiationsIndexRouteImport
       parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/help-support/': {
+      id: '/_usersauth/users/help-support/'
+      path: '/'
+      fullPath: '/users/help-support/'
+      preLoaderRoute: typeof UsersauthUsersHelpSupportIndexRouteImport
+      parentRoute: typeof UsersauthUsersHelpSupportRouteRoute
     }
     '/_usersauth/users/campaign/': {
       id: '/_usersauth/users/campaign/'
@@ -1005,12 +1714,131 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicDarknavbarDiscoveryIndexRouteImport
       parentRoute: typeof PublicDarknavbarRouteRoute
     }
+    '/_admin/admin/wallet/': {
+      id: '/_admin/admin/wallet/'
+      path: '/wallet'
+      fullPath: '/admin/wallet/'
+      preLoaderRoute: typeof AdminAdminWalletIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/vendors/': {
+      id: '/_admin/admin/vendors/'
+      path: '/vendors'
+      fullPath: '/admin/vendors/'
+      preLoaderRoute: typeof AdminAdminVendorsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/users/': {
+      id: '/_admin/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminAdminUsersIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/support/': {
+      id: '/_admin/admin/support/'
+      path: '/support'
+      fullPath: '/admin/support/'
+      preLoaderRoute: typeof AdminAdminSupportIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/settings/': {
+      id: '/_admin/admin/settings/'
+      path: '/settings'
+      fullPath: '/admin/settings/'
+      preLoaderRoute: typeof AdminAdminSettingsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/request/': {
+      id: '/_admin/admin/request/'
+      path: '/request'
+      fullPath: '/admin/request/'
+      preLoaderRoute: typeof AdminAdminRequestIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/payout/': {
+      id: '/_admin/admin/payout/'
+      path: '/payout'
+      fullPath: '/admin/payout/'
+      preLoaderRoute: typeof AdminAdminPayoutIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/invite-links/': {
+      id: '/_admin/admin/invite-links/'
+      path: '/invite-links'
+      fullPath: '/admin/invite-links/'
+      preLoaderRoute: typeof AdminAdminInviteLinksIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/create-admin/': {
+      id: '/_admin/admin/create-admin/'
+      path: '/create-admin'
+      fullPath: '/admin/create-admin/'
+      preLoaderRoute: typeof AdminAdminCreateAdminIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/admins/': {
+      id: '/_admin/admin/admins/'
+      path: '/admins'
+      fullPath: '/admin/admins/'
+      preLoaderRoute: typeof AdminAdminAdminsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/activity-logs/': {
+      id: '/_admin/admin/activity-logs/'
+      path: '/activity-logs'
+      fullPath: '/admin/activity-logs/'
+      preLoaderRoute: typeof AdminAdminActivityLogsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
     '/_access/vendor-access/onboarding/': {
       id: '/_access/vendor-access/onboarding/'
       path: '/vendor-access/onboarding'
       fullPath: '/vendor-access/onboarding/'
       preLoaderRoute: typeof AccessVendorAccessOnboardingIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/vendors/influencers/requests/$slug/': {
+      id: '/vendors/influencers/requests/$slug/'
+      path: '/requests/$slug'
+      fullPath: '/vendors/influencers/requests/$slug/'
+      preLoaderRoute: typeof VendorsInfluencersRequestsSlugIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/rate-card/add/': {
+      id: '/vendors/influencers/rate-card/add/'
+      path: '/rate-card/add'
+      fullPath: '/vendors/influencers/rate-card/add/'
+      preLoaderRoute: typeof VendorsInfluencersRateCardAddIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/payouts/$id/': {
+      id: '/vendors/influencers/payouts/$id/'
+      path: '/payouts/$id'
+      fullPath: '/vendors/influencers/payouts/$id/'
+      preLoaderRoute: typeof VendorsInfluencersPayoutsIdIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/negotiations/$id/': {
+      id: '/vendors/influencers/negotiations/$id/'
+      path: '/negotiations/$id'
+      fullPath: '/vendors/influencers/negotiations/$id/'
+      preLoaderRoute: typeof VendorsInfluencersNegotiationsIdIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/help-support/$id/': {
+      id: '/vendors/influencers/help-support/$id/'
+      path: '/$id'
+      fullPath: '/vendors/influencers/help-support/$id/'
+      preLoaderRoute: typeof VendorsInfluencersHelpSupportIdIndexRouteImport
+      parentRoute: typeof VendorsInfluencersHelpSupportRouteRoute
+    }
+    '/vendors/billboards/settings/coverage/': {
+      id: '/vendors/billboards/settings/coverage/'
+      path: '/settings/coverage'
+      fullPath: '/vendors/billboards/settings/coverage/'
+      preLoaderRoute: typeof VendorsBillboardsSettingsCoverageIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
     }
     '/vendors/billboards/requests/$slug/': {
       id: '/vendors/billboards/requests/$slug/'
@@ -1040,11 +1868,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VendorsBillboardsListingSlugIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
     }
+    '/vendors/billboards/help-support/$id/': {
+      id: '/vendors/billboards/help-support/$id/'
+      path: '/$id'
+      fullPath: '/vendors/billboards/help-support/$id/'
+      preLoaderRoute: typeof VendorsBillboardsHelpSupportIdIndexRouteImport
+      parentRoute: typeof VendorsBillboardsHelpSupportRouteRoute
+    }
     '/_usersauth/users/wallet/fundwallet/': {
       id: '/_usersauth/users/wallet/fundwallet/'
       path: '/wallet/fundwallet'
       fullPath: '/users/wallet/fundwallet/'
       preLoaderRoute: typeof UsersauthUsersWalletFundwalletIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/negotiations/influencers/': {
+      id: '/_usersauth/users/negotiations/influencers/'
+      path: '/negotiations/influencers'
+      fullPath: '/users/negotiations/influencers/'
+      preLoaderRoute: typeof UsersauthUsersNegotiationsInfluencersIndexRouteImport
       parentRoute: typeof UsersauthUsersRouteRoute
     }
     '/_usersauth/users/negotiations/$id/': {
@@ -1053,6 +1895,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/users/negotiations/$id/'
       preLoaderRoute: typeof UsersauthUsersNegotiationsIdIndexRouteImport
       parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/help-support/$id/': {
+      id: '/_usersauth/users/help-support/$id/'
+      path: '/$id'
+      fullPath: '/users/help-support/$id/'
+      preLoaderRoute: typeof UsersauthUsersHelpSupportIdIndexRouteImport
+      parentRoute: typeof UsersauthUsersHelpSupportRouteRoute
     }
     '/_usersauth/users/campaign/$slug/': {
       id: '/_usersauth/users/campaign/$slug/'
@@ -1082,12 +1931,82 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersauthAdsBillboardSlugIndexRouteImport
       parentRoute: typeof UsersauthAdsRouteRoute
     }
+    '/_admin/admin/wallet/transactions/': {
+      id: '/_admin/admin/wallet/transactions/'
+      path: '/wallet/transactions'
+      fullPath: '/admin/wallet/transactions/'
+      preLoaderRoute: typeof AdminAdminWalletTransactionsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/users/$id/': {
+      id: '/_admin/admin/users/$id/'
+      path: '/users/$id'
+      fullPath: '/admin/users/$id/'
+      preLoaderRoute: typeof AdminAdminUsersIdIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/support/$id/': {
+      id: '/_admin/admin/support/$id/'
+      path: '/support/$id'
+      fullPath: '/admin/support/$id/'
+      preLoaderRoute: typeof AdminAdminSupportIdIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/payout/$id/': {
+      id: '/_admin/admin/payout/$id/'
+      path: '/payout/$id'
+      fullPath: '/admin/payout/$id/'
+      preLoaderRoute: typeof AdminAdminPayoutIdIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/vendors/influencers/requests/$slug/dispute-chat/': {
+      id: '/vendors/influencers/requests/$slug/dispute-chat/'
+      path: '/requests/$slug/dispute-chat'
+      fullPath: '/vendors/influencers/requests/$slug/dispute-chat/'
+      preLoaderRoute: typeof VendorsInfluencersRequestsSlugDisputeChatIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/influencers/rate-card/$id/edit/': {
+      id: '/vendors/influencers/rate-card/$id/edit/'
+      path: '/rate-card/$id/edit'
+      fullPath: '/vendors/influencers/rate-card/$id/edit/'
+      preLoaderRoute: typeof VendorsInfluencersRateCardIdEditIndexRouteImport
+      parentRoute: typeof VendorsInfluencersRouteRoute
+    }
+    '/vendors/billboards/requests/$slug/dispute-chat/': {
+      id: '/vendors/billboards/requests/$slug/dispute-chat/'
+      path: '/requests/$slug/dispute-chat'
+      fullPath: '/vendors/billboards/requests/$slug/dispute-chat/'
+      preLoaderRoute: typeof VendorsBillboardsRequestsSlugDisputeChatIndexRouteImport
+      parentRoute: typeof VendorsBillboardsRouteRoute
+    }
     '/vendors/billboards/listing/$slug/edit/': {
       id: '/vendors/billboards/listing/$slug/edit/'
       path: '/listing/$slug/edit'
       fullPath: '/vendors/billboards/listing/$slug/edit/'
       preLoaderRoute: typeof VendorsBillboardsListingSlugEditIndexRouteImport
       parentRoute: typeof VendorsBillboardsRouteRoute
+    }
+    '/_usersauth/users/negotiations/influencers/$id/': {
+      id: '/_usersauth/users/negotiations/influencers/$id/'
+      path: '/negotiations/influencers/$id'
+      fullPath: '/users/negotiations/influencers/$id/'
+      preLoaderRoute: typeof UsersauthUsersNegotiationsInfluencersIdIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/campaign/influencer/$id/': {
+      id: '/_usersauth/users/campaign/influencer/$id/'
+      path: '/campaign/influencer/$id'
+      fullPath: '/users/campaign/influencer/$id/'
+      preLoaderRoute: typeof UsersauthUsersCampaignInfluencerIdIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
+    '/_usersauth/users/campaign/$slug/dispute-chat/': {
+      id: '/_usersauth/users/campaign/$slug/dispute-chat/'
+      path: '/campaign/$slug/dispute-chat'
+      fullPath: '/users/campaign/$slug/dispute-chat/'
+      preLoaderRoute: typeof UsersauthUsersCampaignSlugDisputeChatIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
     }
     '/_usersauth/ads/influencer/$slug/onboarding/': {
       id: '/_usersauth/ads/influencer/$slug/onboarding/'
@@ -1103,6 +2022,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersauthAdsBillboardSlugOnboardIndexRouteImport
       parentRoute: typeof UsersauthAdsRouteRoute
     }
+    '/_admin/admin/users/$id/billboards/': {
+      id: '/_admin/admin/users/$id/billboards/'
+      path: '/users/$id/billboards'
+      fullPath: '/admin/users/$id/billboards/'
+      preLoaderRoute: typeof AdminAdminUsersIdBillboardsIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/request/influencer/$id/': {
+      id: '/_admin/admin/request/influencer/$id/'
+      path: '/request/influencer/$id'
+      fullPath: '/admin/request/influencer/$id/'
+      preLoaderRoute: typeof AdminAdminRequestInfluencerIdIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/request/billboard/$id/': {
+      id: '/_admin/admin/request/billboard/$id/'
+      path: '/request/billboard/$id'
+      fullPath: '/admin/request/billboard/$id/'
+      preLoaderRoute: typeof AdminAdminRequestBillboardIdIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_usersauth/users/campaign/influencer/$id/dispute-chat/': {
+      id: '/_usersauth/users/campaign/influencer/$id/dispute-chat/'
+      path: '/campaign/influencer/$id/dispute-chat'
+      fullPath: '/users/campaign/influencer/$id/dispute-chat/'
+      preLoaderRoute: typeof UsersauthUsersCampaignInfluencerIdDisputeChatIndexRouteImport
+      parentRoute: typeof UsersauthUsersRouteRoute
+    }
     '/_usersauth/ads/influencer/$slug/onboarding/checkout/': {
       id: '/_usersauth/ads/influencer/$slug/onboarding/checkout/'
       path: '/influencer/$slug/onboarding/checkout'
@@ -1117,15 +2064,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UsersauthAdsBillboardSlugOnboardCheckoutIndexRouteImport
       parentRoute: typeof UsersauthAdsRouteRoute
     }
+    '/_admin/admin/request/influencer/$id/dispute-chat/': {
+      id: '/_admin/admin/request/influencer/$id/dispute-chat/'
+      path: '/request/influencer/$id/dispute-chat'
+      fullPath: '/admin/request/influencer/$id/dispute-chat/'
+      preLoaderRoute: typeof AdminAdminRequestInfluencerIdDisputeChatIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/_admin/admin/request/billboard/$id/dispute-chat/': {
+      id: '/_admin/admin/request/billboard/$id/dispute-chat/'
+      path: '/request/billboard/$id/dispute-chat'
+      fullPath: '/admin/request/billboard/$id/dispute-chat/'
+      preLoaderRoute: typeof AdminAdminRequestBillboardIdDisputeChatIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
   }
 }
 
 interface AdminAdminRouteRouteChildren {
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
+  AdminAdminActivityLogsIndexRoute: typeof AdminAdminActivityLogsIndexRoute
+  AdminAdminAdminsIndexRoute: typeof AdminAdminAdminsIndexRoute
+  AdminAdminCreateAdminIndexRoute: typeof AdminAdminCreateAdminIndexRoute
+  AdminAdminInviteLinksIndexRoute: typeof AdminAdminInviteLinksIndexRoute
+  AdminAdminPayoutIndexRoute: typeof AdminAdminPayoutIndexRoute
+  AdminAdminRequestIndexRoute: typeof AdminAdminRequestIndexRoute
+  AdminAdminSettingsIndexRoute: typeof AdminAdminSettingsIndexRoute
+  AdminAdminSupportIndexRoute: typeof AdminAdminSupportIndexRoute
+  AdminAdminUsersIndexRoute: typeof AdminAdminUsersIndexRoute
+  AdminAdminVendorsIndexRoute: typeof AdminAdminVendorsIndexRoute
+  AdminAdminWalletIndexRoute: typeof AdminAdminWalletIndexRoute
+  AdminAdminPayoutIdIndexRoute: typeof AdminAdminPayoutIdIndexRoute
+  AdminAdminSupportIdIndexRoute: typeof AdminAdminSupportIdIndexRoute
+  AdminAdminUsersIdIndexRoute: typeof AdminAdminUsersIdIndexRoute
+  AdminAdminWalletTransactionsIndexRoute: typeof AdminAdminWalletTransactionsIndexRoute
+  AdminAdminRequestBillboardIdIndexRoute: typeof AdminAdminRequestBillboardIdIndexRoute
+  AdminAdminRequestInfluencerIdIndexRoute: typeof AdminAdminRequestInfluencerIdIndexRoute
+  AdminAdminUsersIdBillboardsIndexRoute: typeof AdminAdminUsersIdBillboardsIndexRoute
+  AdminAdminRequestBillboardIdDisputeChatIndexRoute: typeof AdminAdminRequestBillboardIdDisputeChatIndexRoute
+  AdminAdminRequestInfluencerIdDisputeChatIndexRoute: typeof AdminAdminRequestInfluencerIdDisputeChatIndexRoute
 }
 
 const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
   AdminAdminIndexRoute: AdminAdminIndexRoute,
+  AdminAdminActivityLogsIndexRoute: AdminAdminActivityLogsIndexRoute,
+  AdminAdminAdminsIndexRoute: AdminAdminAdminsIndexRoute,
+  AdminAdminCreateAdminIndexRoute: AdminAdminCreateAdminIndexRoute,
+  AdminAdminInviteLinksIndexRoute: AdminAdminInviteLinksIndexRoute,
+  AdminAdminPayoutIndexRoute: AdminAdminPayoutIndexRoute,
+  AdminAdminRequestIndexRoute: AdminAdminRequestIndexRoute,
+  AdminAdminSettingsIndexRoute: AdminAdminSettingsIndexRoute,
+  AdminAdminSupportIndexRoute: AdminAdminSupportIndexRoute,
+  AdminAdminUsersIndexRoute: AdminAdminUsersIndexRoute,
+  AdminAdminVendorsIndexRoute: AdminAdminVendorsIndexRoute,
+  AdminAdminWalletIndexRoute: AdminAdminWalletIndexRoute,
+  AdminAdminPayoutIdIndexRoute: AdminAdminPayoutIdIndexRoute,
+  AdminAdminSupportIdIndexRoute: AdminAdminSupportIdIndexRoute,
+  AdminAdminUsersIdIndexRoute: AdminAdminUsersIdIndexRoute,
+  AdminAdminWalletTransactionsIndexRoute:
+    AdminAdminWalletTransactionsIndexRoute,
+  AdminAdminRequestBillboardIdIndexRoute:
+    AdminAdminRequestBillboardIdIndexRoute,
+  AdminAdminRequestInfluencerIdIndexRoute:
+    AdminAdminRequestInfluencerIdIndexRoute,
+  AdminAdminUsersIdBillboardsIndexRoute: AdminAdminUsersIdBillboardsIndexRoute,
+  AdminAdminRequestBillboardIdDisputeChatIndexRoute:
+    AdminAdminRequestBillboardIdDisputeChatIndexRoute,
+  AdminAdminRequestInfluencerIdDisputeChatIndexRoute:
+    AdminAdminRequestInfluencerIdDisputeChatIndexRoute,
 }
 
 const AdminAdminRouteRouteWithChildren = AdminAdminRouteRoute._addFileChildren(
@@ -1185,7 +2191,25 @@ const UsersauthAdsRouteRouteChildren: UsersauthAdsRouteRouteChildren = {
 const UsersauthAdsRouteRouteWithChildren =
   UsersauthAdsRouteRoute._addFileChildren(UsersauthAdsRouteRouteChildren)
 
+interface UsersauthUsersHelpSupportRouteRouteChildren {
+  UsersauthUsersHelpSupportIndexRoute: typeof UsersauthUsersHelpSupportIndexRoute
+  UsersauthUsersHelpSupportIdIndexRoute: typeof UsersauthUsersHelpSupportIdIndexRoute
+}
+
+const UsersauthUsersHelpSupportRouteRouteChildren: UsersauthUsersHelpSupportRouteRouteChildren =
+  {
+    UsersauthUsersHelpSupportIndexRoute: UsersauthUsersHelpSupportIndexRoute,
+    UsersauthUsersHelpSupportIdIndexRoute:
+      UsersauthUsersHelpSupportIdIndexRoute,
+  }
+
+const UsersauthUsersHelpSupportRouteRouteWithChildren =
+  UsersauthUsersHelpSupportRouteRoute._addFileChildren(
+    UsersauthUsersHelpSupportRouteRouteChildren,
+  )
+
 interface UsersauthUsersRouteRouteChildren {
+  UsersauthUsersHelpSupportRouteRoute: typeof UsersauthUsersHelpSupportRouteRouteWithChildren
   UsersauthUsersIndexRoute: typeof UsersauthUsersIndexRoute
   UsersauthUsersAnalysisIndexRoute: typeof UsersauthUsersAnalysisIndexRoute
   UsersauthUsersCampaignIndexRoute: typeof UsersauthUsersCampaignIndexRoute
@@ -1194,10 +2218,17 @@ interface UsersauthUsersRouteRouteChildren {
   UsersauthUsersWalletIndexRoute: typeof UsersauthUsersWalletIndexRoute
   UsersauthUsersCampaignSlugIndexRoute: typeof UsersauthUsersCampaignSlugIndexRoute
   UsersauthUsersNegotiationsIdIndexRoute: typeof UsersauthUsersNegotiationsIdIndexRoute
+  UsersauthUsersNegotiationsInfluencersIndexRoute: typeof UsersauthUsersNegotiationsInfluencersIndexRoute
   UsersauthUsersWalletFundwalletIndexRoute: typeof UsersauthUsersWalletFundwalletIndexRoute
+  UsersauthUsersCampaignSlugDisputeChatIndexRoute: typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
+  UsersauthUsersCampaignInfluencerIdIndexRoute: typeof UsersauthUsersCampaignInfluencerIdIndexRoute
+  UsersauthUsersNegotiationsInfluencersIdIndexRoute: typeof UsersauthUsersNegotiationsInfluencersIdIndexRoute
+  UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute: typeof UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute
 }
 
 const UsersauthUsersRouteRouteChildren: UsersauthUsersRouteRouteChildren = {
+  UsersauthUsersHelpSupportRouteRoute:
+    UsersauthUsersHelpSupportRouteRouteWithChildren,
   UsersauthUsersIndexRoute: UsersauthUsersIndexRoute,
   UsersauthUsersAnalysisIndexRoute: UsersauthUsersAnalysisIndexRoute,
   UsersauthUsersCampaignIndexRoute: UsersauthUsersCampaignIndexRoute,
@@ -1207,8 +2238,18 @@ const UsersauthUsersRouteRouteChildren: UsersauthUsersRouteRouteChildren = {
   UsersauthUsersCampaignSlugIndexRoute: UsersauthUsersCampaignSlugIndexRoute,
   UsersauthUsersNegotiationsIdIndexRoute:
     UsersauthUsersNegotiationsIdIndexRoute,
+  UsersauthUsersNegotiationsInfluencersIndexRoute:
+    UsersauthUsersNegotiationsInfluencersIndexRoute,
   UsersauthUsersWalletFundwalletIndexRoute:
     UsersauthUsersWalletFundwalletIndexRoute,
+  UsersauthUsersCampaignSlugDisputeChatIndexRoute:
+    UsersauthUsersCampaignSlugDisputeChatIndexRoute,
+  UsersauthUsersCampaignInfluencerIdIndexRoute:
+    UsersauthUsersCampaignInfluencerIdIndexRoute,
+  UsersauthUsersNegotiationsInfluencersIdIndexRoute:
+    UsersauthUsersNegotiationsInfluencersIdIndexRoute,
+  UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute:
+    UsersauthUsersCampaignInfluencerIdDisputeChatIndexRoute,
 }
 
 const UsersauthUsersRouteRouteWithChildren =
@@ -1261,7 +2302,26 @@ const PublicLightnavbarRouteRouteWithChildren =
     PublicLightnavbarRouteRouteChildren,
   )
 
+interface VendorsBillboardsHelpSupportRouteRouteChildren {
+  VendorsBillboardsHelpSupportIndexRoute: typeof VendorsBillboardsHelpSupportIndexRoute
+  VendorsBillboardsHelpSupportIdIndexRoute: typeof VendorsBillboardsHelpSupportIdIndexRoute
+}
+
+const VendorsBillboardsHelpSupportRouteRouteChildren: VendorsBillboardsHelpSupportRouteRouteChildren =
+  {
+    VendorsBillboardsHelpSupportIndexRoute:
+      VendorsBillboardsHelpSupportIndexRoute,
+    VendorsBillboardsHelpSupportIdIndexRoute:
+      VendorsBillboardsHelpSupportIdIndexRoute,
+  }
+
+const VendorsBillboardsHelpSupportRouteRouteWithChildren =
+  VendorsBillboardsHelpSupportRouteRoute._addFileChildren(
+    VendorsBillboardsHelpSupportRouteRouteChildren,
+  )
+
 interface VendorsBillboardsRouteRouteChildren {
+  VendorsBillboardsHelpSupportRouteRoute: typeof VendorsBillboardsHelpSupportRouteRouteWithChildren
   VendorsBillboardsIndexRoute: typeof VendorsBillboardsIndexRoute
   VendorsBillboardsAddBillboardIndexRoute: typeof VendorsBillboardsAddBillboardIndexRoute
   VendorsBillboardsListingIndexRoute: typeof VendorsBillboardsListingIndexRoute
@@ -1274,11 +2334,15 @@ interface VendorsBillboardsRouteRouteChildren {
   VendorsBillboardsNegotiationsIdIndexRoute: typeof VendorsBillboardsNegotiationsIdIndexRoute
   VendorsBillboardsPayoutsIdIndexRoute: typeof VendorsBillboardsPayoutsIdIndexRoute
   VendorsBillboardsRequestsSlugIndexRoute: typeof VendorsBillboardsRequestsSlugIndexRoute
+  VendorsBillboardsSettingsCoverageIndexRoute: typeof VendorsBillboardsSettingsCoverageIndexRoute
   VendorsBillboardsListingSlugEditIndexRoute: typeof VendorsBillboardsListingSlugEditIndexRoute
+  VendorsBillboardsRequestsSlugDisputeChatIndexRoute: typeof VendorsBillboardsRequestsSlugDisputeChatIndexRoute
 }
 
 const VendorsBillboardsRouteRouteChildren: VendorsBillboardsRouteRouteChildren =
   {
+    VendorsBillboardsHelpSupportRouteRoute:
+      VendorsBillboardsHelpSupportRouteRouteWithChildren,
     VendorsBillboardsIndexRoute: VendorsBillboardsIndexRoute,
     VendorsBillboardsAddBillboardIndexRoute:
       VendorsBillboardsAddBillboardIndexRoute,
@@ -1296,13 +2360,83 @@ const VendorsBillboardsRouteRouteChildren: VendorsBillboardsRouteRouteChildren =
     VendorsBillboardsPayoutsIdIndexRoute: VendorsBillboardsPayoutsIdIndexRoute,
     VendorsBillboardsRequestsSlugIndexRoute:
       VendorsBillboardsRequestsSlugIndexRoute,
+    VendorsBillboardsSettingsCoverageIndexRoute:
+      VendorsBillboardsSettingsCoverageIndexRoute,
     VendorsBillboardsListingSlugEditIndexRoute:
       VendorsBillboardsListingSlugEditIndexRoute,
+    VendorsBillboardsRequestsSlugDisputeChatIndexRoute:
+      VendorsBillboardsRequestsSlugDisputeChatIndexRoute,
   }
 
 const VendorsBillboardsRouteRouteWithChildren =
   VendorsBillboardsRouteRoute._addFileChildren(
     VendorsBillboardsRouteRouteChildren,
+  )
+
+interface VendorsInfluencersHelpSupportRouteRouteChildren {
+  VendorsInfluencersHelpSupportIndexRoute: typeof VendorsInfluencersHelpSupportIndexRoute
+  VendorsInfluencersHelpSupportIdIndexRoute: typeof VendorsInfluencersHelpSupportIdIndexRoute
+}
+
+const VendorsInfluencersHelpSupportRouteRouteChildren: VendorsInfluencersHelpSupportRouteRouteChildren =
+  {
+    VendorsInfluencersHelpSupportIndexRoute:
+      VendorsInfluencersHelpSupportIndexRoute,
+    VendorsInfluencersHelpSupportIdIndexRoute:
+      VendorsInfluencersHelpSupportIdIndexRoute,
+  }
+
+const VendorsInfluencersHelpSupportRouteRouteWithChildren =
+  VendorsInfluencersHelpSupportRouteRoute._addFileChildren(
+    VendorsInfluencersHelpSupportRouteRouteChildren,
+  )
+
+interface VendorsInfluencersRouteRouteChildren {
+  VendorsInfluencersHelpSupportRouteRoute: typeof VendorsInfluencersHelpSupportRouteRouteWithChildren
+  VendorsInfluencersIndexRoute: typeof VendorsInfluencersIndexRoute
+  VendorsInfluencersNegotiationsIndexRoute: typeof VendorsInfluencersNegotiationsIndexRoute
+  VendorsInfluencersPayoutsIndexRoute: typeof VendorsInfluencersPayoutsIndexRoute
+  VendorsInfluencersRateCardIndexRoute: typeof VendorsInfluencersRateCardIndexRoute
+  VendorsInfluencersRequestsIndexRoute: typeof VendorsInfluencersRequestsIndexRoute
+  VendorsInfluencersSettingsIndexRoute: typeof VendorsInfluencersSettingsIndexRoute
+  VendorsInfluencersWalletIndexRoute: typeof VendorsInfluencersWalletIndexRoute
+  VendorsInfluencersNegotiationsIdIndexRoute: typeof VendorsInfluencersNegotiationsIdIndexRoute
+  VendorsInfluencersPayoutsIdIndexRoute: typeof VendorsInfluencersPayoutsIdIndexRoute
+  VendorsInfluencersRateCardAddIndexRoute: typeof VendorsInfluencersRateCardAddIndexRoute
+  VendorsInfluencersRequestsSlugIndexRoute: typeof VendorsInfluencersRequestsSlugIndexRoute
+  VendorsInfluencersRateCardIdEditIndexRoute: typeof VendorsInfluencersRateCardIdEditIndexRoute
+  VendorsInfluencersRequestsSlugDisputeChatIndexRoute: typeof VendorsInfluencersRequestsSlugDisputeChatIndexRoute
+}
+
+const VendorsInfluencersRouteRouteChildren: VendorsInfluencersRouteRouteChildren =
+  {
+    VendorsInfluencersHelpSupportRouteRoute:
+      VendorsInfluencersHelpSupportRouteRouteWithChildren,
+    VendorsInfluencersIndexRoute: VendorsInfluencersIndexRoute,
+    VendorsInfluencersNegotiationsIndexRoute:
+      VendorsInfluencersNegotiationsIndexRoute,
+    VendorsInfluencersPayoutsIndexRoute: VendorsInfluencersPayoutsIndexRoute,
+    VendorsInfluencersRateCardIndexRoute: VendorsInfluencersRateCardIndexRoute,
+    VendorsInfluencersRequestsIndexRoute: VendorsInfluencersRequestsIndexRoute,
+    VendorsInfluencersSettingsIndexRoute: VendorsInfluencersSettingsIndexRoute,
+    VendorsInfluencersWalletIndexRoute: VendorsInfluencersWalletIndexRoute,
+    VendorsInfluencersNegotiationsIdIndexRoute:
+      VendorsInfluencersNegotiationsIdIndexRoute,
+    VendorsInfluencersPayoutsIdIndexRoute:
+      VendorsInfluencersPayoutsIdIndexRoute,
+    VendorsInfluencersRateCardAddIndexRoute:
+      VendorsInfluencersRateCardAddIndexRoute,
+    VendorsInfluencersRequestsSlugIndexRoute:
+      VendorsInfluencersRequestsSlugIndexRoute,
+    VendorsInfluencersRateCardIdEditIndexRoute:
+      VendorsInfluencersRateCardIdEditIndexRoute,
+    VendorsInfluencersRequestsSlugDisputeChatIndexRoute:
+      VendorsInfluencersRequestsSlugDisputeChatIndexRoute,
+  }
+
+const VendorsInfluencersRouteRouteWithChildren =
+  VendorsInfluencersRouteRoute._addFileChildren(
+    VendorsInfluencersRouteRouteChildren,
   )
 
 const rootRouteChildren: RootRouteChildren = {
@@ -1312,10 +2446,10 @@ const rootRouteChildren: RootRouteChildren = {
   PublicDarknavbarRouteRoute: PublicDarknavbarRouteRouteWithChildren,
   PublicLightnavbarRouteRoute: PublicLightnavbarRouteRouteWithChildren,
   VendorsBillboardsRouteRoute: VendorsBillboardsRouteRouteWithChildren,
+  VendorsInfluencersRouteRoute: VendorsInfluencersRouteRouteWithChildren,
   AccessEmailVerificationIndexRoute: AccessEmailVerificationIndexRoute,
   AccessSigninIndexRoute: AccessSigninIndexRoute,
   AccessSignupIndexRoute: AccessSignupIndexRoute,
-  VendorsInfluencersIndexRoute: VendorsInfluencersIndexRoute,
   AccessVendorAccessOnboardingIndexRoute:
     AccessVendorAccessOnboardingIndexRoute,
 }

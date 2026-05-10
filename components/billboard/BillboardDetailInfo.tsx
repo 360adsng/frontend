@@ -12,9 +12,15 @@ import {
 
 const locationIcon = "/icons/location.svg";
 
-type MainProps = { bb: PublicBillboardListing };
+type MainProps = {
+  bb: PublicBillboardListing;
+  showOwnerCompanyName?: boolean;
+};
 
-export function BillboardDetailMainColumn({ bb }: MainProps) {
+export function BillboardDetailMainColumn({
+  bb,
+  showOwnerCompanyName = false,
+}: MainProps) {
   const hasCoords =
     bb.latitude != null &&
     bb.longitude != null &&
@@ -40,12 +46,41 @@ export function BillboardDetailMainColumn({ bb }: MainProps) {
       ? bb.audienceTypes.join(", ")
       : null;
 
+  const locationChips: { label: string; value: string }[] = [];
+  if (bb.city || bb.state) {
+    locationChips.push({
+      label: "Area",
+      value: [bb.city, bb.state].filter(Boolean).join(", "),
+    });
+  }
+  if (bb.nearbyLandmarks) {
+    locationChips.push({ label: "Nearby", value: bb.nearbyLandmarks });
+  }
+  if (bb.trafficDescription) {
+    locationChips.push({ label: "Traffic", value: bb.trafficDescription });
+  }
+
   return (
-    <div className="md:w-4/5 space-y-4">
-      <h3 className="flex items-center gap-2 font-bold text-lg">
-        <img alt="" src={locationIcon} className="h-5 w-5 shrink-0" />
-        {bb.name}
-      </h3>
+    <div className="space-y-5">
+      <div>
+        <h3 className="flex items-start gap-2 text-xl font-semibold text-neutral-900 md:text-2xl">
+          <img
+            alt=""
+            src={locationIcon}
+            className="mt-1 h-5 w-5 shrink-0 opacity-80"
+          />
+          <span>{bb.name}</span>
+        </h3>
+
+        {showOwnerCompanyName && bb.ownerCompanyName ? (
+          <p className="mt-1 text-sm text-neutral-600">
+            Owned by{" "}
+            <span className="font-medium text-neutral-800">
+              {bb.ownerCompanyName}
+            </span>
+          </p>
+        ) : null}
+      </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -68,56 +103,66 @@ export function BillboardDetailMainColumn({ bb }: MainProps) {
         )}
       </div>
 
-      <div>
-        <h4 className="text-sm font-semibold text-neutral-600">Board type</h4>
-        <p className="mt-0.5">{boardTypeLabel(bb.boardType)}</p>
-      </div>
-
-      <div>
-        <h4 className="text-sm font-semibold text-neutral-600">Location</h4>
-        <p className="mt-0.5">{bb.address}</p>
-        <p className="text-neutral-700">
-          {bb.city}, {bb.state}
-        </p>
-        {hasCoords ? (
-          <a
-            href={googleMapsSearchUrl(bb.latitude!, bb.longitude!)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-1 inline-block text-sm text-ads360yellowBtn-100 underline"
-          >
-            Open in Google Maps
-          </a>
-        ) : null}
-      </div>
-
-      {bb.nearbyLandmarks ? (
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Nearby</h4>
-          <p className="mt-0.5">{bb.nearbyLandmarks}</p>
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Board type
+          </h4>
+          <p className="mt-1 text-sm font-medium text-neutral-900">
+            {boardTypeLabel(bb.boardType)}
+          </p>
         </div>
-      ) : null}
 
-      {bb.trafficDescription ? (
         <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Traffic</h4>
-          <p className="mt-0.5">{bb.trafficDescription}</p>
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Location
+          </h4>
+          <p className="mt-1 text-sm font-medium text-neutral-900">
+            {bb.address}
+          </p>
+          {locationChips.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {locationChips.map((c) => (
+                <span
+                  key={c.label}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800"
+                  title={c.value}
+                >
+                  <span className="text-neutral-600">{c.label}</span>
+                  <span className="h-1 w-1 rounded-full bg-neutral-300" />
+                  <span className="max-w-[220px] truncate">{c.value}</span>
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {hasCoords ? (
+            <a
+              href={googleMapsSearchUrl(bb.latitude!, bb.longitude!)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block text-sm font-medium text-ads360yellowBtn-100 underline"
+            >
+              Open in Google Maps
+            </a>
+          ) : null}
         </div>
-      ) : null}
+      </div>
 
       {sizeLine ? (
         <div>
-          <h4 className="text-sm font-semibold text-neutral-600">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
             Physical size
           </h4>
-          <p className="mt-0.5">{sizeLine}</p>
+          <p className="mt-1 text-sm text-neutral-800">{sizeLine}</p>
         </div>
       ) : null}
 
       {pixelLine ? (
         <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Pixel size</h4>
-          <p className="mt-0.5">{pixelLine}</p>
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Pixel size
+          </h4>
+          <p className="mt-1 text-sm text-neutral-800">{pixelLine}</p>
         </div>
       ) : null}
 
@@ -145,8 +190,10 @@ export function BillboardDetailMainColumn({ bb }: MainProps) {
       ) : null}
 
       <div>
-        <h4 className="text-sm font-semibold text-neutral-600">Schedule</h4>
-        <p className="mt-0.5">{formatRuntime(bb)}</p>
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          Schedule
+        </h4>
+        <p className="mt-1 text-sm text-neutral-800">{formatRuntime(bb)}</p>
         <p className="mt-1 text-sm text-neutral-600">
           Active days: {formatActiveDaysSummary(bb.activeDays)}
         </p>
@@ -184,9 +231,15 @@ export function BillboardDetailMainColumn({ bb }: MainProps) {
 type PricingProps = {
   bb: PublicBillboardListing;
   actions: ReactNode;
+  /** Hide the notes block (vendor view). */
+  hideNotes?: boolean;
 };
 
-export function BillboardDetailPricingColumn({ bb, actions }: PricingProps) {
+export function BillboardDetailPricingColumn({
+  bb,
+  actions,
+  hideNotes = false,
+}: PricingProps) {
   const p = bb.pricing;
   const rows: { label: string; value: string }[] = [];
   if (p.daily != null && p.daily > 0) {
@@ -200,47 +253,51 @@ export function BillboardDetailPricingColumn({ bb, actions }: PricingProps) {
   }
 
   return (
-    <div className="md:px-3 basis-1/3">
-      <h4 className="my-3 font-semibold">Price</h4>
-      <p className="mt-1 text-lg font-medium text-ads360black-100">
-        From ₦{primaryPrice(bb.pricing)}
+    <aside className="lg:sticky lg:top-24">
+      <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <h4 className="text-sm font-semibold text-neutral-900">Pricing</h4>
+        <p className="mt-2 text-2xl font-semibold text-ads360black-100">
+          ₦{primaryPrice(bb.pricing)}
         {p.daily != null && p.daily > 0 ? (
           <span className="text-sm font-normal text-neutral-600"> / day</span>
         ) : null}
-      </p>
+        </p>
 
-      {rows.length > 0 ? (
-        <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm">
-          {rows.map((r) => (
-            <li key={r.label} className="flex justify-between gap-3">
-              <span className="text-neutral-600">{r.label}</span>
-              <span className="font-medium">{r.value}</span>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-2 text-sm text-neutral-500">No rate tiers listed.</p>
-      )}
-
-      <div className="mt-6 border-t border-neutral-200 pt-4">
-        <h4 className="font-semibold text-neutral-800">Notes</h4>
-        {bb.isNegotiable ? (
-          <p className="mt-2 text-sm text-neutral-700">
-            The owner has indicated this placement may be negotiable.
-          </p>
+        {rows.length > 0 ? (
+          <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm">
+            {rows.map((r) => (
+              <li key={r.label} className="flex justify-between gap-3">
+                <span className="text-neutral-600">{r.label}</span>
+                <span className="font-medium text-neutral-900">{r.value}</span>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <p className="mt-2 text-sm text-neutral-700">
-            Pricing is as shown unless otherwise agreed on-platform.
-          </p>
+          <p className="mt-2 text-sm text-neutral-500">No rate tiers listed.</p>
         )}
-        {bb.durationPerDisplay != null ? (
-          <p className="mt-2 text-sm text-neutral-600">
-            Each loop runs about {bb.durationPerDisplay} seconds on screen.
-          </p>
-        ) : null}
-      </div>
 
-      <div className="mt-6">{actions}</div>
-    </div>
+        {!hideNotes ? (
+          <div className="mt-6 border-t border-neutral-200 pt-4">
+            <h4 className="text-sm font-semibold text-neutral-900">Notes</h4>
+            {bb.isNegotiable ? (
+              <p className="mt-2 text-sm text-neutral-700">
+                The owner has indicated this placement may be negotiable.
+              </p>
+            ) : (
+              <p className="mt-2 text-sm text-neutral-700">
+                Pricing is as shown unless otherwise agreed on-platform.
+              </p>
+            )}
+            {bb.durationPerDisplay != null ? (
+              <p className="mt-2 text-sm text-neutral-600">
+                Each loop runs about {bb.durationPerDisplay} seconds on screen.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        <div className="mt-6 border-t border-neutral-200 pt-4">{actions}</div>
+      </div>
+    </aside>
   );
 }

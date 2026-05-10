@@ -2,6 +2,8 @@ import { baseFetchJson } from "../baseFetch";
 import type {
   BillboardOwnerSignupPayload,
   BillboardOwnerSignupResponse,
+  InfluencerSignupPayload,
+  InfluencerSignupResponse,
   LoginPayload,
   LoginResponse,
   RegisterPayload,
@@ -52,6 +54,17 @@ export async function billboardOwnerSignup(
 ): Promise<BillboardOwnerSignupResponse> {
   return baseFetchJson<BillboardOwnerSignupResponse>(
     "/auth/billboard-owner-signup",
+    { method: "POST", body: payload } as unknown as RequestInit,
+    { skipAuthRefresh: true },
+  );
+}
+
+/** POST /auth/influencer-signup — public; progressive influencer onboarding. */
+export async function influencerSignup(
+  payload: InfluencerSignupPayload,
+): Promise<InfluencerSignupResponse> {
+  return baseFetchJson<InfluencerSignupResponse>(
+    "/auth/influencer-signup",
     { method: "POST", body: payload } as unknown as RequestInit,
     { skipAuthRefresh: true },
   );

@@ -1,9 +1,15 @@
 import React from 'react'
 
-const Checkbox = ({id, onClick, label}:CheckboxProps) => {
+const Checkbox = ({ id, onClick, label, optionValue }: CheckboxProps) => {
+  const valueForHandler =
+    optionValue ??
+    (typeof label === 'string' ? label : '');
   return (
     <div id={id} className="flex gap-2">
-        <input onChange={(e)=>onClick(e, label)} type="checkbox" 
+        <input
+        id={id}
+        onChange={(e) => onClick(e, valueForHandler)}
+        type="checkbox"
         className="relative peer shrink-0
         appearance-none w-4 h-4 border-2 border-ads360yellowBtn-100 rounded-sm bg-white
         mt-1
@@ -11,7 +17,7 @@ const Checkbox = ({id, onClick, label}:CheckboxProps) => {
         focus:outline-none focus:ring-offset-0 focus:ring-2 focus:ring-blue-100
         disabled:border-steel-400 disabled:bg-steel-400"
         />
-        <label htmlFor={id}> {label}</label>
+        <label htmlFor={id} className="flex-1 min-w-0">{label}</label>
         <svg
             className="
                 absolute 

@@ -1,4 +1,4 @@
-import { Link, createFileRoute, useNavigate, useParams } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate, useParams, useSearch } from '@tanstack/react-router';
 
 //import images
 const card = '/icons/usericon/card.svg'
@@ -12,19 +12,43 @@ import { useState } from "react";
 import { Modal } from "@components/modal/modal";
 import { usePayNow, useWallet } from "@endpoint/wallet/useWallet";
 import { useBillboardBooking } from "@endpoint/billboard/useBillboard";
+import { useInfluencerBooking } from "@endpoint/influencer/useInfluencer";
 import { toast } from "sonner";
 
 const Payment = () => {
   const params = useParams({ strict: false }) as { transaction_id?: string };
   const bookingId = Number(params.transaction_id);
-  const booking = useBillboardBooking(
-    Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null,
+  const search = useSearch({ strict: false }) as {
+    bookingKind?: string;
+  };
+  const isInfluencer = search.bookingKind === "influencer";
+
+  const billboardBooking = useBillboardBooking(
+    !isInfluencer && Number.isFinite(bookingId) && bookingId > 0
+      ? bookingId
+      : null,
   );
+  const influencerBooking = useInfluencerBooking(
+    isInfluencer && Number.isFinite(bookingId) && bookingId > 0
+      ? bookingId
+      : null,
+  );
+
   const walletQuery = useWallet();
   const payNow = usePayNow();
   const navigate = useNavigate();
 
-  const amount = Number(booking.data?.negotiatedAmount ?? booking.data?.quotedTotal ?? 0);
+  const amount = Number(
+    isInfluencer
+      ? (influencerBooking.data?.negotiatedAmount ??
+          influencerBooking.data?.quotedTotal ??
+          0)
+      : (billboardBooking.data?.negotiatedAmount ??
+          billboardBooking.data?.quotedTotal ??
+          0),
+  );
+
+  const payKind = isInfluencer ? ("influencer" as const) : undefined;
   const walletBalance = Number(walletQuery.data?.balance ?? 0);
   const [selected, setSelected] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -173,6 +197,7 @@ const Payment = () => {
                     await payNow.mutateAsync({
                       bookingId,
                       paymentMethod: "wallet",
+                      ...(payKind ? { bookingKind: payKind } : {}),
                     });
                     setIsOpen(false);
                     toast.success("Payment successful");
@@ -220,6 +245,7 @@ const Payment = () => {
                     const res = await payNow.mutateAsync({
                       bookingId,
                       paymentMethod: "flutterwave",
+                      ...(payKind ? { bookingKind: payKind } : {}),
                     });
                     const link = (res as any)?.data?.link;
                     if (typeof link === "string" && link.length > 0) {
@@ -244,7 +270,11 @@ const Payment = () => {
 };
 
 export const Route = createFileRoute("/_usersauth/ads/$transaction_id/")({
+  validateSearch: (raw: Record<string, unknown>) => ({
+    bookingKind:
+      raw.bookingKind === "influencer" ? ("influencer" as const) : undefined,
+  }),
   component: Payment,
-})
+});
 
 export default Payment

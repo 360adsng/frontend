@@ -79,33 +79,38 @@ const Billboard = () => {
   return (
     <>
       <section className="bg-[#E9E9E9] px-4 md:px-10 pt-24">
-        <BackBtn> Billboard Details</BackBtn>
+        <div className="mx-auto w-full max-w-6xl">
+          <BackBtn> Billboard Details</BackBtn>
 
-        <p className="text-stone-400 mb-5 mt-3">
-          View full details of billboard and proceed to checkout
-        </p>
-        <div className="w-full flex text-sm md:text-base justify-between md:justify-start md:space-x-3">
-          <button type="button" onClick={() => setView("Billboard Overview")}>
-            Billboard Overview
-            {view === "Billboard Overview" && (
-              <img
-                alt="Billboard Overview selected"
-                src={dash}
-                className="w-2/3 mx-auto relative top-[4px] -left-2"
-              />
-            )}
-          </button>
+          <p className="mb-4 mt-3 text-sm text-stone-500">
+            View full details and proceed to checkout
+          </p>
 
-          <button type="button" onClick={() => setView("License Agreement")}>
-            License Agreement
-            {view === "License Agreement" && (
-              <img
-                alt="License Agreement selected"
-                src={dash}
-                className="w-2/3 mx-auto relative top-[4px] -left-2"
-              />
-            )}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setView("Billboard Overview")}
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                view === "Billboard Overview"
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+              }`}
+            >
+              Overview
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setView("License Agreement")}
+              className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
+                view === "License Agreement"
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+              }`}
+            >
+              License agreement
+            </button>
+          </div>
         </div>
       </section>
 
@@ -133,57 +138,59 @@ const Billboard = () => {
               },
             }}
           >
-            <section className="md:flex px-4 md:px-7 lg:px-20 py-14">
-              <div className="md:px-3 lg:px-6 basis-2/3">
-                <img
-                  src={bb.imageUrl}
-                  alt={bb.name}
-                  className="rounded-t-10 w-full"
-                  onClick={() => setPreview(true)}
-                />
-                <div className="md:flex bg-ads360black-100 space-y-2 md:space-y-0 w-full rounded-b-10 text-white py-2">
-                  <div className="flex items-center space-x-1 lg:px-3">
-                    <img
-                      src={impression}
-                      alt=""
-                      className="rounded-t-10"
-                    />
-                    <p>{displayLine}</p>
+            <section className="bg-[#E9E9E9] px-4 py-8 md:px-10">
+              <div className="mx-auto w-full max-w-6xl">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                  <div className="space-y-6 lg:col-span-2">
+                    <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+                      <button
+                        type="button"
+                        onClick={() => setPreview(true)}
+                        className="block w-full"
+                      >
+                        <img
+                          src={bb.imageUrl}
+                          alt={bb.name}
+                          className="h-[260px] w-full object-cover md:h-[360px]"
+                        />
+                      </button>
+
+                      <div className="flex flex-wrap gap-2 border-t border-neutral-200 p-4">
+                        <span className="inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white">
+                          <img src={impression} alt="" className="h-4 w-4" />
+                          {displayLine}
+                        </span>
+                        <span className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800">
+                          <img src={duration} alt="" className="h-4 w-4" />
+                          {formatRuntime(bb)}
+                        </span>
+                        <span className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800">
+                          <img src={led} alt="" className="h-4 w-4" />
+                          {boardTypeLabel(bb.boardType)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+                      <BillboardDetailMainColumn bb={bb} showOwnerCompanyName />
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-1 lg:px-3">
-                    <img src={duration} alt="" className="rounded-t-10" />
-                    <p>{formatRuntime(bb)}</p>
-                  </div>
-
-                  <div className="flex items-center space-x-1 lg:px-3">
-                    <img src={led} alt="" className="rounded-t-10" />
-                    <p>{boardTypeLabel(bb.boardType)}</p>
-                  </div>
-                </div>
-
-                <BillboardDetailMainColumn bb={bb} />
-              </div>
-
-              <BillboardDetailPricingColumn
-                bb={bb}
-                actions={
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      className="group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-4 h-12"
-                    >
+                  <BillboardDetailPricingColumn
+                    bb={bb}
+                    actions={
                       <Link
                         to="/ads/billboard/$slug/onboard"
                         params={{ slug: String(bb.id) }}
-                        search={{ data:bb }}
+                        search={{ data: bb }}
+                        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-ads360yellow-100 px-4 text-sm font-semibold text-white hover:opacity-95"
                       >
-                        Select Billboard
+                        Select billboard
                       </Link>
-                    </button>
-                  </div>
-                }
-              />
+                    }
+                  />
+                </div>
+              </div>
             </section>
           </motion.div>
         )}

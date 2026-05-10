@@ -1,148 +1,299 @@
-import { useState } from "react";
-const cancel = '/icons/usericon/modalCancelBotton.svg'
-const success = '/icons/usericon/checkSuccess.svg'
-;
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
+const cancel = "/icons/usericon/modalCancelBotton.svg";
 import { Modal } from "@components/modal/modal";
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute, useSearch } from "@tanstack/react-router";
+import Steps from "@components/ui/Steps";
 import BackBtn from "@components/buttons/BackBtn";
-const card = '/del/cards.png'
-const influencerImg = '/del/girl.jpg'
+import CreativeMedia from "@components/ui/CreativeMedia";
+import {
+  useInfluencerBooking,
+  useNegotiateInfluencerBooking,
+} from "@endpoint/influencer/useInfluencer";
+import type { InfluencerNegotiationPhase } from "@endpoint/influencer/influencer";
 
+const FALLBACK_PHOTO = "/icons/user.png";
 
+function formatDurationPlan(plan: string | undefined): string {
+  const p = String(plan ?? "").toLowerCase();
+  if (p === "immediate") return "Immediate (1 day)";
+  if (p === "days") return "Selected calendar days";
+  if (p === "weeks") return "Weeks";
+  if (p === "months") return "Months";
+  return plan ? String(plan) : "—";
+}
 
 const Checkout = () => {
   const [negotia, setNegotia] = useState(false);
   const [negotiatedAmount, setNegotiatedAmount] = useState("");
-  const [successfull, setSuccessfull] = useState(false);
-  const [influencer, setinfluencer] = useState({
-    id: 2,
-    name: "Egbami",
-    image: influencerImg,
-    paid:'no',
-    platform: ['facebook 30000', 'twitter 45000', 'instagram 15000'],
-    negotiationCount: 0,
-    minimumNegotiableAmount: 85000,
-    type: "influencer",
-    duration: "3 days",
-  });
+  const search = useSearch({ strict: false }) as {
+    bookingId?: number | string;
+  };
+  const bookingId = useMemo(() => Number(search.bookingId), [search.bookingId]);
+  const booking = useInfluencerBooking(
+    Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null,
+  );
+  const negotiate = useNegotiateInfluencerBooking();
+  const b = booking.data;
 
-  const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const phase = (b?.negotiationPhase ?? "none") as InfluencerNegotiationPhase;
+
+  const negotiationPayBlocked =
+    Boolean(b?.influencerWasNegotiable) &&
+    b?.negotiatedAmount != null &&
+    phase !== "agreed";
+
+  const perDaySum = useMemo(
+    () =>
+      (b?.platforms ?? []).reduce((s, p) => s + Number(p.amountRate ?? 0), 0),
+    [b?.platforms],
+  );
+
+  const billableDays = b?.billableDays ?? 0;
+  const isDaysPlan = String(b?.durationPlan ?? "").toLowerCase() === "days";
+  const selectedDates = b?.selectedDates ?? [];
+
+  const handleNegotiateInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNegotiatedAmount(e.target.value);
   };
 
-  const submit = (e: React.FormEvent<HTMLFormElement>) => {
+  const submitNegotiation = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSuccessfull(true);
-    setNegotia(false);
-    setinfluencer((prev) => ({ ...prev, negotiationCount: 1 }));
-    setTimeout(() => {
-      setSuccessfull(false);
-    }, 4000);
+    if (!Number.isFinite(bookingId) || bookingId <= 0) {
+      toast.error("Missing booking id");
+      return;
+    }
+    const amt = Number(negotiatedAmount);
+    if (!Number.isFinite(amt) || amt <= 0) {
+      toast.error("Enter a valid amount");
+      return;
+    }
+    try {
+      await negotiate.mutateAsync({ id: bookingId, negotiatedAmount: amt });
+      await booking.refetch();
+      setNegotia(false);
+      setNegotiatedAmount("");
+      toast.success(
+        "Offer sent. Wait for the influencer to accept or counter before paying.",
+      );
+    } catch {
+      // toast handled by hook
+    }
   };
 
   return (
     <>
       <section className="mx-4 md:mx-10 pt-32 pb-24">
-      <BackBtn>influencer Marketing</BackBtn>
+        <BackBtn>influencer Marketing</BackBtn>
 
-        <div className="mt-10 md:flex justify-between my-10">
-            <div className="basis-5/12">
-                <h4 className="my-5 text-[#292728] text-xl">Post Message</h4>
-                <p className="mb-5">
-                    "Unlock the road to convenience with our rideshare app. Say goodbye to traffic woes and hello to hassle-free rides!" 
-                    Contact us @drapmeinc or mail us info@drapme.co
-                    #rideshare #luxurycars #chaffeurservices
+        <Steps step={4} text="#4 - Checkout" />
+
+        {booking.isLoading ? (
+          <div className="text-sm text-gray-600 mt-6">Loading...</div>
+        ) : booking.isError ? (
+          <div className="text-sm text-red-600 mt-6">
+            Could not load booking.
+          </div>
+        ) : null}
+
+        <div className="mt-10 mb-8 max-w-3xl space-y-6">
+          <div className="rounded-10 border border-stone-200 bg-white shadow-sm overflow-hidden">
+            <div className="bg-[#D0B301]/20 px-5 py-3.5 border-b border-stone-100 flex flex-wrap items-center gap-2">
+              <h4 className="text-base font-semibold text-stone-900">
+                Campaign message
+              </h4>
+              <span className="text-xs text-stone-500 md:ml-auto">
+                Brief for the influencer
+              </span>
+            </div>
+            <div className="px-5 py-6 bg-stone-50/50">
+              {b?.message?.trim() ? (
+                <p className="text-stone-800 leading-relaxed whitespace-pre-wrap text-[15px] md:text-base">
+                  {b.message}
                 </p>
+              ) : (
+                <p className="text-stone-400 italic text-sm">
+                  No message was provided.
+                </p>
+              )}
             </div>
-            <div className="basis-5/12">
-                <img alt="influencer"
-                src={card}
-                className="mx-auto"
-                />
+          </div>
+
+          <div className="rounded-10 border border-stone-200 bg-white shadow-sm overflow-hidden">
+            <div className="bg-[#D0B301]/20 px-5 py-3.5 border-b border-stone-100">
+              <h4 className="text-base font-semibold text-stone-900">
+                Creative
+              </h4>
+              <p className="text-xs text-stone-500 mt-0.5">
+                Image or video you attached (if any)
+              </p>
             </div>
+            <div className="px-5 py-5">
+              <CreativeMedia
+                creativeKind={b?.creativeKind}
+                creativeImageUrl={b?.creativeImageUrl}
+                creativeVideoUrl={b?.creativeVideoUrl}
+                hideActions
+                emptyMessage="No image or video attached for this booking."
+              />
+            </div>
+          </div>
         </div>
+
         <div className="w-full overflow-x-auto my-5">
           <table className="min-w-full bg-white">
             <thead className="bg-[#D0B301]/40">
               <tr>
                 <th className="py-2 px-2 md:px-3 border-b">Vendor</th>
                 <th className="py-2 px-2 md:px-3 border-b">Type</th>
-                <th className="py-2 px-2 md:px-3 border-b">Platform/Price</th>
+                <th className="py-2 px-2 md:px-3 border-b">
+                  Platform / rate (per day)
+                </th>
                 <th className="py-2 px-2 md:px-3 border-b">Duration</th>
-                <th className="py-2 px-2 md:px-3 border-b">Start Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">End Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">Total Amount</th>
+                <th className="py-2 px-2 md:px-3 border-b">Start</th>
+                <th className="py-2 px-2 md:px-3 border-b">End</th>
+                <th className="py-2 px-2 md:px-3 border-b">Quoted total</th>
               </tr>
             </thead>
             <tbody className="text-center">
               <tr>
                 <td className="py-2 px-2 md:px-3">
-                <img alt="" src={influencer.image} className="inline" width={40} height={40}/>
-                {influencer.name}
+                  <img
+                    alt=""
+                    src={b?.influencer?.photo || FALLBACK_PHOTO}
+                    className="inline"
+                    width={40}
+                    height={40}
+                  />
+                  {b?.influencer?.mediaName ?? "-"}
+                </td>
+                <td className="py-2 px-2 md:px-3 border-b">Influencer</td>
+                <td className="py-2 px-2 md:px-3 border-b text-left">
+                  <div>
+                    {(b?.platforms ?? []).map((p) => (
+                      <div key={p.id}>
+                        {p.name}
+                        <span className="text-sm text-gray-400">
+                          {" "}
+                          ₦{Number(p.amountRate || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-xs text-stone-500 mt-1 border-t border-stone-100 pt-1">
+                    Combined per day:{" "}
+                    <span className="font-medium text-stone-700">
+                      ₦{Number(perDaySum).toLocaleString()}
+                    </span>
+                  </div>
                 </td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                  Influencer
+                  <div>{formatDurationPlan(b?.durationPlan)}</div>
+                  <div className="text-xs text-stone-500 normal-case mt-0.5">
+                    {billableDays > 0
+                      ? `${billableDays} billable day${billableDays === 1 ? "" : "s"}`
+                      : "—"}
+                  </div>
+                  {isDaysPlan && selectedDates.length > 0 ? (
+                    <div className="text-xs text-left text-stone-600 mt-2 max-w-[10rem] mx-auto space-y-0.5">
+                      {selectedDates.map((d) => (
+                        <div key={d}>{String(d).slice(0, 10)}</div>
+                      ))}
+                    </div>
+                  ) : null}
                 </td>
                 <td className="py-2 px-2 md:px-3 border-b">
-                    <div>
-                        Facebook<span className="text-sm text-gray-400"> ₦30000</span>
-                    </div>
-                    <div>
-                        Twitter<span className="text-sm text-gray-400"> ₦45000</span>
-                    </div>
-                    <div>
-                        Instagram<span className="text-sm text-gray-400"> ₦15000</span>
-                    </div>
+                  {b?.campaignStartDate
+                    ? String(b.campaignStartDate).slice(0, 10)
+                    : "-"}
                 </td>
-                <td className="py-2 px-2 md:px-3 border-b">1 day(s)</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
-                <td className="py-2 px-2 md:px-3 border-b">2023-05-21</td>
-                <td className="py-2 px-2 md:px-3 border-b">₦90,000</td>
+                <td className="py-2 px-2 md:px-3 border-b">
+                  {b?.campaignEndDate
+                    ? String(b.campaignEndDate).slice(0, 10)
+                    : "-"}
+                </td>
+                <td className="py-2 px-2 md:px-3 border-b font-medium">
+                  {b ? `₦${Number(b.quotedTotal || 0).toLocaleString()}` : "-"}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <div className="flex justify-end">
-          <div className="bg-[#D0B301]/40 flex justify-between w-full py-10  px-5 md:w-1/2 lg:w-1/3">
-            <h4>Total Amount</h4>
+          <div className="bg-[#D0B301]/40 flex justify-between w-full py-10 px-5 md:w-1/2 lg:w-1/3">
+            <h4>Total amount</h4>
             <div>
-              <div className="font-bold">₦90,000</div>
+              <div className="font-bold">
+                {b ? `₦${Number(b.quotedTotal || 0).toLocaleString()}` : "—"}
+              </div>
+              <div className="text-sm text-stone-600">
+                {formatDurationPlan(b?.durationPlan)}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex md:justify-end space-x-3 my-3">
+        <div className="flex flex-wrap md:justify-end gap-3 my-3">
           <button
-            disabled={influencer.negotiationCount > 0 ? true : false}
+            type="button"
+            disabled={
+              !b?.influencerWasNegotiable ||
+              b?.minimumNegotiableAmount == null ||
+              b?.negotiatedAmount != null ||
+              negotiate.isPending
+            }
             onClick={() => setNegotia(true)}
             className={`w-123 h-12 rounded-10 my-2 ${
-              influencer.negotiationCount > 0
-                ? "bg-ads360yellow-100/50 text-black/50"
+              !b?.influencerWasNegotiable || b?.negotiatedAmount != null
+                ? "bg-ads360yellow-100/50 text-black/50 cursor-not-allowed"
                 : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"
             }`}
           >
             Negotiate
           </button>
 
-          <button disabled={influencer.paid === 'yes' ? true : false} className={`${influencer.paid === 'yes' ? 'bg-ads360yellow-100/50 text-black/50' : 'hover:animate-changeColor hover:text-white bg-ads360yellow-100'} w-123 h-12 rounded-10 my-2 `}>
-            <Link to={`/ads/${2}`}>Pay Now</Link>
-          </button>
+          {!bookingId ||
+          String(b?.paymentStatus).toLowerCase() === "paid" ||
+          negotiationPayBlocked ? (
+            <span
+              title={
+                negotiationPayBlocked
+                  ? "Complete negotiation (influencer must accept or you accept their counter) before paying."
+                  : undefined
+              }
+              className="inline-flex w-123 cursor-not-allowed items-center justify-center rounded-10 bg-ads360yellow-100/50 px-3 py-3 text-center text-sm text-black/60 my-2"
+            >
+              Pay now
+            </span>
+          ) : (
+            <Link
+              to="/ads/$transaction_id"
+              params={{ transaction_id: String(bookingId || "") }}
+              search={{ bookingKind: "influencer" }}
+              className="hover:animate-changeColor hover:text-white bg-ads360yellow-100 w-123 h-12 rounded-10 my-2 flex items-center justify-center"
+            >
+              Pay now
+            </Link>
+          )}
         </div>
+        {negotiationPayBlocked ? (
+          <p className="max-w-lg text-right text-xs text-amber-900 md:ml-auto">
+            Pay unlocks after the influencer accepts your offer or you accept
+            their counter-offer. Refresh this page for status updates.
+          </p>
+        ) : null}
       </section>
 
       <Modal isOpen={negotia}>
         <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
           <div className="flex justify-between mb-5">
-            <h4 className="">Input Amount</h4>
-            <button onClick={() => setNegotia(false)}>
-              <img
-                src={cancel} alt="modal cancel botton"
-                className="w-5"
-              />
+            <h4 className="">Your offer</h4>
+            <button type="button" onClick={() => setNegotia(false)}>
+              <img src={cancel} alt="" className="w-5" />
             </button>
           </div>
-          <form onSubmit={submit}>
+          <form onSubmit={submitNegotiation}>
             <div className="flex">
               <div className="bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-1/5 content-center text-black/50">
                 {" "}
@@ -151,58 +302,53 @@ const Checkout = () => {
               <input
                 type="number"
                 value={negotiatedAmount}
-                onChange={handleNegotiate}
+                onChange={handleNegotiateInput}
                 className="p-2 focus:outline-none w-full border rounded-r"
               />
             </div>
             <div className="my-3">
               <p className="text-red-700 text-xs">
-                You cannot negotiat lower than ₦
-                {influencer.minimumNegotiableAmount}
+                Minimum offer: ₦{b?.minimumNegotiableAmount ?? 0}
               </p>
-              <p className="text-red-700 text-xs">You can only negotiat once</p>
+              <p className="text-red-700 text-xs">
+                You can only negotiate once per booking.
+              </p>
             </div>
             <div className="flex justify-center">
               <button
+                type="submit"
                 disabled={
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < influencer.minimumNegotiableAmount
-                    ? true
-                    : false
+                  (b?.minimumNegotiableAmount != null &&
+                    parseFloat(negotiatedAmount) < b.minimumNegotiableAmount) ||
+                  negotiate.isPending
                 }
                 className={`${
                   negotiatedAmount === "" ||
-                  parseInt(negotiatedAmount) < influencer.minimumNegotiableAmount
+                  (b?.minimumNegotiableAmount != null &&
+                    parseFloat(negotiatedAmount) < b.minimumNegotiableAmount) ||
+                  negotiate.isPending
                     ? "bg-ads360gray-100"
                     : "bg-ads360black-100/95 hover:bg-ads360black-100"
                 } rounded mt-5  text-white  w-5/6 h-10`}
               >
-                Send Request
+                {negotiate.isPending ? "Sending..." : "Send request"}
               </button>
             </div>
           </form>
-        </div>
-      </Modal>
-
-      <Modal isOpen={successfull}>
-        <div className="bg-white px-5 py-10 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10 grid grid-cols-1 content-center">
-          <img alt=""
-            src={success}
-            className="mx-auto w-2/6"
-          />
-          <div>
-            <p className="text-green-500 text-center mt-5 font-semibold">
-              Request Sent <br /> Successfully
-            </p>
-          </div>
         </div>
       </Modal>
     </>
   );
 };
 
-export const Route = createFileRoute("/_usersauth/ads/influencer/$slug/onboarding/checkout/")({
+export const Route = createFileRoute(
+  "/_usersauth/ads/influencer/$slug/onboarding/checkout/",
+)({
+  validateSearch: (search: Record<string, unknown>) => ({
+    bookingId: search.bookingId,
+  }),
   component: Checkout,
-})
+});
 
-export default Checkout
+export default Checkout;

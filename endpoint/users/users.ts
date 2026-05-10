@@ -2,6 +2,7 @@ import { baseFetchJson } from "../baseFetch";
 import type {
   ChangePasswordPayload,
   MeResponse,
+  MyBillboardCoverageResponse,
   SimpleMessageResponse,
   UpdateProfilePayload,
   UserDashboardResponse,
@@ -24,6 +25,21 @@ export function updateProfile(
     "/users/profile",
     { method: "PATCH", body: payload } as unknown as RequestInit,
   );
+}
+
+export function getMyBillboardCoverage(): Promise<MyBillboardCoverageResponse> {
+  return baseFetchJson<MyBillboardCoverageResponse>("/users/me/billboard-coverage", {
+    method: "GET",
+  });
+}
+
+export function setMyBillboardCoverage(payload: {
+  billboardCoverage: Array<{ state: string; lga: string[] }>;
+}): Promise<SimpleMessageResponse> {
+  return baseFetchJson<SimpleMessageResponse>("/users/me/billboard-coverage", {
+    method: "PATCH",
+    body: payload,
+  } as unknown as RequestInit);
 }
 
 export function changePassword(

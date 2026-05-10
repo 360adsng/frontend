@@ -1,269 +1,541 @@
-"use client"
-;;
-import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react';
-const avatar = '/icons/user.png'
-const dash = '/icons/dash.svg'
-const EditBillboardComponent = () => {
-  const [user, setUser] = useState({
-    email: 'cayomike@gmail.com',
-    phoneNumber: '08140231279',
-    firstName: 'Charles',
-    lastName: 'Ayomike',
-    occupation: 'Web developer',
-    residentialAddress: 'Lagos state, Nigeria',
-    password: ''
+"use client";
+
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
+import type { CountryCode } from "libphonenumber-js";
+import {
+  useChangePassword,
+  useMe,
+  useUploadProfilePhoto,
+  useUpdateProfile,
+} from "@endpoint/users/useUsers";
+import { COUNTRIES } from "../../../../lib/countries";
+import {
+  type BillboardCoverageRow,
+} from "@components/vendor-settings/billboards/BillboardCoverageEditor";
+import { ContactPersonFields } from "@components/vendor-settings/billboards/ContactPersonFields";
+
+const dash = "/icons/dash.svg";
+const avatarFallback = "/icons/user.png";
+
+type Tab = "profile" | "password";
+
+const profileSchemaBillboardOwner = z.object({
+  businessName: z.string().trim().min(1, "Business name is required."),
+  contactName: z.string().trim().min(1, "Contact name is required."),
+  businessDescription: z.string().trim().optional(),
+  businessWebsite: z.string().trim().optional(),
+  address: z.string().trim().optional(),
+  contactPersonEmail: z.string().trim().optional(),
+  contactPersonPosition: z.string().trim().optional(),
+  altPhoneCountryIso2: z.string().trim().optional(),
+  altPhoneNationalNumber: z.string().trim().optional(),
+});
+
+const passwordSchema = z
+  .object({
+    oldPassword: z.string().trim().min(1, "Old password is required."),
+    newPassword: z
+      .string()
+      .trim()
+      .min(8, "New password must be at least 8 characters."),
+    confirmNewPassword: z.string().trim().min(1, "Confirm your new password."),
   })
+  .refine((d) => d.newPassword === d.confirmNewPassword, {
+    path: ["confirmNewPassword"],
+    message: "Passwords do not match.",
+  });
 
-  const handleChange = (e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  }
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return <p className="text-sm text-red-600 mt-1">{message}</p>;
+}
 
+const inputBase =
+  "border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10";
 
-  const [editProfile, setEditProfile] = useState(true)
-  const [view, setView] = useState('Edit')
+function phonePartsFromE164(
+  e164: string | null | undefined,
+): { countryIso2: string; nationalNumber: string } | null {
+  if (!e164) return null;
+  const parsed = parsePhoneNumberFromString(e164);
+  if (!parsed?.isValid()) return null;
+  return {
+    countryIso2: (parsed.country ?? "") as string,
+    nationalNumber: parsed.nationalNumber ?? "",
+  };
+}
 
+function toE164FromParts(
+  countryIso2: string,
+  nationalNumber: string,
+): string | null {
+  const trimmed = nationalNumber.trim().replace(/[\s-]/g, "");
+  if (!countryIso2 || !trimmed) return null;
+  const parsed = parsePhoneNumberFromString(
+    trimmed,
+    countryIso2 as CountryCode,
+  );
+  if (!parsed?.isValid()) return null;
+  return parsed.format("E.164");
+}
 
+function BillboardOwnerSettingsPage() {
+  const [tab, setTab] = useState<Tab>("profile");
+
+  const meQuery = useMe();
+  const me = meQuery.data;
+
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateProfile();
+  const { mutate: uploadPhoto, isPending: isUploadingPhoto } =
+    useUploadProfilePhoto();
+  const { mutate: changePassword, isPending: isChangingPassword } =
+    useChangePassword();
+
+  const [profileErrors, setProfileErrors] = useState<Record<string, string>>(
+    {},
+  );
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>(
+    {},
+  );
+
+  const defaultCountryIso2 = COUNTRIES[0]?.iso2 ?? "NG";
+
+  const [form, setForm] = useState({
+    businessName: "",
+    contactName: "",
+    businessDescription: "",
+    businessWebsite: "",
+    address: "",
+    contactPersonEmail: "",
+    contactPersonPosition: "",
+    altPhoneCountryIso2: defaultCountryIso2,
+    altPhoneNationalNumber: "",
+  });
+
+  const [avatarPreview, setAvatarPreview] = useState<string>(avatarFallback);
+
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    if (!me || me.accountType !== "billboard_owner") return;
+    setAvatarPreview(me.profileImage || avatarFallback);
+    const parts = phonePartsFromE164(me.alternatePhoneNumber);
+    setForm({
+      businessName: me.businessName ?? "",
+      contactName: me.contactName ?? "",
+      businessDescription: me.businessDescription ?? "",
+      businessWebsite: me.businessWebsite ?? "",
+      address: me.address ?? "",
+      contactPersonEmail: me.contactPersonEmail ?? "",
+      contactPersonPosition: me.contactPersonPosition ?? "",
+      altPhoneCountryIso2: parts?.countryIso2 || defaultCountryIso2,
+      altPhoneNationalNumber: parts?.nationalNumber || "",
+    });
+  }, [me]);
+
+  const onSaveProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setProfileErrors({});
+    if (!me || me.accountType !== "billboard_owner") return;
+
+    const parsed = profileSchemaBillboardOwner.safeParse(form);
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        map[issue.path.join(".")] = issue.message;
+      }
+      setProfileErrors(map);
+      return;
+    }
+
+    const altFilled =
+      Boolean(parsed.data.altPhoneCountryIso2?.trim()) ||
+      Boolean(parsed.data.altPhoneNationalNumber?.trim());
+    const altE164 = altFilled
+      ? toE164FromParts(
+          parsed.data.altPhoneCountryIso2 || "",
+          parsed.data.altPhoneNationalNumber || "",
+        )
+      : null;
+    if (altFilled && !altE164) {
+      setProfileErrors({
+        altPhoneNationalNumber: "Enter a valid alternate phone number.",
+      });
+      return;
+    }
+
+    updateProfile({
+      businessName: parsed.data.businessName,
+      contactName: parsed.data.contactName,
+      businessDescription: parsed.data.businessDescription,
+      businessWebsite: parsed.data.businessWebsite,
+      address: parsed.data.address,
+      contactPersonEmail: parsed.data.contactPersonEmail,
+      contactPersonPosition: parsed.data.contactPersonPosition,
+      alternatePhoneNumber: altE164 ?? undefined,
+    });
+  };
+
+  const onSavePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordErrors({});
+
+    const parsed = passwordSchema.safeParse(passwordForm);
+    if (!parsed.success) {
+      const map: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        map[issue.path.join(".")] = issue.message;
+      }
+      setPasswordErrors(map);
+      return;
+    }
+
+    changePassword(
+      {
+        oldPassword: parsed.data.oldPassword,
+        newPassword: parsed.data.newPassword,
+      },
+      {
+        onSuccess: () => {
+          setPasswordForm({
+            oldPassword: "",
+            newPassword: "",
+            confirmNewPassword: "",
+          });
+        },
+      },
+    );
+  };
+
+  const accountTypeLabel = useMemo(() => "Billboard owner", []);
 
   return (
     <>
-        <section className="bg-[#E9E9E9] px-4 md:px-10 pt-14">
+      <section className="bg-[#E9E9E9] px-4 md:px-10 pt-14">
+        <h3 className="text-2xl">Settings</h3>
+        <p className="text-[#8B8B8B] mb-5 mt-3">{accountTypeLabel} settings</p>
 
-            <h3 className='text-2xl'>Settings</h3>
-            <p className='text-[#8B8B8B] mb-5 mt-3'>Edit or view profile settings</p>
+        <div className="w-full flex text-sm md:text-base md:justify-start space-x-3">
+          <button className="relative" onClick={() => setTab("profile")}>
+            Edit Profile
+            {tab === "profile" && (
+              <img
+                alt="selected"
+                src={dash}
+                className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
+              />
+            )}
+          </button>
 
-            <div className="">
-            <div className="w-full flex text-sm md:text-base md:justify-start space-x-3">
-                <button className="relative" onClick={()=>setView('Edit')}>
-                    Edit Profile
-                    {view === 'Edit' && 
-                    <img alt="Billboard Overview selected"
-                        src={dash}
-                        className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-                    />
-                    }
-                </button> 
+          <button className="relative" onClick={() => setTab("password")}>
+            Change Password
+            {tab === "password" && (
+              <img
+                alt="selected"
+                src={dash}
+                className="w-2/5 mx-auto absolute top-[20px] left-[17%]"
+              />
+            )}
+          </button>
+        </div>
+      </section>
 
+      <section className="min-h-screen bg-ads360-hash px-4 md:px-10 py-14">
+        {meQuery.isLoading && <p>Loading...</p>}
+        {meQuery.isError && <p>Failed to load profile.</p>}
 
-                <button className="relative" onClick={()=>setView('password')}>
-                    Change Password
-                    {view === 'password' && 
-                    <img alt="Billboard Overview selected"
-                        src={dash}
-                        className="w-2/5 mx-auto absolute top-[20px] left-[17%]"
-                    />
-                    }
-                </button> 
+        {tab === "profile" && me && me.accountType === "billboard_owner" && (
+          <div className="border border-ads360yellow-100 bg-white rounded-10 my-5 p-4 md:p-6">
+            <h2 className="my-5 font-bold">Business Details</h2>
 
-            </div>
-
-            </div>
-
-            </section>
-    <section className='min-h-screen bg-ads360-hash px-4 md:px-10 py-14'>
-        
-
-
-                      
-
-
-
-        {
-            view === 'Edit' ? 
-            
-        <div className="border border-ads360yellow-100 bg-white rounded-10 my-5 p-2">
-            <div className='mt-5 mb-7'>
-            <h2 className='my-5 font-bold px-5'>User Details</h2>
-            <form>
-                <div className='text-center'>
-                    <img alt=''
-                        src={avatar}
-                        className='w-20 h-20 mx-auto bg-[#f1f1f1] rounded-full'
-                    />
-                    <input type='file' className='border border-[#c5c4c5] text-[#8B8B8B] my-3 w-9/12 md:w-[35%]'/>
+            <div className="text-center mb-8">
+              <label
+                htmlFor="profilePhoto"
+                className="inline-block cursor-pointer"
+              >
+                <img
+                  alt="profile"
+                  src={avatarPreview}
+                  className="w-20 h-20 mx-auto bg-[#f1f1f1] rounded-full object-cover"
+                />
+                <div className="text-sm text-gray-600 mt-3">
+                  Click the image to change
                 </div>
+              </label>
+              <input
+                id="profilePhoto"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const url = URL.createObjectURL(file);
+                  setAvatarPreview(url);
+                  uploadPhoto(file, {
+                    onSuccess: (data) => {
+                      if (data?.url) setAvatarPreview(data.url);
+                    },
+                  });
+                }}
+              />
+              <p className="text-xs text-gray-500">
+                {isUploadingPhoto ? "Uploading..." : "Select an image to upload."}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div className="my-3">
+                  <label>Email:</label>
+                  <input
+                    value={me.email}
+                    disabled
+                    className={`${inputBase} bg-gray-100`}
+                  />
+                </div>
+                <div className="my-3">
+                  <label>Phone Number:</label>
+                  <input
+                    value={me.phone}
+                    disabled
+                    className={`${inputBase} bg-gray-100`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={onSaveProfile}>
+              <div className="md:flex justify-evenly">
+                <div className="md:w-[40%] px-3">
+                  <div className="my-3">
+                    <label>Business Name:</label>
+                    <input
+                      value={form.businessName}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, businessName: e.target.value }))
+                      }
+                      className={inputBase}
+                    />
+                    <FieldError message={profileErrors.businessName} />
+                  </div>
+                  <div className="my-3">
+                    <label>Business Website:</label>
+                    <input
+                      value={form.businessWebsite}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, businessWebsite: e.target.value }))
+                      }
+                      className={inputBase}
+                      placeholder="https://example.com"
+                    />
+                    <FieldError message={profileErrors.businessWebsite} />
+                  </div>
+                </div>
+
+                <div className="md:w-[40%] px-3">
+                  <div className="my-3">
+                    <label>Business Address:</label>
+                    <textarea
+                      value={form.address}
+                      onChange={(e) =>
+                        setForm((p) => ({ ...p, address: e.target.value }))
+                      }
+                      className={inputBase}
+                    />
+                    <FieldError message={profileErrors.address} />
+                  </div>
+                  <div className="my-3">
+                    <label>Business Description:</label>
+                    <textarea
+                      value={form.businessDescription}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          businessDescription: e.target.value,
+                        }))
+                      }
+                      className={inputBase}
+                    />
+                    <FieldError message={profileErrors.businessDescription} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <ContactPersonFields
+                  inputBase={inputBase}
+                  contactName={form.contactName}
+                  onContactName={(v) => setForm((p) => ({ ...p, contactName: v }))}
+                  contactPhoneCountryIso2={form.altPhoneCountryIso2}
+                  contactPhoneNationalNumber={form.altPhoneNationalNumber}
+                  onContactPhoneCountryIso2={(v) =>
+                    setForm((p) => ({ ...p, altPhoneCountryIso2: v }))
+                  }
+                  onContactPhoneNationalNumber={(v) =>
+                    setForm((p) => ({ ...p, altPhoneNationalNumber: v }))
+                  }
+                  contactPersonEmail={form.contactPersonEmail}
+                  onContactPersonEmail={(v) =>
+                    setForm((p) => ({ ...p, contactPersonEmail: v }))
+                  }
+                  contactPersonPosition={form.contactPersonPosition}
+                  onContactPersonPosition={(v) =>
+                    setForm((p) => ({ ...p, contactPersonPosition: v }))
+                  }
+                  countries={COUNTRIES.map((c) => ({
+                    iso2: c.iso2,
+                    flag: c.flag,
+                    callingCode: c.callingCode,
+                  }))}
+                  errorAltPhone={profileErrors.altPhoneNationalNumber}
+                />
+              </div>
+
+              <div className="mt-6 rounded-10 border border-stone-200 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-stone-900">Billboard coverage</div>
+                    <div className="text-xs text-stone-500">
+                      {me?.accountType === "billboard_owner" &&
+                      (me.billboardCoverage?.length ?? 0) > 0
+                        ? `${me.billboardCoverage?.length ?? 0} state(s) configured`
+                        : "No coverage configured yet"}
+                    </div>
+                  </div>
+                  <Link
+                    to="/vendors/billboards/settings/coverage"
+                    className="rounded-10 border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-50"
+                  >
+                    Manage coverage
+                  </Link>
+                </div>
+              </div>
+
+              <div className="text-center my-7">
+                <button
+                  disabled={isUpdating}
+                  type="submit"
+                  className="group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 py-2 px-4 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isUpdating ? "Saving..." : "Save"}
+                </button>
+              </div>
             </form>
-            </div>
-        
-            <form>
-                <div className='md:flex justify-evenly'>
-                    <div className='md:w-[40%] px-3'>
-                        <div className='my-3'>
-                            <label>Email:</label>
-                            <br/>
-                            <input
-                                type="email"
-                                name="email"
-                                value={user.email}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full  p-2 rounded-10'
-                            />
-                        </div>
-                        
-                        <div className='my-3'>
-                            <label>Phone Number:</label>
-                            <br/>
-                            <input
-                            type="tel"
-                            name="phoneNumber"
-                            value={user.phoneNumber}
-                            onChange={handleChange}
-                            required
-                            className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-                        
-                        <div className='my-3'>
-                            <label>First Name:</label>
-                            <br/>
-                            <input
-                            type="text"
-                            name="firstName"
-                            value={user.firstName}
-                            onChange={handleChange}
-                            required
-                            className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-                        
-                        <div className='my-3'>
-                            <label>Last Name:</label>
-                            <br/>
-                            <input
-                            type="text"
-                            name="lastName"
-                            value={user.lastName}
-                            onChange={handleChange}
-                            required
-                            className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-                    </div>
+          </div>
+        )}
 
-
-
-                    <div className='md:w-[40%] px-3'>
-
-                        <div className='my-3'>
-                            <label>Company Name:</label>
-                            <br/>
-                            <input
-                                type="text"
-                                name="occupation"
-                                value={user.occupation}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-                        
-
-                        <div className='my-3'>
-                            <label>Address:</label>
-                            <br/>
-                            <textarea
-                            name="residentialAddress"
-                            value={user.residentialAddress}
-                            onChange={handleChange}
-                            required
-                            className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-                        
-
-                        <div className='my-3'>
-                            <label>Password:</label>
-                            <br/>
-                            <input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-
-                    </div>
-                </div>
-                
-
-                
-                <div className='text-center my-7'>
-                    <button type="submit" className="group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 py-2 px-4">
-                        Save
+        {tab === "password" && (
+          <div className="border border-ads360yellow-100 bg-white rounded-10 my-5 p-4 md:p-6">
+            <div className="mx-auto w-full md:w-1/2">
+              <h2 className="my-5 font-bold">Change Password</h2>
+              <form onSubmit={onSavePassword}>
+                <div className="my-3">
+                  <label>Old Password:</label>
+                  <div className="relative">
+                    <input
+                      type={showOldPassword ? "text" : "password"}
+                      value={passwordForm.oldPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          oldPassword: e.target.value,
+                        }))
+                      }
+                      className={inputBase}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-700"
+                      onClick={() => setShowOldPassword((s) => !s)}
+                    >
+                      {showOldPassword ? "Hide" : "Show"}
                     </button>
+                  </div>
+                  <FieldError message={passwordErrors.oldPassword} />
                 </div>
-            </form>
-        </div>
-        :
 
-        <div className='border border-ads360yellow-100 bg-white rounded-10 my-5 p-2'>
+                <div className="my-3">
+                  <label>New Password:</label>
+                  <div className="relative">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={passwordForm.newPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          newPassword: e.target.value,
+                        }))
+                      }
+                      className={inputBase}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-700"
+                      onClick={() => setShowNewPassword((s) => !s)}
+                    >
+                      {showNewPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <FieldError message={passwordErrors.newPassword} />
+                </div>
 
-            <div className='mx-auto w-full md:w-1/2'>
-            <h2 className='my-5 font-bold'>Change Password</h2>
-                <div className='my-3'>
-                    <label>Old Password:</label>
-                            <br/>
-                            <input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
+                <div className="my-3">
+                  <label>Confirm Password:</label>
+                  <div className="relative">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={passwordForm.confirmNewPassword}
+                      onChange={(e) =>
+                        setPasswordForm((p) => ({
+                          ...p,
+                          confirmNewPassword: e.target.value,
+                        }))
+                      }
+                      className={inputBase}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-700"
+                      onClick={() => setShowConfirmPassword((s) => !s)}
+                    >
+                      {showConfirmPassword ? "Hide" : "Show"}
+                    </button>
+                  </div>
+                  <FieldError message={passwordErrors.confirmNewPassword} />
+                </div>
 
-
-                        <div className='my-3'>
-                        <label>New Password:</label>
-                            <br/>
-                            <input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-
-
-                        <div className='my-3'>
-                        <label>Confirm Password:</label>
-                            <br/>
-                            <input
-                                type="password"
-                                name="password"
-                                value={user.password}
-                                onChange={handleChange}
-                                required
-                                className='border border-[#c5c4c5] text-[#8B8B8B] focus:outline-none w-full p-2 rounded-10'
-                            />
-                        </div>
-
-                
-                        <div className='text-center my-7'>
-                            <button type="submit" className="group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 py-2 px-4">
-                                Save
-                            </button>
-                        </div>
-                
+                <div className="text-center my-7">
+                  <button
+                    disabled={isChangingPassword}
+                    type="submit"
+                    className="group rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 py-2 px-4 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isChangingPassword ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </form>
             </div>
-
-        </div>
-
-    }
-    </section>
+          </div>
+        )}
+      </section>
     </>
-
   );
-};
+}
 
 export const Route = createFileRoute("/vendors/billboards/settings/")({
-  component: EditBillboardComponent,
-})
+  component: BillboardOwnerSettingsPage,
+});
 
-export default EditBillboardComponent
+export default BillboardOwnerSettingsPage;

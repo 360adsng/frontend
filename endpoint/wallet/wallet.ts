@@ -33,7 +33,9 @@ export type TransactionType =
   | "wallet_withdrawal"
   | "wallet_debit"
   | "billboard_booking"
+  | "influencer_booking"
   | "billboard_payout"
+  | "influencer_payout"
   | "refund"
   | "admin_adjustment"
   | "other";
@@ -197,6 +199,8 @@ export function postWalletDeposit(
 export type PayNowPayload = {
   bookingId: number;
   paymentMethod: "wallet" | "flutterwave";
+  /** Omit or `billboard` for billboard bookings; `influencer` for influencer directory bookings */
+  bookingKind?: "billboard" | "influencer";
 };
 
 /** Flutterwave-style envelope returned by POST /wallet/PayNow (flutterwave) */

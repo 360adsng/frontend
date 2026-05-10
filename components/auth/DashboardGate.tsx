@@ -7,11 +7,12 @@ import {
   getDashboardPathForAccountType,
 } from "../../lib/accountDashboard";
 
-export type DashboardGateMode = "users" | "billboard" | "admin";
+export type DashboardGateMode = "users" | "billboard" | "influencer" | "admin";
 
 const MODE_ALLOWED: Record<DashboardGateMode, readonly string[]> = {
   users: [ACCOUNT_TYPE.REGULAR_USER, ACCOUNT_TYPE.BUSINESS_USER],
   billboard: [ACCOUNT_TYPE.BILLBOARD_OWNER],
+  influencer: [ACCOUNT_TYPE.INFLUENCER],
   admin: [ACCOUNT_TYPE.ADMIN],
 };
 

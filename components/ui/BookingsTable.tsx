@@ -36,6 +36,8 @@ function StatusPill({ status }: { status: string }) {
       ? "bg-green-100 text-green-700 border-green-200"
       : s === "active"
         ? "bg-blue-100 text-blue-700 border-blue-200"
+        : s === "dispute"
+          ? "bg-orange-100 text-orange-900 border-orange-300"
         : s === "rejected"
           ? "bg-red-100 text-red-700 border-red-200"
           : s === "pending"

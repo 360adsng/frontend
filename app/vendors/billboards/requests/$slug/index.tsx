@@ -11,13 +11,17 @@ import FilesInput from "@components/inputs/FilesInput";
 import { Modal } from "@components/modal/modal";
 const cancel = "/icons/usericon/modalCancelBotton.svg";
 import {
+  CampaignDisputeNotice,
   CampaignPaymentStatusBadge,
   CampaignStatusBadge,
+  disputeNoticeChatLinkClassNames,
+  disputeNoticeHeaderPillClassNames,
   formatCampaignMoney,
   formatDateRange,
   InfoCard,
   MediaFrame,
   personDisplayName,
+  resolveDisputeNoticePhase,
   SectionLabel,
 } from "@components/campaign/CampaignDetailShared";
 import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
@@ -29,6 +33,16 @@ const Request = () => {
     Number.isFinite(id) && id > 0 ? id : null,
   );
   const b = booking.data;
+  const disputePhase = b
+    ? resolveDisputeNoticePhase({
+        bookingStatus: b.status ?? null,
+        paymentStatus: b.paymentStatus ?? null,
+        disputedAt: b.disputedAt ?? null,
+        disputeReason: b.disputeReason ?? null,
+        disputeChatHasThread: b.disputeChatHasThread ? true : false,
+      })
+    : null;
+  const showDisputeBanner = disputePhase !== null;
   const markActive = useMarkVendorBookingActive();
   const rejectMutation = useRejectVendorBillboardBooking();
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -89,6 +103,17 @@ const Request = () => {
               <div className="flex flex-wrap items-center gap-2 self-end sm:self-start sm:justify-end">
                 <CampaignStatusBadge status={b.status} />
                 <CampaignPaymentStatusBadge paymentStatus={b.paymentStatus} />
+                {showDisputeBanner ? (
+                  <Link
+                    to="/vendors/billboards/requests/$slug/dispute-chat"
+                    params={{ slug: String(b.id) }}
+                    className={`${disputeNoticeHeaderPillClassNames(disputePhase)}`}
+                  >
+                    {disputePhase === "active"
+                      ? "Open dispute chat"
+                      : "View dispute chat"}
+                  </Link>
+                ) : null}
                 <Link
                   to="/vendors/billboards/requests"
                   className="text-xl leading-none text-stone-400 transition hover:text-stone-700"
@@ -209,6 +234,29 @@ const Request = () => {
                 )}
               </MediaFrame>
             </div>
+
+            {showDisputeBanner && disputePhase !== null ? (
+              <div className="px-5 pb-4 sm:px-7">
+                <CampaignDisputeNotice
+                  disputeReason={b.disputeReason ?? null}
+                  disputedAt={b.disputedAt ?? null}
+                  bookingStatus={b.status ?? null}
+                  paymentStatus={b.paymentStatus ?? null}
+                  disputeChatHasThread={b.disputeChatHasThread}
+                  chatLink={
+                    <Link
+                      to="/vendors/billboards/requests/$slug/dispute-chat"
+                      params={{ slug: String(b.id) }}
+                      className={disputeNoticeChatLinkClassNames(disputePhase)}
+                    >
+                      {disputePhase === "active"
+                        ? "Open dispute chat"
+                        : "View dispute chat"}
+                    </Link>
+                  }
+                />
+              </div>
+            ) : null}
 
             <div className="flex flex-col gap-3 border-t border-stone-100 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:px-7">
               {!isRejected && creativeUrl ? (

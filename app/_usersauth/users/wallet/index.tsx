@@ -26,6 +26,9 @@ function accountDisplayName(me: MeResponse | undefined): string {
   if (me.accountType === "regular_user") {
     return `${me.firstName} ${me.lastName}`.trim() || me.email;
   }
+  if (me.accountType === "admin") {
+    return `${me.firstName} ${me.lastName}`.trim() || me.email;
+  }
   return me.email;
 }
 

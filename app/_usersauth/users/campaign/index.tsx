@@ -1,53 +1,77 @@
-"use client"
-import { createFileRoute, Link } from '@tanstack/react-router'
-const dash = '/icons/dash.svg'
-import { useState } from 'react'
-import { useMyBillboardBookings } from '@endpoint/billboard/useBillboard'
-import { BookingsTable } from '@components/ui/BookingsTable'
+"use client";
 
-const Campaign = () => {
-  
-  const [view, setView] = useState('Billboard')
-  const { data, isLoading, isError } = useMyBillboardBookings()
- 
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useMyBillboardBookings } from "@endpoint/billboard/useBillboard";
+import { useMyInfluencerBookings } from "@endpoint/influencer/useInfluencer";
+import { BookingsTable } from "@components/ui/BookingsTable";
+
+type CampaignTab = "billboard" | "influencer" | "whatsapp" | "sms" | "digital";
+
+const TAB_ITEMS: { key: CampaignTab; label: string }[] = [
+  { key: "billboard", label: "Billboard" },
+  { key: "influencer", label: "Influencer" },
+  { key: "whatsapp", label: "Whatsapp" },
+  { key: "sms", label: "SMS" },
+  { key: "digital", label: "Digital" },
+];
+
+function Campaign() {
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const tab: CampaignTab = search.tab;
+
+  const billboard = useMyBillboardBookings();
+  const influencer = useMyInfluencerBookings();
+
+  const setTab = (next: CampaignTab) => {
+    void navigate({
+      to: "/users/campaign",
+      search: { tab: next },
+      replace: true,
+    });
+  };
 
   return (
-    <>
-    <section className="bg-[#E9E9E9] px-4 md:px-10 py-2">
-        <h3 className='text-2xl'>Campaigns</h3>
-        <p className="text-stone-400 mt-3">
-          Check all ads campaign history
-        </p>
-    </section>
-      <section className='min-h-screen bg-ads360-hash px-4 md:px-10 py-14'>
+    <section className="min-h-screen bg-ads360-hash px-4 py-10 md:px-10">
+      <div className="mx-auto max-w-5xl">
+        <div className="mb-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h1 className="font-serif text-2xl text-stone-900 md:text-3xl">
+              Campaigns
+            </h1>
+            <p className="mt-1 text-sm text-stone-600">
+              Check all ads campaign history
+            </p>
+          </div>
+          <Link
+            to="/users/campaign/create"
+            className="inline-flex w-fit rounded-10 border-2 border-ads360yellow-100 bg-ads360yellow-100 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+          >
+            Create Campaign
+          </Link>
+        </div>
 
-        
-    <div className="flex justify-between items-center">
-            <div className="flex justify-between items-center">
-              <button className="bg-ads360yellow-100 text-white px-4 py-2 rounded-md">
-                <Link to="/users/campaign/create">Create Campaign</Link>
-              </button>
-            </div>
+        <div className="mb-6 flex flex-wrap gap-2 border-b border-stone-200 pb-2">
+          {TAB_ITEMS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setTab(key)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                tab === key
+                  ? "bg-stone-900 text-white"
+                  : "border border-stone-200 bg-white text-stone-700 hover:bg-stone-50"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
-            <div className="">
-              <select 
-              onChange={(e) => setView(e.target.value)} 
-              className="bg-white text-black border-2 border-ads360yellow-100 px-4 py-2 rounded-md">
-                <option value="Billboard">Billboard</option>
-                <option value="Influencer">Influencer</option>
-                <option value="Whatsapp">Whatsapp</option>
-                <option value="sms">SMS</option>
-                <option value="Digital">Digital</option>
-              </select>
-            </div>
-    </div>
-
-
-        {
-          view === 'Billboard' &&
-          <>
+        <div>
+          {tab === "billboard" ? (
             <BookingsTable
-              rows={(data ?? []).map((r) => ({
+              rows={(billboard.data ?? []).map((r) => ({
                 id: r.id,
                 listing: r.listingName ?? "-",
                 createdAt: r.createdAt as unknown as string,
@@ -57,8 +81,8 @@ const Campaign = () => {
                 actionHref: `/users/campaign/${r.id}`,
                 actionLabel: "View",
               }))}
-              isLoading={isLoading}
-              isError={isError}
+              isLoading={billboard.isLoading}
+              isError={billboard.isError}
               emptyText="No campaigns found"
               statusFilterLabel="Filter by status"
               statusOptions={[
@@ -67,35 +91,62 @@ const Campaign = () => {
                 { value: "active", label: "Active" },
                 { value: "rejected", label: "Rejected" },
                 { value: "completed", label: "Completed" },
+                { value: "abandoned", label: "Abandoned" },
               ]}
               pageSize={10}
             />
-          </>
-        }
-        {
-          view === 'Influencer' &&
-          <div>No matching records found</div>
-        }
-        {
-          view === 'sms' &&
-          <div>No matching records found</div>
-        }
-        {
-          view === 'Digital' &&
-          <div>No matching records found</div>
-        }
-        {
-          view === 'Whatsapp' &&
-          <div>No matching records found</div>
-        }
-      </section>
-    </>
+          ) : null}
 
-  )
+          {tab === "influencer" ? (
+            <BookingsTable
+              rows={(influencer.data ?? []).map((r) => ({
+                id: r.id,
+                listing: r.listingName ?? "-",
+                createdAt: r.createdAt as unknown as string,
+                amount: r.negotiatedAmount ?? r.quotedTotal,
+                status: r.status,
+                paymentStatus: r.paymentStatus ?? "unpaid",
+                actionHref: `/users/campaign/influencer/${r.id}`,
+                actionLabel: "View",
+              }))}
+              isLoading={influencer.isLoading}
+              isError={influencer.isError}
+              emptyText="No influencer campaigns found"
+              statusFilterLabel="Filter by status"
+              statusOptions={[
+                { value: "all", label: "All" },
+                { value: "pending", label: "Pending" },
+                { value: "active", label: "Active" },
+                { value: "rejected", label: "Rejected" },
+                { value: "completed", label: "Completed" },
+                { value: "abandoned", label: "Abandoned" },
+              ]}
+              pageSize={10}
+            />
+          ) : null}
+
+          {tab === "whatsapp" || tab === "sms" || tab === "digital" ? (
+            <div className="mt-4 text-center text-sm text-stone-500">
+              No matching records found
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 export const Route = createFileRoute("/_usersauth/users/campaign/")({
+  validateSearch: (raw: Record<string, unknown>) => {
+    const t = String(raw.tab ?? "")
+      .trim()
+      .toLowerCase();
+    if (["influencer", "whatsapp", "sms", "digital"].includes(t)) {
+      return { tab: t as CampaignTab };
+    }
+    return { tab: "billboard" as CampaignTab };
+  },
   component: Campaign,
-})
+});
 
-export default Campaign
+export default Campaign;

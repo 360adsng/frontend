@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
+import { FiHelpCircle } from "react-icons/fi"
 import { useLogout } from "@endpoint/auth/useAuth"
 
 const settings = '/icons/usericon/whitesettings.svg'
@@ -88,7 +89,12 @@ const BillBoardDrawerContent : React.FC<Props> = ({toggleDrawer}) => {
             off:settings,
             on:onsettings
 
-        }
+        },
+        {
+            link:'/vendors/billboards/help-support',
+            name:'Help & support',
+            kind: 'help' as const,
+        },
     ]
 
 
@@ -132,28 +138,45 @@ const BillBoardDrawerContent : React.FC<Props> = ({toggleDrawer}) => {
             {
                 navItem2.map((items, i)=>(
                     <li key={i}>
-                        {pathname === items.link?
+                        {'kind' in items && items.kind === 'help' ? (
+                            pathname.startsWith(items.link) ? (
+                                <Link onClick={toggleDrawer} to={items.link} className='border-l-2 items-center border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
+                                    <FiHelpCircle className='h-8 w-8 shrink-0 text-ads360yellow-100' aria-hidden />
+                                    <span className='text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
+                                        {items.name}
+                                    </span>
+                                </Link>
+                            ) : (
+                                <Link onClick={toggleDrawer} to={items.link} className='py-2 items-center px-4 flex'>
+                                    <FiHelpCircle className='h-8 w-8 shrink-0 text-white' aria-hidden />
+                                    <span className='px-2 xl:px-4 hover:font-bold'>
+                                        {items.name}
+                                    </span>
+                                </Link>
+                            )
+                        ) : (
+                            pathname === items.link?
 
-                        <Link onClick={toggleDrawer} to={items.link} className='border-l-2 items-center border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
-                            <img src={items.on}
-                                alt={items.name}
-                                className='w-8 h-8'
-                            />
-                            <span className='text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
-                                {items.name}
-                            </span>
-                        </Link>
-                        :
-                        <Link onClick={toggleDrawer} to={items.link} className='py-2 items-center px-4 flex'>
-                            <img src={items.off}
-                                alt={items.name}
-                                className='w-8 h-8'
-                            />
-                            <span className='px-2 xl:px-4 hover:font-bold'>
-                                {items.name}
-                            </span>
-                        </Link>
-                        }
+                            <Link onClick={toggleDrawer} to={items.link} className='border-l-2 items-center border-ads360yellow-100 bg-[#322f31] rounded-r-[200px] py-2 px-4 flex'>
+                                <img src={items.on}
+                                    alt={items.name}
+                                    className='w-8 h-8'
+                                />
+                                <span className='text-ads360yellow-100 px-2 xl:px-4 hover:font-bold'>
+                                    {items.name}
+                                </span>
+                            </Link>
+                            :
+                            <Link onClick={toggleDrawer} to={items.link} className='py-2 items-center px-4 flex'>
+                                <img src={items.off}
+                                    alt={items.name}
+                                    className='w-8 h-8'
+                                />
+                                <span className='px-2 xl:px-4 hover:font-bold'>
+                                    {items.name}
+                                </span>
+                            </Link>
+                        )}
                     </li>
                 ))
             }

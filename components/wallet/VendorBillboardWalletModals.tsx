@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import Select from "react-select";
-import type { SingleValue } from "react-select";
+import { useEffect, useState } from "react";
 import { Modal } from "@components/modal/modal";
 import { toast } from "sonner";
 import type { NigerianBank } from "@endpoint/wallet/wallet";
@@ -11,43 +9,9 @@ import {
   type SavedPayoutBank,
   type SavePayoutBankPayload,
 } from "./vendorBillboardWalletTypes";
+import { BankSelect } from "./BankSelect";
 
 const cancel = "/icons/usericon/modalCancelBotton.svg";
-
-type BankSelectOption = { value: string; label: string };
-
-/** Must sit above `@components/modal/modal` overlay (`z-[10000000]`). */
-const BANK_SELECT_MENU_Z = 10000050;
-
-const bankSelectStyles = {
-  control: (base: Record<string, unknown>) => ({
-    ...base,
-    minHeight: 40,
-    borderRadius: "0.5rem",
-    borderColor: "#e7e5e4",
-    fontSize: "0.875rem",
-    boxShadow: "none",
-  }),
-  menu: (base: Record<string, unknown>) => ({
-    ...base,
-    fontSize: "0.875rem",
-    zIndex: BANK_SELECT_MENU_Z,
-  }),
-  menuPortal: (base: Record<string, unknown>) => ({
-    ...base,
-    zIndex: BANK_SELECT_MENU_Z,
-  }),
-  menuList: (base: Record<string, unknown>) => ({
-    ...base,
-    zIndex: BANK_SELECT_MENU_Z,
-  }),
-  option: (base: Record<string, unknown>, state: { isFocused: boolean }) => ({
-    ...base,
-    backgroundColor: state.isFocused ? "#fafaf9" : "white",
-    color: "#1c1917",
-    cursor: "pointer",
-  }),
-};
 
 type AddBankModalProps = {
   isOpen: boolean;
@@ -74,20 +38,6 @@ export function AddBankModal({
   const verifyAccountMutation = useVerifyAccount();
 
   const list = nigerianBanks ?? [];
-
-  const bankOptions: BankSelectOption[] = useMemo(
-    () =>
-      list.map((b) => ({
-        value: String(b.code),
-        label: b.name,
-      })),
-    [list],
-  );
-
-  const selectedBankOption = useMemo(
-    () => bankOptions.find((o) => o.value === bankCode) ?? null,
-    [bankOptions, bankCode],
-  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -143,26 +93,15 @@ export function AddBankModal({
           <p className="mt-1 text-sm text-stone-500">No banks available.</p>
         ) : (
           <div className="mt-1">
-            <Select<BankSelectOption, false>
-              inputId="add-bank-institution"
-              instanceId="add-bank-institution"
-              options={bankOptions}
-              value={selectedBankOption}
-              onChange={(opt: SingleValue<BankSelectOption>) => {
-                if (opt) {
-                  setBankCode(opt.value);
-                  setVerifiedName(null);
-                }
+            <BankSelect
+              id="add-bank-institution"
+              banks={list}
+              bankCode={bankCode}
+              onBankCodeChange={(code) => {
+                setBankCode(code);
+                setVerifiedName(null);
               }}
-              isSearchable
-              isClearable={false}
-              placeholder="Search or choose bank…"
-              noOptionsMessage={() => "No bank matches your search"}
-              menuPortalTarget={
-                typeof document !== "undefined" ? document.body : null
-              }
-              menuPosition="fixed"
-              styles={bankSelectStyles}
+              disabled={false}
             />
           </div>
         )}

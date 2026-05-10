@@ -16,7 +16,9 @@ declare type Preview = {
 declare type CheckboxProps = {
     id:string, 
     onClick:(e: React.ChangeEvent<HTMLInputElement>, value:string)=>void, 
-    label:string
+    label: string | React.ReactNode
+    /** When `label` is not a string, pass the value used for selection (e.g. platform name). */
+    optionValue?: string
 }
 
 declare type FileInputProps = {
