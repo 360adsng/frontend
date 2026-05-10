@@ -2,7 +2,7 @@
 
 import { Link, createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import BlackButtons from "@components/buttons/BlackButton";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 import type { CountryCode } from "libphonenumber-js";
 import { useRegister } from "@endpoint/auth/useAuth";
@@ -144,16 +144,37 @@ const SignUp = () => {
       slider.current?.classList.add("SignupSliderB");
       slider.current?.classList.remove("SignupSliderI");
       slider.current?.classList.remove("left-0");
-      sliderI.current?.classList.add("SignupI");
-      sliderB.current?.classList.add("SignupB");
     } else {
       setIsIndividual(true);
       slider.current?.classList.add("SignupSliderI");
       slider.current?.classList.remove("SignupSliderB");
-      sliderB.current?.classList.remove("SignupB");
-      sliderI.current?.classList.remove("SignupI");
     }
   };
+
+  /** Mobile: two full-width columns in a row; `SignupB`/`SignupI` slide the visible form into view. Must match `isIndividual` — the previous toggle logic showed the wrong panel under the wrong tab. */
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const syncPanels = () => {
+      const b = sliderB.current;
+      const i = sliderI.current;
+      if (!b || !i) return;
+      if (mq.matches) {
+        b.classList.remove("SignupB");
+        i.classList.remove("SignupI");
+        return;
+      }
+      if (isIndividual) {
+        b.classList.add("SignupB");
+        i.classList.add("SignupI");
+      } else {
+        b.classList.remove("SignupB");
+        i.classList.remove("SignupI");
+      }
+    };
+    syncPanels();
+    mq.addEventListener("change", syncPanels);
+    return () => mq.removeEventListener("change", syncPanels);
+  }, [isIndividual]);
 
   const defaultCountryIso2 = COUNTRIES[0]?.iso2 ?? "NG";
 
