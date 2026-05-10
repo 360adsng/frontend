@@ -1,9 +1,9 @@
 /**
- * https://backend-934c.onrender.com
+ * http://localhost:3001
  * HTTP client for 360backend (Nest). Set `VITE_API_BASE_URL` in `.env` (e.g. http://localhost:3000).
  */
 
-const DEFAULT_BASE_URL = "http://localhost:3001";
+const DEFAULT_BASE_URL = "https://backend-934c.onrender.com";
 
 /** localStorage keys — use these after login so refresh works */
 export const ACCESS_TOKEN_STORAGE_KEY = "access_token";
