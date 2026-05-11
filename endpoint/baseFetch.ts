@@ -1,5 +1,5 @@
 /**
- * http://localhost:3001
+ *
  * HTTP client for 360backend (Nest). Set `VITE_API_BASE_URL` in `.env` (e.g. http://localhost:3000).
  */
 
