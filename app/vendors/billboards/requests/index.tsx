@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMyVendorBillboardBookings } from "@endpoint/billboard/useBillboard";
 import { BookingsTable } from "@components/ui/BookingsTable";
-const search = '/icons/search.svg'
+const search = "/icons/search.svg";
 
 type VendorRequestsFilter =
   | "all"
@@ -33,7 +33,9 @@ const Requests = () => {
       filter === "all"
         ? notNegotiating
         : filter === "abandoned"
-          ? notNegotiating.filter((r) => r.status === "pending" && isAbandoned(r.createdAt))
+          ? notNegotiating.filter(
+              (r) => r.status === "pending" && isAbandoned(r.createdAt),
+            )
           : notNegotiating.filter((r) => r.status === filter);
     const s = q.trim().toLowerCase();
     if (!s) return filtered;
@@ -47,36 +49,17 @@ const Requests = () => {
   return (
     <>
       <section className="bg-ads360-hash min-h-screen px-4 md:px-10 py-14">
-      <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-        <div className="flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10">
+        <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+          <div className="flex lg:w-1/4 md:w-2/5 bg-[#f7f8f8] space-x-2 rounded-[40px] px-5 h-10">
             <button type="button">
-              <img src={search}
-                alt="searchicon"
-              />
-              </button>
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                className="rounded-10 w-full bg-transparent focus:outline-none h-full"
-                placeholder="search..."
-              />
-          </div>
-
-          <div className="flex gap-2 items-center justify-end">
-            <div className="text-sm text-stone-600">Filter:</div>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value as VendorRequestsFilter)}
-              className="bg-white text-black border border-ads360yellow-100 px-3 py-2 rounded-10"
-            >
-              <option value="all">All (excluding negotiating)</option>
-              <option value="abandoned">Abandoned (unpaid 4+ days)</option>
-              <option value="pending">Pending</option>
-              <option value="active">Active</option>
-              <option value="dispute">Dispute</option>
-              <option value="rejected">Rejected</option>
-              <option value="completed">Completed</option>
-            </select>
+              <img src={search} alt="searchicon" />
+            </button>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="rounded-10 w-full bg-transparent focus:outline-none h-full"
+              placeholder="search..."
+            />
           </div>
         </div>
         <div className="w-full my-5">
@@ -106,13 +89,11 @@ const Requests = () => {
             pageSize={10}
           />
         </div>
-
       </section>
     </>
-  )
-}
+  );
+};
 
 export const Route = createFileRoute("/vendors/billboards/requests/")({
   component: Requests,
-})
-
+});

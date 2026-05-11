@@ -4,11 +4,14 @@ import { cloudflare } from '@cloudflare/vite-plugin'
 import viteReact from '@vitejs/plugin-react'
 import path from 'node:path'
 
-/** Cloudflare Workers / Pages — see https://tanstack.com/start/latest/docs/framework/react/guide/hosting */
-const useCloudflare =
-  process.env.CLOUDFLARE === 'true' || process.env.CF_PAGES === 'true'
+/** Cloudflare Workers — https://tanstack.com/start/latest/docs/framework/react/guide/hosting */
+export default defineConfig(({ mode }) => {
+  const useCloudflare =
+    mode === 'cloudflare' ||
+    process.env.CLOUDFLARE === 'true' ||
+    process.env.CF_PAGES === 'true'
 
-export default defineConfig({
+  return {
   server: {
     port: 3000,
     // On Windows + OneDrive/network folders, file watching can miss changes or stall.
@@ -44,4 +47,5 @@ export default defineConfig({
     }),
     viteReact(),
   ],
+  }
 })
