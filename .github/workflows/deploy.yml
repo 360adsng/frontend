@@ -1,4 +1,4 @@
-name: Deploy SSR App
+name: Deploy to Cloudflare Workers
 
 on:
   push:
@@ -9,21 +9,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      # 1. Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      # 2. Setup Node (IMPORTANT: Node 22 required for Wrangler)
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22.x
+          cache: npm
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: npm ci
 
-      - name: Build app
+      # 4. Build project (creates dist/)
+      - name: Build project
         run: npm run build
 
-      - name: Deploy to Cloudflare Workers
+      # 5. Debug (optional but VERY useful)
+      - name: Check build output
+        run: ls -R dist
+
+      # 6. Deploy to Cloudflare Workers
+      - name: Deploy to Cloudflare
         run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
