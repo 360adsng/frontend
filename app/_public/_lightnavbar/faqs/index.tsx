@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router"
 import Faqs from "@components/ui/Faqs";
 import BlackButtons from "@components/buttons/BlackButton";
+import { marketingHead } from "@lib/siteMeta";
 
 const Faq = () =>{
 
@@ -27,7 +28,13 @@ const Faq = () =>{
 }
 
 export const Route = createFileRoute("/_public/_lightnavbar/faqs/")({
+  head: () =>
+    marketingHead({
+      pageTitle: "FAQ",
+      description:
+        "Answers to common questions about running billboard and influencer campaigns, billing, and using the 360 Ads platform.",
+      canonicalPath: "/faqs",
+    }),
   component: Faq,
 })
 
-export default Faq

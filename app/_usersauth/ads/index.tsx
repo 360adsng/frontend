@@ -120,4 +120,3 @@ export const Route = createFileRoute("/_usersauth/ads/")({
   component: Ads,
 })
 
-export default Ads

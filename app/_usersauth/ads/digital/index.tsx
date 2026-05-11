@@ -8,4 +8,3 @@ export const Route = createFileRoute("/_usersauth/ads/digital/")({
   component: Digital,
 });
 
-export default Digital;

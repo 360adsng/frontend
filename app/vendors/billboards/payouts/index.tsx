@@ -160,5 +160,3 @@ export const Route = createFileRoute("/vendors/billboards/payouts/")({
   component: VendorPayoutsPage,
 });
 
-export default VendorPayoutsPage;
-

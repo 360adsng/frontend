@@ -14,6 +14,7 @@ const Layout = () => (
 );
 
 export const Route = createFileRoute("/_admin")({
+  ssr: false,
   beforeLoad: () => {
     if (typeof window === "undefined") return;
     if (!hasAccessToken()) {
@@ -30,4 +31,3 @@ export const Route = createFileRoute("/_admin")({
   component: Layout,
 });
 
-export default Layout;

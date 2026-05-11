@@ -493,4 +493,3 @@ export const Route = createFileRoute("/_admin/admin/wallet/transactions/")({
   component: AdminAllTransactionsPage,
 });
 
-export default AdminAllTransactionsPage;

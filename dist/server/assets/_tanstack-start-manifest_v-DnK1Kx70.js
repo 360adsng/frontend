@@ -12,6 +12,8 @@ var tsrStartManifest = () => ({
 				"/vendors/billboards",
 				"/vendors/influencers",
 				"/_access/email-verification/",
+				"/_access/forgot-password/",
+				"/_access/reset-password/",
 				"/_access/signin/",
 				"/_access/signup/",
 				"/_access/vendor-access/onboarding/"
@@ -25,17 +27,17 @@ var tsrStartManifest = () => ({
 				}
 			}],
 			preloads: [
-				"/assets/index-ksMhQZr4.js",
-				"/assets/useUsers-CrC2HGXe.js",
+				"/assets/index-DljJnIqP.js",
+				"/assets/useUsers-C20xCbY2.js",
 				"/assets/countries-1Yz399KR.js",
-				"/assets/nigeriaStatesLgas-CamrRt2g.js"
+				"/assets/nigeriaStatesLgas-B9JehKP4.js"
 			]
 		},
 		"/_usersauth/users/settings/": {
 			filePath: "C:/Users/user/OneDrive/Desktop/360/360frontend/app/_usersauth/users/settings/index.tsx",
 			children: void 0,
 			assets: void 0,
-			preloads: ["/assets/settings-Ba2V3wGi.js"]
+			preloads: ["/assets/settings-BDX0VDbF.js"]
 		},
 		"/_usersauth/users/negotiations/influencers/": {
 			filePath: "C:/Users/user/OneDrive/Desktop/360/360frontend/app/_usersauth/users/negotiations/influencers/index.tsx",
@@ -47,10 +49,10 @@ var tsrStartManifest = () => ({
 			filePath: "C:/Users/user/OneDrive/Desktop/360/360frontend/app/vendors/billboards/settings/coverage/index.tsx",
 			children: void 0,
 			assets: void 0,
-			preloads: ["/assets/coverage-D7VKRHrX.js"]
+			preloads: ["/assets/coverage-CwHYvGf0.js"]
 		}
 	},
-	clientEntry: "/assets/index-ksMhQZr4.js"
+	clientEntry: "/assets/index-DljJnIqP.js"
 });
 //#endregion
 export { tsrStartManifest };

@@ -116,4 +116,3 @@ export const Route = createFileRoute("/vendors/billboards/requests/")({
   component: Requests,
 })
 
-export default Requests

@@ -8,4 +8,3 @@ export const Route = createFileRoute("/_usersauth/ads/whatsapp/")({
   component: Whatsapp,
 });
 
-export default Whatsapp;

@@ -117,4 +117,3 @@ export const Route = createFileRoute("/vendors/influencers/requests/")({
   component: Requests,
 });
 
-export default Requests;

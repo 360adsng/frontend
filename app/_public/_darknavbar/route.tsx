@@ -16,4 +16,3 @@ export const Route = createFileRoute("/_public/_darknavbar")({
   component: Layout,
 })
 
-export default Layout

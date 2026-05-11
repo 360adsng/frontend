@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 const manInfluencer1 = '//images/maninfluencer1.png'
 import BlackButtonsLong from "@components/buttons/BlackButtonsLong";
 import HowWeThink from '@components/ui/HowWeThink';
+import { marketingHead } from "@lib/siteMeta";
 
 const About = () =>{
     return(
@@ -51,7 +52,13 @@ const About = () =>{
 }
 
 export const Route = createFileRoute("/_public/_lightnavbar/about/")({
+  head: () =>
+    marketingHead({
+      pageTitle: "About us",
+      description:
+        "360 Ads NG is a digital marketing company building tools to automate billboard and influencer campaigns for brands and SMEs in Nigeria.",
+      canonicalPath: "/about",
+    }),
   component: About,
 })
 
-export default About

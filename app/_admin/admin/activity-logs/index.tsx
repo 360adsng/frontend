@@ -279,4 +279,3 @@ export const Route = createFileRoute("/_admin/admin/activity-logs/")({
   component: AdminActivityLogsPage,
 });
 
-export default AdminActivityLogsPage;

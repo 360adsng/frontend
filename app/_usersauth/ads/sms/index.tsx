@@ -205,4 +205,3 @@ export const Route = createFileRoute("/_usersauth/ads/sms/")({
   component: Sms,
 })
 
-export default Sms

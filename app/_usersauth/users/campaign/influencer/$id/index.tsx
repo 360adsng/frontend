@@ -359,4 +359,3 @@ export const Route = createFileRoute(
   component: InfluencerCampaignDetail,
 });
 
-export default InfluencerCampaignDetail;

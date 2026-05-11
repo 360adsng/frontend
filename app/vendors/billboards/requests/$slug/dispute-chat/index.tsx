@@ -21,4 +21,3 @@ export const Route = createFileRoute(
   component: VendorBillboardDisputeChatPage,
 });
 
-export default VendorBillboardDisputeChatPage;

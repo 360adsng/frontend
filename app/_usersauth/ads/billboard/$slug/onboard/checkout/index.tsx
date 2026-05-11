@@ -235,4 +235,3 @@ export const Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/ch
   component: Checkout,
 })
 
-export default Checkout

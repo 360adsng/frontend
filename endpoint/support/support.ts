@@ -1,4 +1,5 @@
 import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 
 /** Matches backend `SupportTicketPriority` / UI types. */
 export type SupportTicketPriority = "high" | "medium" | "low";
@@ -49,42 +50,41 @@ export async function createSupportTicket(payload: {
   priority: SupportTicketPriority;
   imageFile?: File | null;
 }): Promise<SupportTicketDetail> {
-  const form = new FormData();
-  form.append("title", payload.title);
-  form.append("message", payload.message);
-  form.append("priority", payload.priority);
+  let attachmentUrl: string | undefined;
   if (payload.imageFile) {
-    form.append("file", payload.imageFile);
+    const { publicUrl } = await uploadFileToR2(payload.imageFile, "support");
+    attachmentUrl = publicUrl;
   }
   return baseFetchJson<SupportTicketDetail>("/support/tickets", {
     method: "POST",
-    body: form,
-  });
+    body: {
+      title: payload.title,
+      message: payload.message,
+      priority: payload.priority,
+      ...(attachmentUrl ? { attachmentUrl } : {}),
+    },
+  } as unknown as RequestInit);
 }
 
-export function addSupportMessage(
+export async function addSupportMessage(
   ticketId: number,
   body: string,
   imageFile?: File | null,
 ): Promise<SupportTicketDetail> {
+  let attachmentUrl: string | undefined;
   if (imageFile) {
-    const form = new FormData();
-    form.append("body", body);
-    form.append("file", imageFile);
-    return baseFetchJson<SupportTicketDetail>(
-      `/support/tickets/${ticketId}/messages`,
-      {
-        method: "POST",
-        body: form,
-      },
-    );
+    const { publicUrl } = await uploadFileToR2(imageFile, "support");
+    attachmentUrl = publicUrl;
   }
   return baseFetchJson<SupportTicketDetail>(
     `/support/tickets/${ticketId}/messages`,
     {
       method: "POST",
-      body: { body },
-    },
+      body: {
+        body,
+        ...(attachmentUrl ? { attachmentUrl } : {}),
+      },
+    } as unknown as RequestInit,
   );
 }
 

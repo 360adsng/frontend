@@ -14,4 +14,3 @@ export const Route = createFileRoute("/vendors/billboards/help-support/$id/")({
   component: Page,
 });
 
-export default Page;

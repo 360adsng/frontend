@@ -22,4 +22,3 @@ export const Route = createFileRoute("/_usersauth/users")({
   component: Layout,
 })
 
-export default Layout

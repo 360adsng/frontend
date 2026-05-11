@@ -21,4 +21,3 @@ export const Route = createFileRoute(
   component: VendorInfluencerDisputeChatPage,
 });
 
-export default VendorInfluencerDisputeChatPage;

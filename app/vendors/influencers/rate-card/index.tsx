@@ -93,4 +93,3 @@ export const Route = createFileRoute("/vendors/influencers/rate-card/")({
   component: InfluencerRateCard,
 });
 
-export default InfluencerRateCard;

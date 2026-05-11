@@ -136,8 +136,8 @@ const SignIn = () => {
               <div className="flex justify-between my-3">
                 <div />
                 <div>
-                  <Link to="/" className="text-ads360yellow-100">
-                    Forget Password
+                  <Link to="/forgot-password" className="text-ads360yellow-100">
+                    Forgot password
                   </Link>
                 </div>
               </div>
@@ -180,4 +180,3 @@ export const Route = createFileRoute("/_access/signin/")({
   component: SignIn,
 });
 
-export default SignIn;

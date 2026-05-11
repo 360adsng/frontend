@@ -270,4 +270,3 @@ export const Route = createFileRoute("/_usersauth/ads/billboard/$slug/")({
   component: Billboard,
 });
 
-export default Billboard;

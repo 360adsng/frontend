@@ -219,4 +219,3 @@ export const Route = createFileRoute("/vendors/influencers/wallet/")({
   component: InfluencerWalletSection,
 });
 
-export default InfluencerWalletSection;

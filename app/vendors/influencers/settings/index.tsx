@@ -570,4 +570,3 @@ export const Route = createFileRoute("/vendors/influencers/settings/")({
   component: InfluencerSettingsPage,
 });
 
-export default InfluencerSettingsPage;

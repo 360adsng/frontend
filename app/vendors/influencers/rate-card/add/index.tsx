@@ -286,4 +286,3 @@ export const Route = createFileRoute("/vendors/influencers/rate-card/add/")({
   component: InfluencerAddPlatform,
 });
 
-export default InfluencerAddPlatform;

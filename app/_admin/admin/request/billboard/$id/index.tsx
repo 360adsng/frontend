@@ -436,4 +436,3 @@ export const Route = createFileRoute("/_admin/admin/request/billboard/$id/")({
   component: AdminBillboardRequestDetailPage,
 });
 
-export default AdminBillboardRequestDetailPage;

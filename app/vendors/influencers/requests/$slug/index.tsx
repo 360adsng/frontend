@@ -405,4 +405,3 @@ export const Route = createFileRoute("/vendors/influencers/requests/$slug/")({
   component: Request,
 });
 
-export default Request;

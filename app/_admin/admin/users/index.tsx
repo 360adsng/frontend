@@ -264,4 +264,3 @@ export const Route = createFileRoute("/_admin/admin/users/")({
   component: AdminUsersPage,
 });
 
-export default AdminUsersPage;

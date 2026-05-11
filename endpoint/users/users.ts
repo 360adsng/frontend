@@ -1,4 +1,5 @@
 import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 import type {
   ChangePasswordPayload,
   MeResponse,
@@ -54,12 +55,10 @@ export function changePassword(
 export type UploadPhotoResponse = { message: string; url: string };
 
 export async function uploadProfilePhoto(file: File): Promise<UploadPhotoResponse> {
-  const form = new FormData();
-  form.append("file", file);
-
+  const { publicUrl } = await uploadFileToR2(file, "profile");
   return baseFetchJson<UploadPhotoResponse>("/users/profile/photo", {
     method: "POST",
-    body: form,
-  });
+    body: { imageUrl: publicUrl },
+  } as unknown as RequestInit);
 }
 

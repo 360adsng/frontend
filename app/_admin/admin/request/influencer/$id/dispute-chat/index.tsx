@@ -15,4 +15,3 @@ export const Route = createFileRoute(
   component: AdminInfluencerDisputeChatPage,
 });
 
-export default AdminInfluencerDisputeChatPage;

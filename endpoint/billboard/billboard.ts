@@ -1,4 +1,5 @@
 import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 
 export type CreateBillboardListingPayload = {
   name: string;
@@ -98,20 +99,24 @@ export type UpdateBillboardListingResponse = {
   listing: PublicBillboardListing;
 };
 
-export function updateMyBillboardListing(
+export async function updateMyBillboardListing(
   id: number,
   payload: CreateBillboardListingPayload,
   imageFile?: File | null,
 ): Promise<UpdateBillboardListingResponse> {
-  const form = new FormData();
-  form.append("payload", JSON.stringify(payload));
-  if (imageFile) form.append("file", imageFile);
+  let body: CreateBillboardListingPayload & { imageUrl?: string } = {
+    ...payload,
+  };
+  if (imageFile) {
+    const { publicUrl } = await uploadFileToR2(imageFile, "billboard");
+    body = { ...body, imageUrl: publicUrl };
+  }
   return baseFetchJson<UpdateBillboardListingResponse>(
     `/billboard/listings/mine/${id}`,
     {
       method: "PATCH",
-      body: form,
-    },
+      body,
+    } as unknown as RequestInit,
   );
 }
 
@@ -142,6 +147,8 @@ export type CreateBillboardBookingPayload = {
   periodDurationCount?: number;
   creativeKind: "image" | "video";
   creativeVideoUrl?: string;
+  /** Set automatically after R2 upload when using image creative, or pass explicitly */
+  creativeImageUrl?: string;
 };
 
 export type NegotiationPhase =
@@ -250,31 +257,39 @@ export function getMyBillboardListingById(
   );
 }
 
-export function createBillboardListing(
+export async function createBillboardListing(
   payload: CreateBillboardListingPayload,
   imageFile: File,
 ): Promise<CreateBillboardListingResponse> {
-  const form = new FormData();
-  form.append("payload", JSON.stringify(payload));
-  form.append("file", imageFile);
+  const { publicUrl } = await uploadFileToR2(imageFile, "billboard");
   return baseFetchJson<CreateBillboardListingResponse>("/billboard/listings", {
     method: "POST",
-    body: form,
-  });
+    body: { ...payload, imageUrl: publicUrl },
+  } as unknown as RequestInit);
 }
 
-export function createBillboardBooking(
+export async function createBillboardBooking(
   listingId: number,
   payload: CreateBillboardBookingPayload,
   imageFile?: File,
 ): Promise<BillboardBooking> {
-  const form = new FormData();
-  form.append("payload", JSON.stringify(payload));
-  if (imageFile) form.append("file", imageFile);
-  return baseFetchJson<BillboardBooking>(`/billboard/listings/${listingId}/bookings`, {
-    method: "POST",
-    body: form,
-  });
+  const base = { ...payload };
+  if (payload.creativeKind === "image") {
+    if (imageFile) {
+      const { publicUrl } = await uploadFileToR2(imageFile, "booking");
+      base.creativeImageUrl = publicUrl;
+    }
+    if (!base.creativeImageUrl?.trim()) {
+      throw new Error("Image creative requires an uploaded file or creativeImageUrl");
+    }
+  }
+  return baseFetchJson<BillboardBooking>(
+    `/billboard/listings/${listingId}/bookings`,
+    {
+      method: "POST",
+      body: base,
+    } as unknown as RequestInit,
+  );
 }
 
 export function getBillboardBookingById(id: number): Promise<BillboardBooking> {
@@ -456,15 +471,17 @@ export type MarkVendorBookingActiveResponse = {
   activeAt: string | null;
 };
 
-export function markVendorBookingActive(
+export async function markVendorBookingActive(
   bookingId: number,
   proofImage: File,
 ): Promise<MarkVendorBookingActiveResponse> {
-  const form = new FormData();
-  form.append("file", proofImage);
+  const { publicUrl } = await uploadFileToR2(proofImage, "booking");
   return baseFetchJson<MarkVendorBookingActiveResponse>(
     `/billboard/vendor/bookings/${bookingId}/active`,
-    { method: "POST", body: form },
+    {
+      method: "POST",
+      body: { imageUrl: publicUrl },
+    } as unknown as RequestInit,
   );
 }
 

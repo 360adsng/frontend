@@ -170,5 +170,3 @@ export const Route = createFileRoute(
   component: InfluencerNegotiationDetail,
 });
 
-export default InfluencerNegotiationDetail;
-

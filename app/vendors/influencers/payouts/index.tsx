@@ -162,4 +162,3 @@ export const Route = createFileRoute("/vendors/influencers/payouts/")({
   component: InfluencerPayoutsPage,
 });
 
-export default InfluencerPayoutsPage;

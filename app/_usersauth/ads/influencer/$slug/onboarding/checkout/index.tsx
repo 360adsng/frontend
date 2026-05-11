@@ -351,4 +351,3 @@ export const Route = createFileRoute(
   component: Checkout,
 });
 
-export default Checkout;

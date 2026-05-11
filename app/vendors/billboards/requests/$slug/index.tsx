@@ -418,4 +418,3 @@ export const Route = createFileRoute("/vendors/billboards/requests/$slug/")({
   component: Request,
 });
 
-export default Request;

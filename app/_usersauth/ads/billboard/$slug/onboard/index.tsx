@@ -393,4 +393,3 @@ export const Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/")
   component: Onboard,
 })
 
-export default Onboard

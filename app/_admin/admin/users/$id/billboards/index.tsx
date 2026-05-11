@@ -154,4 +154,3 @@ export const Route = createFileRoute("/_admin/admin/users/$id/billboards/")({
   component: AdminUserBillboardsPage,
 });
 
-export default AdminUserBillboardsPage;

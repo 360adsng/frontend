@@ -289,4 +289,3 @@ export const Route = createFileRoute("/vendors/billboards/listing/$slug/")({
   component: Billboard,
 });
 
-export default Billboard;

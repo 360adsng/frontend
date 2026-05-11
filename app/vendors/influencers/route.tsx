@@ -26,6 +26,7 @@ function Layout() {
 }
 
 export const Route = createFileRoute("/vendors/influencers")({
+  ssr: false,
   beforeLoad: () => {
     if (typeof window === "undefined") return;
     if (!hasAccessToken()) {
@@ -42,4 +43,3 @@ export const Route = createFileRoute("/vendors/influencers")({
   component: Layout,
 });
 
-export default Layout;

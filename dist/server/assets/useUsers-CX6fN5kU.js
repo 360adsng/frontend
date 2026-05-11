@@ -254,6 +254,38 @@ addRequestInterceptor((ctx) => {
 	};
 });
 //#endregion
+//#region endpoint/storage/r2.ts
+function postStoragePresign(body) {
+	return baseFetchJson("/storage/presign", {
+		method: "POST",
+		body
+	});
+}
+/**
+* Client-side direct upload to Cloudflare R2 using a presigned URL from the API.
+*/
+async function uploadFileToR2(file, kind) {
+	const contentType = file.type || "image/jpeg";
+	const presign = await postStoragePresign({
+		kind,
+		fileName: file.name || "upload.jpg",
+		contentType
+	});
+	const res = await fetch(presign.uploadUrl, {
+		method: "PUT",
+		body: file,
+		headers: { "Content-Type": contentType }
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => "");
+		throw new Error(`R2 upload failed (${res.status})${text ? `: ${text.slice(0, 200)}` : ""}`);
+	}
+	return {
+		publicUrl: presign.publicUrl,
+		key: presign.key
+	};
+}
+//#endregion
 //#region endpoint/users/users.ts
 function getMe() {
 	return baseFetchJson("/users/me", { method: "GET" });
@@ -283,11 +315,10 @@ function changePassword(payload) {
 	});
 }
 async function uploadProfilePhoto(file) {
-	const form = new FormData();
-	form.append("file", file);
+	const { publicUrl } = await uploadFileToR2(file, "profile");
 	return baseFetchJson("/users/profile/photo", {
 		method: "POST",
-		body: form
+		body: { imageUrl: publicUrl }
 	});
 }
 //#endregion
@@ -374,4 +405,4 @@ function useSetMyBillboardCoverage() {
 	});
 }
 //#endregion
-export { useUpdateProfile as a, ACCESS_TOKEN_STORAGE_KEY as c, baseFetchJson as d, clearAuthTokens as f, saveAuthTokens as g, saveAccountType as h, useSetMyBillboardCoverage as i, ApiError as l, hasAccessToken as m, useMe as n, useUploadProfilePhoto as o, getAccountType as p, useMyBillboardCoverage as r, useUserDashboard as s, useChangePassword as t, baseFetch as u };
+export { useUpdateProfile as a, uploadFileToR2 as c, baseFetchJson as d, clearAuthTokens as f, saveAuthTokens as g, saveAccountType as h, useSetMyBillboardCoverage as i, ACCESS_TOKEN_STORAGE_KEY as l, hasAccessToken as m, useMe as n, useUploadProfilePhoto as o, getAccountType as p, useMyBillboardCoverage as r, useUserDashboard as s, useChangePassword as t, ApiError as u };

@@ -473,4 +473,3 @@ export const Route = createFileRoute("/_admin/admin/request/")({
   component: AdminRequestPage,
 });
 
-export default AdminRequestPage;

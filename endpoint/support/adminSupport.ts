@@ -1,4 +1,5 @@
 import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 import type {
   SupportTicketDetail,
   SupportTicketPriority,
@@ -71,21 +72,20 @@ export async function addAdminSupportMessage(
   body: string,
   imageFile?: File | null,
 ): Promise<AdminSupportTicketDetail> {
+  let attachmentUrl: string | undefined;
   if (imageFile) {
-    const form = new FormData();
-    form.append("body", body);
-    form.append("file", imageFile);
-    return baseFetchJson<AdminSupportTicketDetail>(
-      `/admin/support/tickets/${ticketId}/messages`,
-      { method: "POST", body: form },
-    );
+    const { publicUrl } = await uploadFileToR2(imageFile, "support");
+    attachmentUrl = publicUrl;
   }
   return baseFetchJson<AdminSupportTicketDetail>(
     `/admin/support/tickets/${ticketId}/messages`,
     {
       method: "POST",
-      body: { body },
-    },
+      body: {
+        body,
+        ...(attachmentUrl ? { attachmentUrl } : {}),
+      },
+    } as unknown as RequestInit,
   );
 }
 

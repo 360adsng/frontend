@@ -297,4 +297,3 @@ export const Route = createFileRoute("/_admin/admin/payout/")({
   component: AdminPayoutListPage,
 });
 
-export default AdminPayoutListPage;

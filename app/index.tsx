@@ -11,6 +11,7 @@ import NewsLetter from "@components/ui/NewsLetter";
 import CountUp from "@components/ui/CountUp";
 import LightNavbar from "@components/navs/public/LightNavBar";
 import Footer from "@components/navs/public/Footer";
+import { marketingHead, SEO_DEFAULT_DESCRIPTION } from "@lib/siteMeta";
 
 //import images
 const heroGirl = "/images/herogirl.png";
@@ -203,7 +204,12 @@ function Home() {
 }
 
 export const Route = createFileRoute("/")({
+  head: () =>
+    marketingHead({
+      pageTitle: "Billboard & influencer advertising platform",
+      description: SEO_DEFAULT_DESCRIPTION,
+      canonicalPath: "/",
+    }),
   component: Home,
 });
 
-export default Home;

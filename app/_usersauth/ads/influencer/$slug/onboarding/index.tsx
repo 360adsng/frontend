@@ -439,4 +439,3 @@ export const Route = createFileRoute(
   component: Onboard,
 });
 
-export default Onboard;

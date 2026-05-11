@@ -212,4 +212,3 @@ export const Route = createFileRoute("/vendors/influencers/negotiations/$id/")({
   component: VendorInfluencerNegotiationDetail,
 });
 
-export default VendorInfluencerNegotiationDetail;

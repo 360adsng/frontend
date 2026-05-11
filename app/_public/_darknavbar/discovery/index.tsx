@@ -12,6 +12,7 @@ import CountUp from '@components/ui/CountUp'
 import SectionX from '@components/slides/InViewX';
 import SectionY from '@components/slides/InViewY';
 import NewsLetter from '@components/ui/NewsLetter';
+import { marketingHead } from "@lib/siteMeta";
 
 
 
@@ -205,7 +206,13 @@ const Service = () => {
 }
 
 export const Route = createFileRoute("/_public/_darknavbar/discovery/")({
+  head: () =>
+    marketingHead({
+      pageTitle: "Services",
+      description:
+        "Explore automated billboard, digital, and influencer advertising services from 360 Ads — tailored campaigns and placements for brands in Nigeria.",
+      canonicalPath: "/discovery",
+    }),
   component: Service,
 })
 
-export default Service

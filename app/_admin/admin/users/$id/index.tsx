@@ -31,4 +31,3 @@ export const Route = createFileRoute("/_admin/admin/users/$id/")({
   component: AdminUserDetailPage,
 });
 
-export default AdminUserDetailPage;

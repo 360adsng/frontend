@@ -13,4 +13,3 @@ export const Route = createFileRoute("/_admin/admin/vendors/")({
   component: AdminVendorsPage,
 });
 
-export default AdminVendorsPage;

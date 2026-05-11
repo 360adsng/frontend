@@ -14,4 +14,3 @@ export const Route = createFileRoute("/_admin/admin/support/$id/")({
   component: AdminSupportTicketPage,
 });
 
-export default AdminSupportTicketPage;

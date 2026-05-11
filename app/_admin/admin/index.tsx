@@ -317,4 +317,3 @@ export const Route = createFileRoute("/_admin/admin/")({
   component: AdminHome,
 });
 
-export default AdminHome;

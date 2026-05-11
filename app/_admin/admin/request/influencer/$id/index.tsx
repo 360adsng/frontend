@@ -582,4 +582,3 @@ export const Route = createFileRoute(
   component: AdminInfluencerRequestDetailPage,
 });
 
-export default AdminInfluencerRequestDetailPage;

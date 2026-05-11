@@ -843,4 +843,3 @@ export const Route = createFileRoute("/vendors/billboards/listing/$slug/edit/")(
   component: Edit,
 });
 
-export default Edit;

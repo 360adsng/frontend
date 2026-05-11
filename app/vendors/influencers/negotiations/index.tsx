@@ -75,4 +75,3 @@ export const Route = createFileRoute("/vendors/influencers/negotiations/")({
   component: VendorInfluencerNegotiationsPage,
 });
 
-export default VendorInfluencerNegotiationsPage;

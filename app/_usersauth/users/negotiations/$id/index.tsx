@@ -174,4 +174,3 @@ export const Route = createFileRoute("/_usersauth/users/negotiations/$id/")({
   component: NegotiationDetail,
 });
 
-export default NegotiationDetail;

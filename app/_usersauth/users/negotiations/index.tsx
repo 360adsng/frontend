@@ -128,4 +128,3 @@ export const Route = createFileRoute("/_usersauth/users/negotiations/")({
   component: NegotiationsPage,
 });
 
-export default NegotiationsPage;

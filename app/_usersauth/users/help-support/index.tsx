@@ -11,4 +11,3 @@ export const Route = createFileRoute("/_usersauth/users/help-support/")({
   component: Page,
 });
 
-export default Page;

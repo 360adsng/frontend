@@ -10,7 +10,14 @@ import {
   invalidateSessionAfterLogin,
   removeSessionQueriesOnLogout,
 } from "../query/sessionScopedQueries";
-import { login, logout, register, vendorOnboarding } from "./auth";
+import {
+  forgotPassword,
+  login,
+  logout,
+  register,
+  resetPassword,
+  vendorOnboarding,
+} from "./auth";
 import type { LoginResponse } from "./types";
 
 function errorMessage(error: unknown): string {
@@ -71,6 +78,30 @@ export function useLogout() {
 export function useVendorOnboarding() {
   return useMutation({
     mutationFn: vendorOnboarding,
+    onError: (error) => {
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: forgotPassword,
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError: (error) => {
+      toast.error(errorMessage(error));
+    },
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: resetPassword,
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
     onError: (error) => {
       toast.error(errorMessage(error));
     },

@@ -549,4 +549,3 @@ export const Route = createFileRoute("/_admin/admin/invite-links/")({
   component: AdminInviteLinksPage,
 });
 
-export default AdminInviteLinksPage;

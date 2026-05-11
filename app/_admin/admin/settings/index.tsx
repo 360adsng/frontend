@@ -491,4 +491,3 @@ export const Route = createFileRoute("/_admin/admin/settings/")({
   component: AdminSettingsPage,
 });
 
-export default AdminSettingsPage;

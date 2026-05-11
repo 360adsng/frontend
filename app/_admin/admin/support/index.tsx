@@ -336,4 +336,3 @@ export const Route = createFileRoute("/_admin/admin/support/")({
   component: AdminSupportPage,
 });
 
-export default AdminSupportPage;

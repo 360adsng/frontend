@@ -143,4 +143,3 @@ export const Route = createFileRoute("/_usersauth/users/wallet/")({
   component: WalletSection,
 });
 
-export default WalletSection;

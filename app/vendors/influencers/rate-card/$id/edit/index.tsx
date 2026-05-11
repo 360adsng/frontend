@@ -219,5 +219,3 @@ export const Route = createFileRoute(
   component: InfluencerEditPlatform,
 });
 
-export default InfluencerEditPlatform;
-

@@ -7,6 +7,10 @@
     "dev": "vite dev",
     "build": "vite build",
     "start": "node .output/server/index.mjs",
+    "preview": "vite preview",
+    "deploy:cloudflare": "npm run build && wrangler deploy",
+    "cf-typegen": "wrangler types",
+    "strip-route-exports": "node scripts/strip-route-default-exports.mjs",
     "migrate-fs-routes": "node scripts/migrate-fs-routes.mjs",
     "bulk-replace-next": "node scripts/bulk-replace-next.mjs",
     "inject-routes": "node scripts/inject-create-file-route.mjs",
@@ -36,12 +40,13 @@
     "sonner": "^2.0.7",
     "swiper": "^9.3.1",
     "tailwindcss": "3.3.2",
-    "typescript": "5.0.4",
+    "typescript": "5.7.3",
     "vite": "^8.0.8",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@netlify/vite-plugin-tanstack-start": "^1.3.5",
-    "@types/node": "^25.6.0"
+    "@cloudflare/vite-plugin": "^1.36.3",
+    "@types/node": "^25.6.0",
+    "wrangler": "^4.45.0"
   }
 }

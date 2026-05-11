@@ -166,4 +166,3 @@ export const Route = createFileRoute("/_usersauth/users/")({
   component: Dashboard,
 })
 
-export default Dashboard

@@ -87,4 +87,3 @@ export const Route = createFileRoute("/_usersauth/ads/sms/checkout/")({
   component: Checkout,
 })
 
-export default Checkout

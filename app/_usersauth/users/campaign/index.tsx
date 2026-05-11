@@ -149,4 +149,3 @@ export const Route = createFileRoute("/_usersauth/users/campaign/")({
   component: Campaign,
 });
 
-export default Campaign;

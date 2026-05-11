@@ -13,4 +13,3 @@ export const Route = createFileRoute("/vendors/influencers/help-support/")({
   component: Page,
 });
 
-export default Page;

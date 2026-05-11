@@ -263,4 +263,3 @@ export const Route = createFileRoute("/_usersauth/ads/billboard/")({
   component: Billboards,
 });
 
-export default Billboards;

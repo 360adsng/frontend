@@ -225,4 +225,3 @@ export const Route = createFileRoute("/vendors/billboards/wallet/")({
   component: WalletSection,
 });
 
-export default WalletSection;

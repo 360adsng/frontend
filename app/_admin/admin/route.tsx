@@ -24,7 +24,7 @@ function AdminShell() {
 }
 
 export const Route = createFileRoute("/_admin/admin")({
+  ssr: false,
   component: AdminShell,
 });
 
-export default AdminShell;

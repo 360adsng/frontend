@@ -251,5 +251,3 @@ export const Route = createFileRoute("/_access/vendor-access/onboarding/" as any
   component: VendorAccessOnboarding,
 });
 
-export default VendorAccessOnboarding;
-

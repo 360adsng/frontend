@@ -10,6 +10,7 @@ const twitter = '/icons/twitter2.svg'
 const google = '/icons/Google2.svg'
 import { Link, createFileRoute } from '@tanstack/react-router';
 const ReactAdsLogo = '/logo/adsWhite.svg'
+import { marketingHead } from "@lib/siteMeta";
 
 
 
@@ -96,7 +97,13 @@ const Contact = () => {
 }
 
 export const Route = createFileRoute("/_public/_lightnavbar/contact/")({
+  head: () =>
+    marketingHead({
+      pageTitle: "Contact",
+      description:
+        "Get in touch with 360 Ads for billboard, digital, and influencer advertising in Nigeria. Email hello@360ads.ng or reach us through the contact form.",
+      canonicalPath: "/contact",
+    }),
   component: Contact,
 })
 
-export default Contact

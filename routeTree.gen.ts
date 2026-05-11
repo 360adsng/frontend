@@ -27,6 +27,8 @@ import { Route as UsersauthAdsIndexRouteImport } from './app/_usersauth/ads/inde
 import { Route as AdminAdminIndexRouteImport } from './app/_admin/admin/index'
 import { Route as AccessSignupIndexRouteImport } from './app/_access/signup/index'
 import { Route as AccessSigninIndexRouteImport } from './app/_access/signin/index'
+import { Route as AccessResetPasswordIndexRouteImport } from './app/_access/reset-password/index'
+import { Route as AccessForgotPasswordIndexRouteImport } from './app/_access/forgot-password/index'
 import { Route as AccessEmailVerificationIndexRouteImport } from './app/_access/email-verification/index'
 import { Route as VendorsInfluencersHelpSupportRouteRouteImport } from './app/vendors/influencers/help-support/route'
 import { Route as VendorsBillboardsHelpSupportRouteRouteImport } from './app/vendors/billboards/help-support/route'
@@ -201,6 +203,18 @@ const AccessSigninIndexRoute = AccessSigninIndexRouteImport.update({
   path: '/signin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AccessResetPasswordIndexRoute =
+  AccessResetPasswordIndexRouteImport.update({
+    id: '/_access/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AccessForgotPasswordIndexRoute =
+  AccessForgotPasswordIndexRouteImport.update({
+    id: '/_access/forgot-password/',
+    path: '/forgot-password/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AccessEmailVerificationIndexRoute =
   AccessEmailVerificationIndexRouteImport.update({
     id: '/_access/email-verification/',
@@ -724,6 +738,8 @@ export interface FileRoutesByFullPath {
   '/vendors/billboards/help-support': typeof VendorsBillboardsHelpSupportRouteRouteWithChildren
   '/vendors/influencers/help-support': typeof VendorsInfluencersHelpSupportRouteRouteWithChildren
   '/email-verification/': typeof AccessEmailVerificationIndexRoute
+  '/forgot-password/': typeof AccessForgotPasswordIndexRoute
+  '/reset-password/': typeof AccessResetPasswordIndexRoute
   '/signin/': typeof AccessSigninIndexRoute
   '/signup/': typeof AccessSignupIndexRoute
   '/admin/': typeof AdminAdminIndexRoute
@@ -819,6 +835,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/email-verification': typeof AccessEmailVerificationIndexRoute
+  '/forgot-password': typeof AccessForgotPasswordIndexRoute
+  '/reset-password': typeof AccessResetPasswordIndexRoute
   '/signin': typeof AccessSigninIndexRoute
   '/signup': typeof AccessSignupIndexRoute
   '/admin': typeof AdminAdminIndexRoute
@@ -927,6 +945,8 @@ export interface FileRoutesById {
   '/vendors/billboards/help-support': typeof VendorsBillboardsHelpSupportRouteRouteWithChildren
   '/vendors/influencers/help-support': typeof VendorsInfluencersHelpSupportRouteRouteWithChildren
   '/_access/email-verification/': typeof AccessEmailVerificationIndexRoute
+  '/_access/forgot-password/': typeof AccessForgotPasswordIndexRoute
+  '/_access/reset-password/': typeof AccessResetPasswordIndexRoute
   '/_access/signin/': typeof AccessSigninIndexRoute
   '/_access/signup/': typeof AccessSignupIndexRoute
   '/_admin/admin/': typeof AdminAdminIndexRoute
@@ -1032,6 +1052,8 @@ export interface FileRouteTypes {
     | '/vendors/billboards/help-support'
     | '/vendors/influencers/help-support'
     | '/email-verification/'
+    | '/forgot-password/'
+    | '/reset-password/'
     | '/signin/'
     | '/signup/'
     | '/admin/'
@@ -1127,6 +1149,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/email-verification'
+    | '/forgot-password'
+    | '/reset-password'
     | '/signin'
     | '/signup'
     | '/admin'
@@ -1234,6 +1258,8 @@ export interface FileRouteTypes {
     | '/vendors/billboards/help-support'
     | '/vendors/influencers/help-support'
     | '/_access/email-verification/'
+    | '/_access/forgot-password/'
+    | '/_access/reset-password/'
     | '/_access/signin/'
     | '/_access/signup/'
     | '/_admin/admin/'
@@ -1336,6 +1362,8 @@ export interface RootRouteChildren {
   VendorsBillboardsRouteRoute: typeof VendorsBillboardsRouteRouteWithChildren
   VendorsInfluencersRouteRoute: typeof VendorsInfluencersRouteRouteWithChildren
   AccessEmailVerificationIndexRoute: typeof AccessEmailVerificationIndexRoute
+  AccessForgotPasswordIndexRoute: typeof AccessForgotPasswordIndexRoute
+  AccessResetPasswordIndexRoute: typeof AccessResetPasswordIndexRoute
   AccessSigninIndexRoute: typeof AccessSigninIndexRoute
   AccessSignupIndexRoute: typeof AccessSignupIndexRoute
   AccessVendorAccessOnboardingIndexRoute: typeof AccessVendorAccessOnboardingIndexRoute
@@ -1467,6 +1495,20 @@ declare module '@tanstack/react-router' {
       path: '/signin'
       fullPath: '/signin/'
       preLoaderRoute: typeof AccessSigninIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_access/reset-password/': {
+      id: '/_access/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof AccessResetPasswordIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_access/forgot-password/': {
+      id: '/_access/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password/'
+      preLoaderRoute: typeof AccessForgotPasswordIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_access/email-verification/': {
@@ -2448,6 +2490,8 @@ const rootRouteChildren: RootRouteChildren = {
   VendorsBillboardsRouteRoute: VendorsBillboardsRouteRouteWithChildren,
   VendorsInfluencersRouteRoute: VendorsInfluencersRouteRouteWithChildren,
   AccessEmailVerificationIndexRoute: AccessEmailVerificationIndexRoute,
+  AccessForgotPasswordIndexRoute: AccessForgotPasswordIndexRoute,
+  AccessResetPasswordIndexRoute: AccessResetPasswordIndexRoute,
   AccessSigninIndexRoute: AccessSigninIndexRoute,
   AccessSignupIndexRoute: AccessSignupIndexRoute,
   AccessVendorAccessOnboardingIndexRoute:

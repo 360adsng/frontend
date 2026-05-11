@@ -93,4 +93,3 @@ export const Route = createFileRoute("/_access/email-verification/")({
   component: EmailVerification,
 });
 
-export default EmailVerification;

@@ -2,12 +2,15 @@ import { baseFetchJson } from "../baseFetch";
 import type {
   BillboardOwnerSignupPayload,
   BillboardOwnerSignupResponse,
+  ForgotPasswordPayload,
   InfluencerSignupPayload,
   InfluencerSignupResponse,
   LoginPayload,
   LoginResponse,
+  MessageResponse,
   RegisterPayload,
   RegisterResponse,
+  ResetPasswordPayload,
   VendorOnboardingPayload,
   VendorOnboardingResponse,
 } from "./types";
@@ -18,6 +21,28 @@ export async function register(
 ): Promise<RegisterResponse> {
   return baseFetchJson<RegisterResponse>(
     "/auth/register",
+    { method: "POST", body: payload } as unknown as RequestInit,
+    { skipAuthRefresh: true },
+  );
+}
+
+/** POST /auth/forgot-password — public; generic success message for enumeration safety. */
+export async function forgotPassword(
+  payload: ForgotPasswordPayload,
+): Promise<MessageResponse> {
+  return baseFetchJson<MessageResponse>(
+    "/auth/forgot-password",
+    { method: "POST", body: payload } as unknown as RequestInit,
+    { skipAuthRefresh: true },
+  );
+}
+
+/** POST /auth/reset-password — public; body: { token, password }. */
+export async function resetPassword(
+  payload: ResetPasswordPayload,
+): Promise<MessageResponse> {
+  return baseFetchJson<MessageResponse>(
+    "/auth/reset-password",
     { method: "POST", body: payload } as unknown as RequestInit,
     { skipAuthRefresh: true },
   );

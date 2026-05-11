@@ -229,4 +229,3 @@ export const Route = createFileRoute("/_usersauth/ads/influencer/")({
   component: Influencer,
 })
 
-export default Influencer

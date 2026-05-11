@@ -208,4 +208,3 @@ export const Route = createFileRoute("/_admin/admin/create-admin/")({
   component: AdminCreateAdminPage,
 });
 
-export default AdminCreateAdminPage;

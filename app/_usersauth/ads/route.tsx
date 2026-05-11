@@ -18,4 +18,3 @@ export const Route = createFileRoute("/_usersauth/ads")({
   component: Layout,
 })
 
-export default Layout

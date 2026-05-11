@@ -235,4 +235,3 @@ export const Route = createFileRoute("/vendors/billboards/listing/")({
   component: Billboards,
 });
 
-export default Billboards;

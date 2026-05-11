@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import sonnerCss from "sonner/dist/styles.css?url";
 import appCss from "../styles/global.css?url";
 import NotFoundPage from "@components/NotFoundPage";
+import { SEO_DEFAULT_DESCRIPTION } from "@lib/siteMeta";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -20,6 +21,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       { title: "360 Ads" },
+      { name: "description", content: SEO_DEFAULT_DESCRIPTION },
     ],
     links: [
       {

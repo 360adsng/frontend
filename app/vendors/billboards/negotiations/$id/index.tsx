@@ -204,4 +204,3 @@ export const Route = createFileRoute("/vendors/billboards/negotiations/$id/")({
   component: VendorNegotiationDetail,
 });
 
-export default VendorNegotiationDetail;

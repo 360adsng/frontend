@@ -259,4 +259,3 @@ export const Route = createFileRoute("/_admin/admin/payout/$id/")({
   component: AdminPayoutDetailPage,
 });
 
-export default AdminPayoutDetailPage;

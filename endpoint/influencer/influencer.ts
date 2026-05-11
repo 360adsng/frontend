@@ -1,4 +1,5 @@
 import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 import type { PublicInfluencerPlatform } from "../auth/types";
 
 export type MyPlatformsResponse = { platforms: PublicInfluencerPlatform[] };
@@ -144,26 +145,36 @@ export type CreateInfluencerBookingPayload = {
   periodDurationCount?: number;
   creativeKind: "none" | "image" | "video";
   creativeVideoUrl?: string;
+  creativeImageUrl?: string;
   platformIds: number[];
   message: string;
 };
 
 export type CreateInfluencerBookingResponse = { id: number };
 
-export function createInfluencerBooking(
+export async function createInfluencerBooking(
   influencerProfileId: number,
   payload: CreateInfluencerBookingPayload,
   imageFile?: File,
 ): Promise<CreateInfluencerBookingResponse> {
-  const form = new FormData();
-  form.append("payload", JSON.stringify(payload));
-  if (imageFile) form.append("file", imageFile);
+  const base = { ...payload };
+  if (payload.creativeKind === "image") {
+    if (imageFile) {
+      const { publicUrl } = await uploadFileToR2(imageFile, "booking");
+      base.creativeImageUrl = publicUrl;
+    }
+    if (!base.creativeImageUrl?.trim()) {
+      throw new Error(
+        "Image creative requires an uploaded file or creativeImageUrl",
+      );
+    }
+  }
   return baseFetchJson<CreateInfluencerBookingResponse>(
     `/influencers/directory/${influencerProfileId}/bookings`,
     {
       method: "POST",
-      body: form,
-    },
+      body: base,
+    } as unknown as RequestInit,
   );
 }
 
@@ -377,15 +388,17 @@ export type MarkVendorInfluencerBookingActiveResponse = {
   activeAt: string | null;
 };
 
-export function markVendorInfluencerBookingActive(
+export async function markVendorInfluencerBookingActive(
   bookingId: number,
   proofImage: File,
 ): Promise<MarkVendorInfluencerBookingActiveResponse> {
-  const form = new FormData();
-  form.append("file", proofImage);
+  const { publicUrl } = await uploadFileToR2(proofImage, "booking");
   return baseFetchJson<MarkVendorInfluencerBookingActiveResponse>(
     `/influencers/vendor/bookings/${bookingId}/active`,
-    { method: "POST", body: form },
+    {
+      method: "POST",
+      body: { imageUrl: publicUrl },
+    } as unknown as RequestInit,
   );
 }
 

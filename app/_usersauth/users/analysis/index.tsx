@@ -11,4 +11,3 @@ export const Route = createFileRoute("/_usersauth/users/analysis/")({
   component: Analysis,
 })
 
-export default Analysis

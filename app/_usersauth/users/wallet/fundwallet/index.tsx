@@ -144,4 +144,3 @@ export const Route = createFileRoute("/_usersauth/users/wallet/fundwallet/")({
   component: Payment,
 })
 
-export default Payment

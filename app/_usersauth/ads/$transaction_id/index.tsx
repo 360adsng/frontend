@@ -277,4 +277,3 @@ export const Route = createFileRoute("/_usersauth/ads/$transaction_id/")({
   component: Payment,
 });
 
-export default Payment

@@ -16,6 +16,7 @@ const Layout = () => {
 }
 
 export const Route = createFileRoute("/_usersauth")({
+  ssr: false,
   beforeLoad: () => {
     if (typeof window === 'undefined') return
     if (!hasAccessToken()) {
@@ -32,4 +33,3 @@ export const Route = createFileRoute("/_usersauth")({
   component: Layout,
 })
 
-export default Layout

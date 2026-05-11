@@ -1,4 +1,5 @@
-import { baseFetch, baseFetchJson } from "../baseFetch";
+import { baseFetchJson } from "../baseFetch";
+import { uploadFileToR2 } from "../storage/r2";
 
 export type DisputeBookingKindApi = "influencer" | "billboard";
 
@@ -33,28 +34,24 @@ export async function postDisputeMessage(
   image?: File | null,
 ): Promise<DisputeMessageDto> {
   const trimmed = body.trim();
-  const img = image?.size ? image : null;
-
-  if (!trimmed && !img) {
+  let imageUrl: string | undefined;
+  if (image?.size) {
+    const { publicUrl } = await uploadFileToR2(image, "dispute");
+    imageUrl = publicUrl;
+  }
+  if (!trimmed && !imageUrl) {
     throw new Error("Message or image is required");
   }
-
-  if (!img) {
-    return baseFetchJson<DisputeMessageDto>(
-      `/dispute-chat/${bookingKind}/${bookingId}/messages`,
-      { method: "POST", body: { body: trimmed } },
-    );
-  }
-
-  const fd = new FormData();
-  if (trimmed) fd.append("body", trimmed);
-  fd.append("file", img);
-
-  const res = await baseFetch(
+  return baseFetchJson<DisputeMessageDto>(
     `/dispute-chat/${bookingKind}/${bookingId}/messages`,
-    { method: "POST", body: fd },
+    {
+      method: "POST",
+      body: {
+        ...(trimmed ? { body: trimmed } : {}),
+        ...(imageUrl ? { imageUrl } : {}),
+      },
+    } as unknown as RequestInit,
   );
-  return (await res.json()) as DisputeMessageDto;
 }
 
 /** Admin dispute resolution — same payout path as campaign owner confirming delivery */

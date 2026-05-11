@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-import netlify from '@netlify/vite-plugin-tanstack-start'
+import { cloudflare } from '@cloudflare/vite-plugin'
 import viteReact from '@vitejs/plugin-react'
 import path from 'node:path'
 
-// Netlify injects NETLIFY=true during builds. Running the Netlify adapter on every
-// `vite dev` adds work you do not need locally and can make dev feel sluggish.
-const useNetlifyPlugin = process.env.NETLIFY === 'true'
+/** Cloudflare Workers / Pages — see https://tanstack.com/start/latest/docs/framework/react/guide/hosting */
+const useCloudflare =
+  process.env.CLOUDFLARE === 'true' || process.env.CF_PAGES === 'true'
 
 export default defineConfig({
   server: {
@@ -17,8 +17,7 @@ export default defineConfig({
       usePolling: process.env.VITE_FS_POLLING === '1',
     },
   },
-  // Bundle react-icons into SSR output. Netlify's Node ESM loader fails on
-  // named imports from react-icons' CJS/ESM entry (see AiOutlineDownload error).
+  // Bundle react-icons into SSR output — avoids Node ESM interop issues with mixed CJS/ESM entry points.
   ssr: {
     noExternal: ['react-icons'],
   },
@@ -33,16 +32,16 @@ export default defineConfig({
     },
   },
   plugins: [
+    ...(useCloudflare
+      ? [cloudflare({ viteEnvironment: { name: 'ssr' } })]
+      : []),
     tanstackStart({
       srcDirectory: '.',
       router: {
         routesDirectory: 'app',
         generatedRouteTree: 'routeTree.gen.ts',
-        // Extra logging / work; keep off unless debugging route generation.
-        verboseFileRoutes: process.env.VITE_VERBOSE_FILE_ROUTES === '1',
       },
     }),
-    ...(useNetlifyPlugin ? [netlify()] : []),
     viteReact(),
   ],
 })

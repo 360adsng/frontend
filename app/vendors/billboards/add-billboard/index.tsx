@@ -740,4 +740,3 @@ export const Route = createFileRoute("/vendors/billboards/add-billboard/")({
   component: Add,
 });
 
-export default Add;

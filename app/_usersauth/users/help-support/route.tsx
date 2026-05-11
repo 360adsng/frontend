@@ -8,4 +8,3 @@ export const Route = createFileRoute("/_usersauth/users/help-support")({
   component: HelpSupportLayout,
 });
 
-export default HelpSupportLayout;

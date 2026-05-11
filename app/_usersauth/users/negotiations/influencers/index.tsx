@@ -13,6 +13,6 @@ export const Route = createFileRoute(
   component: () => null,
 });
 
-export default function InfluencerNegotiationsRedirect() {
+function InfluencerNegotiationsRedirect() {
   return null;
 }

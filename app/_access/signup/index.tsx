@@ -834,4 +834,3 @@ export const Route = createFileRoute("/_access/signup/")({
   component: SignUp,
 });
 
-export default SignUp;

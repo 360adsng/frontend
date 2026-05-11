@@ -75,5 +75,3 @@ export const Route = createFileRoute("/vendors/billboards/negotiations/")({
   component: VendorNegotiationsPage,
 });
 
-export default VendorNegotiationsPage;
-

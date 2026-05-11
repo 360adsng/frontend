@@ -538,4 +538,3 @@ export const Route = createFileRoute("/vendors/billboards/settings/")({
   component: BillboardOwnerSettingsPage,
 });
 
-export default BillboardOwnerSettingsPage;

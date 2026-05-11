@@ -136,4 +136,3 @@ export const Route = createFileRoute("/_usersauth/wallet/")({
   component: WalletPaymentReturnPage,
 });
 
-export default WalletPaymentReturnPage;
