@@ -32,3 +32,15 @@ export const NIGERIA_STATES_LGAS: StateOption[] = [
 export function getStateById(id: string): StateOption | undefined {
   return NIGERIA_STATES_LGAS.find((s) => s.id === id);
 }
+
+/** Map stored coverage state (id or display name) to a stable state id. */
+export function resolveStateId(stored: string): string {
+  if (!stored) return "";
+  const byId = getStateById(stored);
+  if (byId) return byId.id;
+  const lower = stored.toLowerCase();
+  const match = NIGERIA_STATES_LGAS.find(
+    (s) => s.id === lower || s.name.toLowerCase() === lower,
+  );
+  return match?.id ?? "";
+}

@@ -23,16 +23,13 @@ import {
   setMyBillboardListingAvailability,
   updateMyBillboardListing,
   type SetListingAvailabilityPayload,
-  type BillboardBookingListItem,
   type BillboardBookingsQueryParams,
   type BillboardListQueryParams,
-  type BillboardBooking,
   type BookerNegotiationResponsePayload,
   type CreateBillboardBookingPayload,
   type CreateBillboardListingPayload,
   type UpdateBillboardListingResponse,
   type VendorNegotiationPayload,
-  type BillboardOwnerDashboardResponse,
 } from "./billboard";
 
 function errorMessage(error: unknown): string {
@@ -135,12 +132,21 @@ export type CreateBillboardBookingVariables = {
   listingId: number;
   payload: CreateBillboardBookingPayload;
   imageFile?: File;
+  arconCertificateFile?: File;
 };
 
 export function useCreateBillboardBooking() {
   return useMutation({
-    mutationFn: ({ listingId, payload, imageFile }: CreateBillboardBookingVariables) =>
-      createBillboardBooking(listingId, payload, imageFile),
+    mutationFn: ({
+      listingId,
+      payload,
+      imageFile,
+      arconCertificateFile,
+    }: CreateBillboardBookingVariables) =>
+      createBillboardBooking(listingId, payload, {
+        imageFile,
+        arconCertificateFile,
+      }),
     onError: (error) => {
       toast.error(errorMessage(error));
     },

@@ -26,7 +26,11 @@ export type VerifyAccountResponse = {
   }
 }
 
-export type TransactionStatus = "pending" | "completed" | "failed";
+export type TransactionStatus =
+  | "pending"
+  | "processing"
+  | "completed"
+  | "failed";
 
 export type TransactionType =
   | "wallet_fund"

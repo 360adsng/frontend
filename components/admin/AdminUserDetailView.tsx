@@ -20,6 +20,14 @@ import type {
 } from "@endpoint/admin/admin";
 import { ApiError } from "@endpoint";
 import {
+  pickCompanyContact,
+  pickContactDetails,
+  pickCoverageLines,
+  pickDisplayName,
+  pickLocationLine,
+  type DisplayContact,
+} from "./adminUserDetailHelpers";
+import {
   FiCalendar,
   FiDollarSign,
   FiMail,
@@ -60,36 +68,6 @@ function formatNaira(n: number): string {
   } catch {
     return `₦${n.toLocaleString()}`;
   }
-}
-
-function pickDisplayName(d: AdminUserDetail): string {
-  const bp = d.businessProfile as { businessName?: string } | null | undefined;
-  if (bp?.businessName?.trim()) return bp.businessName.trim();
-  const bb = d.billboardProfile as { businessName?: string } | null | undefined;
-  if (bb?.businessName?.trim()) return bb.businessName.trim();
-  const ip = d.individualProfile as
-    | { firstName?: string; lastName?: string }
-    | null
-    | undefined;
-  if (ip?.firstName || ip?.lastName) {
-    return `${ip.firstName ?? ""} ${ip.lastName ?? ""}`.trim();
-  }
-  const inf = d.influencerProfile as
-    | { mediaName?: string; firstName?: string; lastName?: string }
-    | null
-    | undefined;
-  if (inf?.mediaName?.trim()) return inf.mediaName.trim();
-  if (inf?.firstName) {
-    return `${inf.firstName} ${inf.lastName ?? ""}`.trim();
-  }
-  const ap = d.adminProfile as
-    | { firstName?: string; lastName?: string }
-    | null
-    | undefined;
-  if (ap?.firstName) {
-    return `${ap.firstName} ${ap.lastName ?? ""}`.trim();
-  }
-  return d.email;
 }
 
 function formatAdminRoleLabel(role: string): string {
@@ -242,33 +220,71 @@ function isVerified(d: AdminUserDetail): boolean {
   return Boolean(d.emailVerifiedAt);
 }
 
-function pickLocationLine(d: AdminUserDetail): { primary: string; secondary?: string } {
-  const bb = d.billboardProfile as
-    | {
-        businessAddress?: string;
-        billboardCoverage?: { state: string; lga: string[] }[];
-      }
-    | null
-    | undefined;
-  if (bb?.billboardCoverage?.length) {
-    const first = bb.billboardCoverage[0];
-    const state = first.state;
-    const lga = first.lga?.[0];
-    return {
-      primary: state ?? "—",
-      secondary: lga ? `${lga}, ${state}` : bb.businessAddress ?? undefined,
-    };
-  }
-  if (bb?.businessAddress) {
-    return { primary: bb.businessAddress };
-  }
-  const bu = d.businessProfile as { businessAddress?: string } | null | undefined;
-  if (bu?.businessAddress) return { primary: bu.businessAddress };
-  const inf = d.influencerProfile as { address?: string } | null | undefined;
-  if (inf?.address) return { primary: inf.address };
-  const ip = d.individualProfile as { address?: string } | null | undefined;
-  if (ip?.address) return { primary: ip.address };
-  return { primary: "—" };
+function CompanyContactRows({
+  email,
+  phone,
+}: {
+  email: string;
+  phone: string;
+}) {
+  return (
+    <>
+      <div className="flex gap-3">
+        <FiMail className="mt-0.5 h-5 w-5 shrink-0 text-stone-400" aria-hidden />
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">
+            Company email
+          </p>
+          <p className="font-semibold text-stone-900">{email}</p>
+        </div>
+      </div>
+      <div className="flex gap-3">
+        <FiPhone className="mt-0.5 h-5 w-5 shrink-0 text-stone-400" aria-hidden />
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">
+            Company phone
+          </p>
+          <p className="font-semibold text-stone-900">{phone}</p>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function ContactDetailsBody({ contact }: { contact: DisplayContact }) {
+  return (
+    <div className="space-y-3 text-stone-700">
+      {contact.position ? (
+        <p className="text-sm text-stone-600">
+          <span className="text-stone-500">Role: </span>
+          {contact.position}
+        </p>
+      ) : null}
+      <div className="flex items-center gap-2 text-sm">
+        <FiMail className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
+        <span>
+          <span className="text-stone-500">Email: </span>
+          {contact.email}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 text-sm">
+        <FiPhone className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
+        <span>
+          <span className="text-stone-500">Phone: </span>
+          {contact.phone}
+        </span>
+      </div>
+      {contact.alternatePhone ? (
+        <div className="flex items-center gap-2 text-sm">
+          <FiPhone className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
+          <span>
+            <span className="text-stone-500">Alternate phone: </span>
+            {contact.alternatePhone}
+          </span>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 /** Brand logo or profile photo URL for the company / creator header (not “documents”). */
@@ -610,6 +626,9 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
   const accountBlocked = Boolean(d.blockedAt);
   const walletBlocked = Boolean(d.walletBlockedAt);
   const loc = pickLocationLine(d);
+  const contact = pickContactDetails(d);
+  const companyContact = pickCompanyContact(d);
+  const coverageLines = pickCoverageLines(d);
   const subtitle = pickSubtitleLabel(d.accountType);
   const docs = buildVerificationDocs(d);
   const companyVisualUrl = pickCompanyVisualUrl(d);
@@ -620,11 +639,7 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
     (d.businessProfile as { businessName?: string } | undefined)?.businessName ||
     name;
 
-  const contactName =
-    (d.billboardProfile as { ContactPersonName?: string } | undefined)
-      ?.ContactPersonName ||
-    (d.businessProfile as { contactName?: string } | undefined)?.contactName ||
-    pickDisplayName(d);
+  const contactName = contact.name;
 
   const showCompanyCard =
     d.accountType === "billboard_owner" ||
@@ -656,6 +671,12 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
 
   const isSimpleAccount =
     d.accountType === "admin" || d.accountType === "regular_user";
+
+  const mailtoEmail = contact.email || companyContact.email;
+  const contactMailto =
+    mailtoEmail && mailtoEmail !== "—"
+      ? `mailto:${encodeURIComponent(mailtoEmail)}`
+      : null;
 
   const adminRoles =
     d.accountType === "admin" ? adminRolesFromDetail(d) : [];
@@ -777,34 +798,41 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
             </div>
           </div>
           <hr className="my-5 border-stone-200" />
-          <div className="space-y-3 text-stone-700">
-            <div className="flex items-center gap-2 text-sm">
-              <FiMail className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
-              <span>{d.email}</span>
+          {d.accountType === "admin" ? (
+            <div className="mb-5 flex gap-3">
+              <FiMapPin
+                className="mt-0.5 h-5 w-5 shrink-0 text-stone-400"
+                aria-hidden
+              />
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-500">
+                  Location
+                </p>
+                <p className="font-semibold text-stone-900">{loc.primary}</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-sm">
-              <FiPhone className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
-              <span>{d.phone}</span>
-            </div>
-            {d.accountType !== "admin" && d.walletSummary ? (
-              <p className="pt-1 text-xs text-stone-500">
-                Wallet balance:{" "}
-                <span className="font-semibold text-stone-800">
-                  {formatNaira(d.walletSummary.balance)} {d.walletSummary.currency}
-                </span>
-                {walletBlocked ? (
-                  <span className="ml-2 text-red-600">(wallet blocked)</span>
-                ) : null}
-              </p>
-            ) : null}
-          </div>
-          <a
-            href={`mailto:${encodeURIComponent(d.email)}`}
-            className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ads360yellow-100 hover:underline"
-          >
-            Send email
-            <FiMail className="h-4 w-4" aria-hidden />
-          </a>
+          ) : null}
+          <ContactDetailsBody contact={contact} />
+          {d.accountType !== "admin" && d.walletSummary ? (
+            <p className="mt-3 text-xs text-stone-500">
+              Wallet balance:{" "}
+              <span className="font-semibold text-stone-800">
+                {formatNaira(d.walletSummary.balance)} {d.walletSummary.currency}
+              </span>
+              {walletBlocked ? (
+                <span className="ml-2 text-red-600">(wallet blocked)</span>
+              ) : null}
+            </p>
+          ) : null}
+          {contactMailto ? (
+            <a
+              href={contactMailto}
+              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ads360yellow-100 hover:underline"
+            >
+              Send email
+              <FiMail className="h-4 w-4" aria-hidden />
+            </a>
+          ) : null}
         </GoldCard>
       ) : (
         <div className="grid gap-6 lg:grid-cols-2">
@@ -840,11 +868,12 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
                       Location
                     </p>
                     <p className="font-semibold text-stone-900">{loc.primary}</p>
-                    {loc.secondary ? (
-                      <p className="text-sm text-stone-500">{loc.secondary}</p>
-                    ) : null}
                   </div>
                 </div>
+                <CompanyContactRows
+                  email={companyContact.email}
+                  phone={companyContact.phone}
+                />
                 <div className="flex gap-3">
                   <FiCalendar
                     className="mt-0.5 h-5 w-5 shrink-0 text-stone-400"
@@ -911,42 +940,52 @@ export function AdminUserDetailView({ userId }: { userId: number }) {
               />
               <div className="min-w-0">
                 <p className="font-serif text-xl text-stone-900">{contactName}</p>
-                <p className="text-sm text-sky-900/60">Primary contact</p>
+                <p className="text-sm text-sky-900/60">
+                  {contact.position ?? "Primary contact"}
+                </p>
               </div>
             </div>
             <hr className="my-5 border-stone-200" />
-            <div className="space-y-3 text-stone-700">
-              <div className="flex items-center gap-2 text-sm">
-                <FiMail className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
-                <span>{d.email}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <FiPhone className="h-4 w-4 shrink-0 text-stone-400" aria-hidden />
-                <span>{d.phone}</span>
-              </div>
-              {d.walletSummary ? (
-                <p className="pt-1 text-xs text-stone-500">
-                  Wallet balance:{" "}
-                  <span className="font-semibold text-stone-800">
-                    {formatNaira(d.walletSummary.balance)}{" "}
-                    {d.walletSummary.currency}
-                  </span>
-                  {walletBlocked ? (
-                    <span className="ml-2 text-red-600">(wallet blocked)</span>
-                  ) : null}
-                </p>
-              ) : null}
-            </div>
-            <a
-              href={`mailto:${encodeURIComponent(d.email)}`}
-              className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ads360yellow-100 hover:underline"
-            >
-              Send email
-              <FiMail className="h-4 w-4" aria-hidden />
-            </a>
+            <ContactDetailsBody contact={contact} />
+            {d.walletSummary ? (
+              <p className="mt-3 text-xs text-stone-500">
+                Wallet balance:{" "}
+                <span className="font-semibold text-stone-800">
+                  {formatNaira(d.walletSummary.balance)}{" "}
+                  {d.walletSummary.currency}
+                </span>
+                {walletBlocked ? (
+                  <span className="ml-2 text-red-600">(wallet blocked)</span>
+                ) : null}
+              </p>
+            ) : null}
+            {contactMailto ? (
+              <a
+                href={contactMailto}
+                className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ads360yellow-100 hover:underline"
+              >
+                Send email
+                <FiMail className="h-4 w-4" aria-hidden />
+              </a>
+            ) : null}
           </GoldCard>
         </div>
       )}
+
+      {d.accountType === "billboard_owner" && coverageLines.length > 0 ? (
+        <GoldCard title="Coverage areas">
+          <ul className="space-y-2 text-sm text-stone-700">
+            {coverageLines.map((line) => (
+              <li
+                key={line}
+                className="rounded-lg border border-stone-200 bg-stone-50 px-4 py-2.5 font-medium text-stone-900"
+              >
+                {line}
+              </li>
+            ))}
+          </ul>
+        </GoldCard>
+      ) : null}
 
       {d.accountType === "influencer" ? (
         <GoldCard title="Platforms">

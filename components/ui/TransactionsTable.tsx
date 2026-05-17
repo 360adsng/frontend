@@ -18,6 +18,7 @@ const TYPE_LABELS: Record<TransactionType, string> = {
 
 const STATUS_LABELS: Record<TransactionStatus, string> = {
   pending: "Pending",
+  processing: "Processing",
   completed: "Completed",
   failed: "Failed",
 };
@@ -48,8 +49,8 @@ function Pill({ kind, value }: { kind: "status" | "type"; value: string }) {
       ? "bg-emerald-100 text-emerald-800 border-emerald-200"
       : v === "failed" || v === "rejected"
         ? "bg-red-100 text-red-700 border-red-200"
-        : v === "pending"
-          ? "bg-amber-100 text-amber-900 border-amber-200"
+        : v === "pending" || v === "processing"
+          ? "bg-sky-100 text-sky-900 border-sky-200"
           : "bg-stone-100 text-stone-700 border-stone-200";
   return (
     <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${styles}`}>

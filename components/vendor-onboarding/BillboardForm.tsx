@@ -1,33 +1,47 @@
 import BlackButtons from "@components/buttons/BlackButton";
+import PhoneNumberField from "@components/inputs/PhoneNumberField";
 import { billboardOwnerSignup } from "@endpoint/auth/auth";
-import { ApiError } from "@endpoint/baseFetch";
+import { uploadVendorOnboardingFile } from "@endpoint/auth/onboardingStorage";
+import {
+  ApiError,
+  saveAccountType,
+  saveAuthTokens,
+} from "@endpoint/baseFetch";
 import type {
   PublicBillboardBusiness,
   VendorOnboardingUser,
 } from "@endpoint/auth/types";
-import { NIGERIA_STATES_LGAS, getStateById } from "../../lib/nigeriaStatesLgas";
-import { useEffect, useMemo, useState } from "react";
+import { resolveStateId } from "../../lib/nigeriaStatesLgas";
+import {
+  defaultCountryIso2,
+  parseE164ToPhoneFields,
+  parsePhoneToE164,
+  type PhoneFields,
+} from "../../lib/phoneInput";
+import {
+  BillboardCoverageEditor,
+  type BillboardCoverageRow,
+} from "@components/vendor-settings/billboards/BillboardCoverageEditor";
+import VendorDocumentUpload from "./VendorDocumentUpload";
+import { useEffect, useState } from "react";
 
-const inputBase =
-  "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded min-h-[38px] md:min-h-[45px]";
+const baseInputClass =
+  "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded h-[38px] md:h-[45px] border";
+
+function inputClass(hasError = false) {
+  return `${baseInputClass} ${hasError ? "border-red-500" : "border-transparent"}`;
+}
+
+const coverageInputBase =
+  "bg-[#E4E4E4] focus:outline-none px-2 w-full rounded min-h-[38px] md:min-h-[45px] border border-transparent";
 
 type BackendStep = "account" | "business" | "contact" | "fix";
 type BillboardWizardStep = 1 | 2 | 3;
-export type BillboardCoverageRow = { state: string; lga: string[] };
 
 function errorMessage(error: unknown): string {
   if (error instanceof ApiError) return error.message;
   if (error instanceof Error) return error.message;
   return "Something went wrong. Please try again.";
-}
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => resolve(fr.result as string);
-    fr.onerror = () => reject(fr.error);
-    fr.readAsDataURL(file);
-  });
 }
 
 function initialWizardStepFromBackend(
@@ -60,110 +74,112 @@ export default function BillboardForm({
   );
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
-  // Step 1 — user
   const [email] = useState(inviteEmail);
-  const [phone, setPhone] = useState("");
+  const [phone, setPhone] = useState<PhoneFields>({
+    countryIso2: defaultCountryIso2,
+    nationalNumber: "",
+  });
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPw, setShowPw] = useState(false);
-  const [showPw2, setShowPw2] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // Step 2 — business
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
+  const [printingPricePerSqMeter, setPrintingPricePerSqMeter] = useState("");
   const [cacPreview, setCacPreview] = useState<string | null>(null);
-  const [cacFile, setCacFile] = useState<File | null>(null);
+  const [cacFileName, setCacFileName] = useState<string | null>(null);
   const [cacServerUrl, setCacServerUrl] = useState<string | null>(null);
+  const [cacUploading, setCacUploading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoFileName, setLogoFileName] = useState<string | null>(null);
   const [logoServerUrl, setLogoServerUrl] = useState<string | null>(null);
-  const [website, setWebsite] = useState("");
+  const [logoUploading, setLogoUploading] = useState(false);
   const [coverageRows, setCoverageRows] = useState<BillboardCoverageRow[]>([
     { state: "", lga: [] },
   ]);
 
-  // Step 3 — contact
   const [contactName, setContactName] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
+  const [contactPhone, setContactPhone] = useState<PhoneFields>({
+    countryIso2: defaultCountryIso2,
+    nationalNumber: "",
+  });
+  const [contactPhoneError, setContactPhoneError] = useState<string | null>(
+    null,
+  );
   const [contactEmail, setContactEmail] = useState("");
   const [contactPosition, setContactPosition] = useState("");
 
   useEffect(() => {
-    if (savedUser?.phone) setPhone(savedUser.phone);
+    if (savedUser?.phone) {
+      setPhone(parseE164ToPhoneFields(savedUser.phone));
+    }
   }, [savedUser]);
 
   useEffect(() => {
     if (!savedBusiness) return;
     setBusinessName(savedBusiness.businessName ?? "");
     setBusinessAddress(savedBusiness.businessAddress ?? "");
-    setWebsite(savedBusiness.businessWebsite ?? "");
+    if (
+      savedBusiness.printingPricePerSqMeter != null &&
+      Number.isFinite(savedBusiness.printingPricePerSqMeter)
+    ) {
+      setPrintingPricePerSqMeter(String(savedBusiness.printingPricePerSqMeter));
+    }
     if (savedBusiness.cac) {
       setCacServerUrl(savedBusiness.cac);
       setCacPreview(savedBusiness.cac);
+      setCacFileName("CAC on file");
     }
     if (savedBusiness.businessLogo) {
       setLogoServerUrl(savedBusiness.businessLogo);
       setLogoPreview(savedBusiness.businessLogo);
+      setLogoFileName("Logo on file");
     }
     if (savedBusiness.billboardCoverage?.length) {
       setCoverageRows(
         savedBusiness.billboardCoverage.map((c) => ({
-          state: c.state,
+          state: resolveStateId(c.state),
           lga: c.lga ?? [],
         })),
       );
     }
     setContactName(savedBusiness.contactPersonName ?? "");
-    setContactPhone(savedBusiness.contactPersonPhone ?? "");
+    if (savedBusiness.contactPersonPhone) {
+      setContactPhone(parseE164ToPhoneFields(savedBusiness.contactPersonPhone));
+    }
     setContactEmail(savedBusiness.contactPersonEmail ?? "");
     setContactPosition(savedBusiness.contactPersonPosition ?? "");
   }, [savedBusiness]);
 
-  const setRowState = (index: number, stateId: string) => {
-    setCoverageRows((rows) =>
-      rows.map((r, i) => (i === index ? { state: stateId, lga: [] } : r)),
-    );
-  };
+  const hasCacUrl = Boolean(cacServerUrl);
 
-  const addCoverageRow = () => {
-    setCoverageRows((rows) => [...rows, { state: "", lga: [] }]);
-  };
+  const printingNum = parseFloat(printingPricePerSqMeter.replace(/,/g, ""));
+  const hasValidPrintingPrice =
+    Number.isFinite(printingNum) && printingNum > 0;
 
-  const removeCoverageRow = (index: number) => {
-    setCoverageRows((rows) => rows.filter((_, i) => i !== index));
-  };
-
-  const toggleLga = (rowIndex: number, lgaName: string) => {
-    setCoverageRows((rows) =>
-      rows.map((r, i) => {
-        if (i !== rowIndex) return r;
-        const next = new Set(r.lga);
-        if (next.has(lgaName)) next.delete(lgaName);
-        else next.add(lgaName);
-        return { ...r, lga: Array.from(next) };
-      }),
-    );
-  };
-
-  const hasCacOrServer =
-    Boolean(cacFile) ||
-    Boolean(cacServerUrl) ||
-    Boolean(cacPreview && !cacPreview.startsWith("blob:"));
+  const phoneReady = Boolean(phone.nationalNumber.trim());
+  const passwordsMatch =
+    Boolean(password) && Boolean(confirmPassword) && password === confirmPassword;
 
   const canGoNext =
     wizardStep === 1
-      ? Boolean(phone.trim() && password && password === confirmPassword)
+      ? phoneReady && passwordsMatch
       : wizardStep === 2
         ? Boolean(
             businessName.trim() &&
               businessAddress.trim() &&
-              hasCacOrServer &&
+              hasValidPrintingPrice &&
+              hasCacUrl &&
+              !cacUploading &&
+              !logoUploading &&
               coverageRows.some((r) => r.state && r.lga.length > 0),
           )
         : Boolean(
             contactName.trim() &&
-              contactPhone.trim() &&
+              contactPhone.nationalNumber.trim() &&
               contactEmail.trim() &&
               contactPosition.trim(),
           );
@@ -171,14 +187,29 @@ export default function BillboardForm({
   const handleContinueStep1 = async () => {
     if (!canGoNext || wizardStep !== 1) return;
     setFormError(null);
+    setPhoneError(null);
+
+    const e164 = parsePhoneToE164(phone.countryIso2, phone.nationalNumber);
+    if (!e164) {
+      setPhoneError("Enter a valid phone number.");
+      return;
+    }
+
     setSubmitting(true);
     try {
-      await billboardOwnerSignup({
+      const step1 = await billboardOwnerSignup({
         inviteToken,
         step: 1,
-        phoneNumber: phone.trim(),
+        phoneNumber: e164,
         password,
       });
+      if (step1.accessToken && step1.refreshToken) {
+        saveAuthTokens({
+          accessToken: step1.accessToken,
+          refreshToken: step1.refreshToken,
+        });
+        saveAccountType("billboard_owner");
+      }
       await onAfterSave();
       setWizardStep(2);
     } catch (e) {
@@ -203,14 +234,10 @@ export default function BillboardForm({
         businessName: businessName.trim(),
         address: businessAddress.trim(),
         billboardCoverage: coverage,
-        website: website.trim() || undefined,
+        printingPricePerSqMeter: printingNum,
+        cacUrl: cacServerUrl!,
+        ...(logoServerUrl ? { logoUrl: logoServerUrl } : {}),
       };
-
-      if (cacFile) payload.cacDataUrl = await fileToDataUrl(cacFile);
-      else if (cacServerUrl) payload.cacUrl = cacServerUrl;
-
-      if (logoFile) payload.logoDataUrl = await fileToDataUrl(logoFile);
-      else if (logoServerUrl) payload.logoUrl = logoServerUrl;
 
       await billboardOwnerSignup(payload);
       await onAfterSave();
@@ -225,13 +252,24 @@ export default function BillboardForm({
   const handleSubmitStep3 = async () => {
     if (!canGoNext || wizardStep !== 3) return;
     setFormError(null);
+    setContactPhoneError(null);
+
+    const contactE164 = parsePhoneToE164(
+      contactPhone.countryIso2,
+      contactPhone.nationalNumber,
+    );
+    if (!contactE164) {
+      setContactPhoneError("Enter a valid contact phone number.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       await billboardOwnerSignup({
         inviteToken,
         step: 3,
         contactName: contactName.trim(),
-        contactPhone: contactPhone.trim(),
+        contactPhone: contactE164,
         contactEmail: contactEmail.trim(),
         contactPosition: contactPosition.trim(),
       });
@@ -243,14 +281,47 @@ export default function BillboardForm({
     }
   };
 
-  const stateOptions = useMemo(
-    () =>
-      Object.keys(NIGERIA_STATES_LGAS).map((id) => ({
-        id,
-        name: getStateById(id)?.name ?? id,
-      })),
-    [],
-  );
+  const handleCacSelect = async (file: File) => {
+    setCacUploading(true);
+    setFormError(null);
+    try {
+      const { publicUrl } = await uploadVendorOnboardingFile(file, inviteToken);
+      setCacServerUrl(publicUrl);
+      setCacPreview(publicUrl);
+      setCacFileName(file.name);
+    } catch (e) {
+      setFormError(errorMessage(e));
+    } finally {
+      setCacUploading(false);
+    }
+  };
+
+  const handleCacClear = () => {
+    setCacFileName(null);
+    setCacPreview(null);
+    setCacServerUrl(null);
+  };
+
+  const handleLogoSelect = async (file: File) => {
+    setLogoUploading(true);
+    setFormError(null);
+    try {
+      const { publicUrl } = await uploadVendorOnboardingFile(file, inviteToken);
+      setLogoServerUrl(publicUrl);
+      setLogoPreview(publicUrl);
+      setLogoFileName(file.name);
+    } catch (e) {
+      setFormError(errorMessage(e));
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const handleLogoClear = () => {
+    setLogoFileName(null);
+    setLogoPreview(null);
+    setLogoServerUrl(null);
+  };
 
   return (
     <div>
@@ -269,57 +340,80 @@ export default function BillboardForm({
       {wizardStep === 1 && (
         <div>
           <div className="my-3">
-            <label>Email</label>
-            <input className={inputBase} value={email} disabled />
-          </div>
-          <div className="my-3">
-            <label>Phone number</label>
+            <label htmlFor="onboarding-email">Email</label>
+            <br />
             <input
-              className={inputBase}
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              id="onboarding-email"
+              className={inputClass()}
+              value={email}
+              disabled
             />
           </div>
-          <div className="my-3">
-            <label>Password</label>
-            <div className="flex gap-2">
-              <input
-                className={inputBase}
-                type={showPw ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                className="rounded border px-3 text-sm"
-                onClick={() => setShowPw((s) => !s)}
-              >
-                {showPw ? "Hide" : "Show"}
-              </button>
+
+          <PhoneNumberField
+            id="onboarding-phone"
+            value={phone}
+            onChange={(next) => {
+              setPhoneError(null);
+              setPhone(next);
+            }}
+            inputClass={inputClass}
+            error={phoneError}
+          />
+
+          <div className="lg:flex my-3 gap-0 lg:gap-4">
+            <div className="basis-1/2 my-3 lg:my-0">
+              <label htmlFor="onboarding-password">Password</label>
+              <br />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="onboarding-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className={inputClass()}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                  onClick={() => setShowPassword((s) => !s)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="my-3">
-            <label>Confirm password</label>
-            <div className="flex gap-2">
-              <input
-                className={inputBase}
-                type={showPw2 ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                className="rounded border px-3 text-sm"
-                onClick={() => setShowPw2((s) => !s)}
-              >
-                {showPw2 ? "Hide" : "Show"}
-              </button>
+
+            <div className="basis-1/2 my-3 lg:my-0">
+              <label htmlFor="onboarding-confirm-password">Confirm Password</label>
+              <br />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  id="onboarding-confirm-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  className={inputClass(
+                    Boolean(
+                      password &&
+                        confirmPassword &&
+                        password !== confirmPassword,
+                    ),
+                  )}
+                />
+                <button
+                  type="button"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-gray-700"
+                  onClick={() => setShowConfirmPassword((s) => !s)}
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {password && confirmPassword && password !== confirmPassword ? (
+                <p className="mt-1 text-sm text-red-600">Passwords do not match.</p>
+              ) : null}
             </div>
-            {password && confirmPassword && password !== confirmPassword ? (
-              <p className="mt-1 text-sm text-red-600">
-                Passwords do not match.
-              </p>
-            ) : null}
           </div>
         </div>
       )}
@@ -328,150 +422,69 @@ export default function BillboardForm({
         <div>
           <div className="my-3">
             <label>Business name</label>
+            <br />
             <input
-              className={inputBase}
+              className={inputClass()}
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
             />
           </div>
           <div className="my-3">
             <label>Business address</label>
+            <br />
             <input
-              className={inputBase}
+              className={inputClass()}
               value={businessAddress}
               onChange={(e) => setBusinessAddress(e.target.value)}
             />
           </div>
-          <div className="my-3">
-            <label>Website (optional)</label>
-            <input
-              className={inputBase}
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-            />
-          </div>
 
           <div className="my-3">
-            <label>CAC document (required)</label>
-            <input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={(e) => {
-                const f = e.target.files?.[0] ?? null;
-                setCacFile(f);
-                setCacPreview(f ? URL.createObjectURL(f) : cacServerUrl);
-              }}
-            />
-            {cacPreview ? (
-              <div className="mt-2 text-sm">
-                <a
-                  href={cacPreview}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Preview CAC
-                </a>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="my-3">
-            <label>Logo (optional)</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const f = e.target.files?.[0] ?? null;
-                setLogoFile(f);
-                setLogoPreview(f ? URL.createObjectURL(f) : logoServerUrl);
-              }}
-            />
-            {logoPreview ? (
-              <div className="mt-2 text-sm">
-                <a
-                  href={logoPreview}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  Preview logo
-                </a>
-              </div>
-            ) : null}
-          </div>
-
-          <div className="my-3">
-            <label className="font-medium">Billboard coverage (required)</label>
-            <p className="text-sm text-gray-600 mt-1">
-              Select a state and at least one LGA for each row.
+            <label>Printing price (₦ per m²)</label>
+            <p className="text-xs text-gray-600 mt-1 mb-1">
+              Used for static vinyl printing quotes (your rate per square metre).
             </p>
+            <input
+              className={inputClass()}
+              type="number"
+              min={0}
+              step="0.01"
+              value={printingPricePerSqMeter}
+              onChange={(e) => setPrintingPricePerSqMeter(e.target.value)}
+              placeholder="e.g. 4500"
+            />
           </div>
 
-          {coverageRows.map((row, idx) => {
-            const st = getStateById(row.state);
-            const lgas = st?.lgas ?? [];
-            return (
-              <div key={idx} className="my-4 rounded border p-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <select
-                    className={inputBase}
-                    value={row.state}
-                    onChange={(e) => setRowState(idx, e.target.value)}
-                  >
-                    <option value="">Select state</option>
-                    {stateOptions.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        {s.name}
-                      </option>
-                    ))}
-                  </select>
-                  {coverageRows.length > 1 && (
-                    <button
-                      type="button"
-                      className="rounded border px-3 py-2 text-sm"
-                      onClick={() => removeCoverageRow(idx)}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
+          <VendorDocumentUpload
+            label="CAC document"
+            required
+            hint="PDF or image of your CAC registration (max 8MB per file)."
+            accept=".pdf,application/pdf,image/png,image/jpeg,image/webp"
+            previewUrl={cacPreview}
+            fileName={cacFileName}
+            onSelect={handleCacSelect}
+            onClear={handleCacClear}
+            uploading={cacUploading}
+          />
 
-                {row.state ? (
-                  <div className="mt-3">
-                    <p className="text-sm font-medium">Select LGAs</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {lgas.map((lga) => {
-                        const active = row.lga.includes(lga);
-                        return (
-                          <button
-                            key={lga}
-                            type="button"
-                            onClick={() => toggleLga(idx, lga)}
-                            className={`rounded border px-3 py-1 text-sm ${
-                              active
-                                ? "bg-ads360yellow-100 text-white border-ads360yellow-100"
-                                : ""
-                            }`}
-                          >
-                            {lga}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+          <VendorDocumentUpload
+            label="Business logo"
+            hint="Optional. PNG or JPG works best for your vendor profile."
+            accept="image/png,image/jpeg,image/webp"
+            previewUrl={logoPreview}
+            fileName={logoFileName}
+            onSelect={handleLogoSelect}
+            onClear={handleLogoClear}
+            uploading={logoUploading}
+          />
 
-          <button
-            type="button"
-            className="rounded border px-3 py-2 text-sm"
-            onClick={addCoverageRow}
-          >
-            Add coverage row
-          </button>
+          <div className="my-4">
+            <BillboardCoverageEditor
+              rows={coverageRows}
+              onChange={setCoverageRows}
+              inputBase={coverageInputBase}
+            />
+          </div>
         </div>
       )}
 
@@ -479,32 +492,39 @@ export default function BillboardForm({
         <div>
           <div className="my-3">
             <label>Contact name</label>
+            <br />
             <input
-              className={inputBase}
+              className={inputClass()}
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
             />
           </div>
-          <div className="my-3">
-            <label>Contact phone</label>
-            <input
-              className={inputBase}
-              value={contactPhone}
-              onChange={(e) => setContactPhone(e.target.value)}
-            />
-          </div>
+          <PhoneNumberField
+            id="onboarding-contact-phone"
+            label="Contact phone"
+            value={contactPhone}
+            onChange={(next) => {
+              setContactPhoneError(null);
+              setContactPhone(next);
+            }}
+            inputClass={inputClass}
+            error={contactPhoneError}
+          />
+
           <div className="my-3">
             <label>Contact email</label>
+            <br />
             <input
-              className={inputBase}
+              className={inputClass()}
               value={contactEmail}
               onChange={(e) => setContactEmail(e.target.value)}
             />
           </div>
           <div className="my-3">
             <label>Position / role</label>
+            <br />
             <input
-              className={inputBase}
+              className={inputClass()}
               value={contactPosition}
               onChange={(e) => setContactPosition(e.target.value)}
             />
@@ -551,4 +571,3 @@ export default function BillboardForm({
     </div>
   );
 }
-

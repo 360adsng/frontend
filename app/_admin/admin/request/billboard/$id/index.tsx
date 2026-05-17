@@ -7,7 +7,15 @@ import {
   disputeNoticeHeaderPillClassNames,
   resolveDisputeNoticePhase,
 } from "@components/campaign/CampaignDetailShared";
-import { useAdminBillboardBookingRequest } from "@endpoint/admin/useAdminBookingRequests";
+import {
+  useAdminBillboardBookingRequest,
+  useAttachAdminBillboardArconCertificate,
+} from "@endpoint/admin/useAdminBookingRequests";
+import { AdminBillboardPaymentActions } from "@components/admin/AdminBillboardPaymentActions";
+import { AdminVerifyFlutterwavePaymentButton } from "@components/admin/AdminVerifyFlutterwavePaymentButton";
+import { ArconCertificatePanel } from "@components/billboard/ArconCertificatePanel";
+import { CampaignBillboardAssetsSection } from "@components/campaign/CampaignBillboardAssetsSection";
+import { uploadFileToR2 } from "@endpoint/storage/r2";
 import type { AdminBriefUser } from "@endpoint/admin/adminBookingRequests";
 
 function formatMoney(amount: number, currency: string): string {
@@ -79,6 +87,7 @@ function AdminBillboardRequestDetailPage() {
   const id = Number.parseInt(idParam, 10);
   const valid = Number.isFinite(id) && id > 0;
   const q = useAdminBillboardBookingRequest(valid ? id : null);
+  const attachArcon = useAttachAdminBillboardArconCertificate(valid ? id : 0);
   const d = q.data;
   const listing = d?.listing;
   const disputePhase = d
@@ -91,7 +100,6 @@ function AdminBillboardRequestDetailPage() {
       })
     : null;
   const showDisputeBanner = disputePhase !== null;
-
 
   return (
     <section className="min-h-[70vh] bg-ads360-hash px-4 py-10 md:px-10">
@@ -175,7 +183,7 @@ function AdminBillboardRequestDetailPage() {
 
               <p className="mt-6 text-lg font-semibold tabular-nums text-stone-900">
                 {formatMoney(
-                  Number(d.negotiatedAmount ?? d.quotedTotal),
+                  Number(d.payableTotal ?? d.negotiatedAmount ?? d.quotedTotal),
                   d.currency,
                 )}
                 {d.negotiatedAmount == null &&
@@ -186,6 +194,54 @@ function AdminBillboardRequestDetailPage() {
                   </span>
                 ) : null}
               </p>
+
+              <dl className="mt-4 grid gap-2 rounded-xl border border-stone-200 bg-stone-50/80 px-4 py-3 text-sm">
+                <div className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                  Payment breakdown
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-stone-600">Placement</dt>
+                  <dd className="font-medium tabular-nums text-stone-900">
+                    {formatMoney(d.placementAmount ?? 0, d.currency)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-stone-600">Print</dt>
+                  <dd className="font-medium tabular-nums text-stone-900">
+                    {formatMoney(d.printAmount ?? 0, d.currency)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <dt className="text-stone-600">ARCON (platform)</dt>
+                  <dd className="font-medium tabular-nums text-stone-900">
+                    {formatMoney(d.arconAmount ?? 0, d.currency)}
+                  </dd>
+                </div>
+                <div className="flex justify-between gap-4 border-t border-stone-200 pt-2">
+                  <dt className="text-stone-600">Vendor hold</dt>
+                  <dd className="font-semibold tabular-nums text-stone-900">
+                    {formatMoney(d.vendorHoldAmount ?? 0, d.currency)}
+                  </dd>
+                </div>
+                <p className="text-xs text-stone-500">
+                  Vendor incoming receives placement + print only; ARCON is credited
+                  to the app wallet.
+                </p>
+              </dl>
+
+              <AdminVerifyFlutterwavePaymentButton
+                bookingId={d.id}
+                kind="billboard"
+                booking={d}
+                onSuccess={() => void q.refetch()}
+                className="mt-5"
+              />
+
+              <AdminBillboardPaymentActions
+                booking={d}
+                onSuccess={() => void q.refetch()}
+                className="mt-5"
+              />
 
               <dl className="mt-6 grid gap-4 text-sm sm:grid-cols-2">
                 <UserBlock title="Booker" u={d.booker} />
@@ -238,6 +294,40 @@ function AdminBillboardRequestDetailPage() {
                   Listing #{d.billboardListingId} (summary unavailable)
                 </p>
               )}
+            </div>
+
+            <div className="overflow-hidden rounded-10 border border-stone-200 bg-white shadow-sm">
+              <CampaignBillboardAssetsSection
+                creativeKind={d.creativeKind}
+                creativeImageUrl={d.creativeImageUrl}
+                creativeVideoUrl={d.creativeVideoUrl}
+                creativeEmptyMessage="No creative uploaded"
+                listingName={listing?.name}
+                activeProofImageUrl={d.activeProofImageUrl}
+                activeProofEmptyMessage="No activation proof yet"
+                arconPanel={
+                  <ArconCertificatePanel
+                    booking={d}
+                    audience="admin"
+                    className="!px-0 !pb-0"
+                    adminUploadPending={attachArcon.isPending}
+                    onAdminUpload={async (file) => {
+                      const { publicUrl } = await uploadFileToR2(
+                        file,
+                        "booking",
+                      );
+                      const url = publicUrl?.trim();
+                      if (!url) {
+                        throw new Error(
+                          "Upload did not return a certificate URL",
+                        );
+                      }
+                      await attachArcon.mutateAsync(url);
+                      await q.refetch();
+                    }}
+                  />
+                }
+              />
             </div>
 
             <div className="rounded-10 border border-stone-200 bg-white p-6 shadow-sm">
@@ -377,53 +467,7 @@ function AdminBillboardRequestDetailPage() {
                 </div>
               </dl>
 
-              {(d.creativeImageUrl ||
-                d.creativeVideoUrl ||
-                d.activeProofImageUrl) && (
-                <div className="mt-6 border-t border-stone-100 pt-6">
-                  <p className="text-sm font-semibold text-stone-700">Media</p>
-                  <div className="mt-3 flex flex-wrap gap-4">
-                    {d.creativeImageUrl ? (
-                      <a
-                        href={d.creativeImageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block"
-                      >
-                        <img
-                          src={d.creativeImageUrl}
-                          alt="Creative"
-                          className="max-h-48 max-w-full rounded-lg border border-stone-200"
-                        />
-                      </a>
-                    ) : null}
-                    {d.activeProofImageUrl ? (
-                      <a
-                        href={d.activeProofImageUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block"
-                      >
-                        <img
-                          src={d.activeProofImageUrl}
-                          alt="Active proof"
-                          className="max-h-48 max-w-full rounded-lg border border-stone-200"
-                        />
-                      </a>
-                    ) : null}
-                    {d.creativeVideoUrl ? (
-                      <a
-                        href={d.creativeVideoUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sm font-medium text-ads360yellow-100 underline"
-                      >
-                        Open creative video
-                      </a>
-                    ) : null}
-                  </div>
-                </div>
-              )}
+
             </div>
           </div>
         ) : null}
@@ -435,4 +479,5 @@ function AdminBillboardRequestDetailPage() {
 export const Route = createFileRoute("/_admin/admin/request/billboard/$id/")({
   component: AdminBillboardRequestDetailPage,
 });
+
 

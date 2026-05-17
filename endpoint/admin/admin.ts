@@ -102,12 +102,16 @@ export type AdminBillboardListingSummary = {
   address: string;
   city: string;
   state: string;
-  boardType: string;
+  billboardType: string;
+  creativeFulfillmentType: string;
   isAvailable: boolean;
   pricing: {
     daily?: number;
     weekly?: number;
     monthly?: number;
+    quarterly?: number;
+    semiAnnual?: number;
+    annual?: number;
   };
   imageUrl: string;
   createdAt: string;
@@ -223,6 +227,7 @@ export async function patchAdminVendorVerification(
 
 export type AdminDashboardCounts = {
   disputesOpen: number;
+  arconApplicationsPending: number;
   payoutsPending: number;
   billboard: {
     total: number;
@@ -264,6 +269,16 @@ export type AdminDashboardDisputeQueueItem = {
   createdAt: string;
 };
 
+export type AdminDashboardArconQueueItem = {
+  kind: "billboard";
+  id: number;
+  listingName: string | null;
+  booker?: AdminDashboardBriefUser | null;
+  turnaround: string | null;
+  paymentStatus: string;
+  createdAt: string;
+};
+
 export type AdminDashboardPayoutQueueItem = {
   id: number;
   amount: number;
@@ -299,6 +314,7 @@ export type AdminDashboardResponse = {
   counts: AdminDashboardCounts;
   queues: {
     disputes: AdminDashboardDisputeQueueItem[];
+    arconApplications: AdminDashboardArconQueueItem[];
     payouts: AdminDashboardPayoutQueueItem[];
   };
   recent: {

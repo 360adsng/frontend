@@ -13,7 +13,9 @@ export function toBillboardListQuery(
   return {
     page,
     limit,
-    boardType: draft.boardType || undefined,
+    billboardType: draft.billboardType || undefined,
+    creativeFulfillmentType:
+      draft.creativeFulfillmentType || undefined,
     location: draft.location.trim() || undefined,
     minPrice:
       minPrice !== undefined && !Number.isNaN(minPrice) ? minPrice : undefined,
@@ -27,7 +29,8 @@ export function toBillboardListQuery(
 }
 
 export const defaultBillboardFilterForm = (): BillboardFilterForm => ({
-  boardType: "",
+  billboardType: "",
+  creativeFulfillmentType: "",
   minPrice: "",
   maxPrice: "",
   location: "",

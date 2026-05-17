@@ -67,6 +67,7 @@ export function CampaignStatusBadge({ status }: { status: string }) {
 const paymentStatusStyles: Record<string, string> = {
   paid: "bg-emerald-50 text-emerald-800 border-emerald-200",
   unpaid: "bg-amber-50 text-amber-900 border-amber-200",
+  processing: "bg-sky-50 text-sky-900 border-sky-200",
   refunded: "bg-violet-50 text-violet-800 border-violet-200",
 };
 

@@ -98,6 +98,7 @@ import { Route as UsersauthAdsBillboardSlugIndexRouteImport } from './app/_users
 import { Route as AdminAdminWalletTransactionsIndexRouteImport } from './app/_admin/admin/wallet/transactions/index'
 import { Route as AdminAdminUsersIdIndexRouteImport } from './app/_admin/admin/users/$id/index'
 import { Route as AdminAdminSupportIdIndexRouteImport } from './app/_admin/admin/support/$id/index'
+import { Route as AdminAdminRequestBillboardIndexRouteImport } from './app/_admin/admin/request/billboard/index'
 import { Route as AdminAdminPayoutIdIndexRouteImport } from './app/_admin/admin/payout/$id/index'
 import { Route as VendorsInfluencersRequestsSlugDisputeChatIndexRouteImport } from './app/vendors/influencers/requests/$slug/dispute-chat/index'
 import { Route as VendorsInfluencersRateCardIdEditIndexRouteImport } from './app/vendors/influencers/rate-card/$id/edit/index'
@@ -107,6 +108,8 @@ import { Route as UsersauthUsersNegotiationsInfluencersIdIndexRouteImport } from
 import { Route as UsersauthUsersCampaignInfluencerIdIndexRouteImport } from './app/_usersauth/users/campaign/influencer/$id/index'
 import { Route as UsersauthUsersCampaignSlugDisputeChatIndexRouteImport } from './app/_usersauth/users/campaign/$slug/dispute-chat/index'
 import { Route as UsersauthAdsInfluencerSlugOnboardingIndexRouteImport } from './app/_usersauth/ads/influencer/$slug/onboarding/index'
+import { Route as UsersauthAdsBillboardLearnCreativeIndexRouteImport } from './app/_usersauth/ads/billboard/learn/creative/index'
+import { Route as UsersauthAdsBillboardLearnArconIndexRouteImport } from './app/_usersauth/ads/billboard/learn/arcon/index'
 import { Route as UsersauthAdsBillboardSlugOnboardIndexRouteImport } from './app/_usersauth/ads/billboard/$slug/onboard/index'
 import { Route as AdminAdminUsersIdBillboardsIndexRouteImport } from './app/_admin/admin/users/$id/billboards/index'
 import { Route as AdminAdminRequestInfluencerIdIndexRouteImport } from './app/_admin/admin/request/influencer/$id/index'
@@ -619,6 +622,12 @@ const AdminAdminSupportIdIndexRoute =
     path: '/support/$id/',
     getParentRoute: () => AdminAdminRouteRoute,
   } as any)
+const AdminAdminRequestBillboardIndexRoute =
+  AdminAdminRequestBillboardIndexRouteImport.update({
+    id: '/request/billboard/',
+    path: '/request/billboard/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 const AdminAdminPayoutIdIndexRoute = AdminAdminPayoutIdIndexRouteImport.update({
   id: '/payout/$id/',
   path: '/payout/$id/',
@@ -670,6 +679,18 @@ const UsersauthAdsInfluencerSlugOnboardingIndexRoute =
   UsersauthAdsInfluencerSlugOnboardingIndexRouteImport.update({
     id: '/influencer/$slug/onboarding/',
     path: '/influencer/$slug/onboarding/',
+    getParentRoute: () => UsersauthAdsRouteRoute,
+  } as any)
+const UsersauthAdsBillboardLearnCreativeIndexRoute =
+  UsersauthAdsBillboardLearnCreativeIndexRouteImport.update({
+    id: '/billboard/learn/creative/',
+    path: '/billboard/learn/creative/',
+    getParentRoute: () => UsersauthAdsRouteRoute,
+  } as any)
+const UsersauthAdsBillboardLearnArconIndexRoute =
+  UsersauthAdsBillboardLearnArconIndexRouteImport.update({
+    id: '/billboard/learn/arcon/',
+    path: '/billboard/learn/arcon/',
     getParentRoute: () => UsersauthAdsRouteRoute,
   } as any)
 const UsersauthAdsBillboardSlugOnboardIndexRoute =
@@ -792,6 +813,7 @@ export interface FileRoutesByFullPath {
   '/vendors/influencers/settings/': typeof VendorsInfluencersSettingsIndexRoute
   '/vendors/influencers/wallet/': typeof VendorsInfluencersWalletIndexRoute
   '/admin/payout/$id/': typeof AdminAdminPayoutIdIndexRoute
+  '/admin/request/billboard/': typeof AdminAdminRequestBillboardIndexRoute
   '/admin/support/$id/': typeof AdminAdminSupportIdIndexRoute
   '/admin/users/$id/': typeof AdminAdminUsersIdIndexRoute
   '/admin/wallet/transactions/': typeof AdminAdminWalletTransactionsIndexRoute
@@ -818,6 +840,8 @@ export interface FileRoutesByFullPath {
   '/admin/request/influencer/$id/': typeof AdminAdminRequestInfluencerIdIndexRoute
   '/admin/users/$id/billboards/': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
+  '/ads/billboard/learn/arcon/': typeof UsersauthAdsBillboardLearnArconIndexRoute
+  '/ads/billboard/learn/creative/': typeof UsersauthAdsBillboardLearnCreativeIndexRoute
   '/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
   '/users/campaign/$slug/dispute-chat/': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
   '/users/campaign/influencer/$id/': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
@@ -889,6 +913,7 @@ export interface FileRoutesByTo {
   '/vendors/influencers/settings': typeof VendorsInfluencersSettingsIndexRoute
   '/vendors/influencers/wallet': typeof VendorsInfluencersWalletIndexRoute
   '/admin/payout/$id': typeof AdminAdminPayoutIdIndexRoute
+  '/admin/request/billboard': typeof AdminAdminRequestBillboardIndexRoute
   '/admin/support/$id': typeof AdminAdminSupportIdIndexRoute
   '/admin/users/$id': typeof AdminAdminUsersIdIndexRoute
   '/admin/wallet/transactions': typeof AdminAdminWalletTransactionsIndexRoute
@@ -915,6 +940,8 @@ export interface FileRoutesByTo {
   '/admin/request/influencer/$id': typeof AdminAdminRequestInfluencerIdIndexRoute
   '/admin/users/$id/billboards': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/ads/billboard/$slug/onboard': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
+  '/ads/billboard/learn/arcon': typeof UsersauthAdsBillboardLearnArconIndexRoute
+  '/ads/billboard/learn/creative': typeof UsersauthAdsBillboardLearnCreativeIndexRoute
   '/ads/influencer/$slug/onboarding': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
   '/users/campaign/$slug/dispute-chat': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
   '/users/campaign/influencer/$id': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
@@ -999,6 +1026,7 @@ export interface FileRoutesById {
   '/vendors/influencers/settings/': typeof VendorsInfluencersSettingsIndexRoute
   '/vendors/influencers/wallet/': typeof VendorsInfluencersWalletIndexRoute
   '/_admin/admin/payout/$id/': typeof AdminAdminPayoutIdIndexRoute
+  '/_admin/admin/request/billboard/': typeof AdminAdminRequestBillboardIndexRoute
   '/_admin/admin/support/$id/': typeof AdminAdminSupportIdIndexRoute
   '/_admin/admin/users/$id/': typeof AdminAdminUsersIdIndexRoute
   '/_admin/admin/wallet/transactions/': typeof AdminAdminWalletTransactionsIndexRoute
@@ -1025,6 +1053,8 @@ export interface FileRoutesById {
   '/_admin/admin/request/influencer/$id/': typeof AdminAdminRequestInfluencerIdIndexRoute
   '/_admin/admin/users/$id/billboards/': typeof AdminAdminUsersIdBillboardsIndexRoute
   '/_usersauth/ads/billboard/$slug/onboard/': typeof UsersauthAdsBillboardSlugOnboardIndexRoute
+  '/_usersauth/ads/billboard/learn/arcon/': typeof UsersauthAdsBillboardLearnArconIndexRoute
+  '/_usersauth/ads/billboard/learn/creative/': typeof UsersauthAdsBillboardLearnCreativeIndexRoute
   '/_usersauth/ads/influencer/$slug/onboarding/': typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
   '/_usersauth/users/campaign/$slug/dispute-chat/': typeof UsersauthUsersCampaignSlugDisputeChatIndexRoute
   '/_usersauth/users/campaign/influencer/$id/': typeof UsersauthUsersCampaignInfluencerIdIndexRoute
@@ -1106,6 +1136,7 @@ export interface FileRouteTypes {
     | '/vendors/influencers/settings/'
     | '/vendors/influencers/wallet/'
     | '/admin/payout/$id/'
+    | '/admin/request/billboard/'
     | '/admin/support/$id/'
     | '/admin/users/$id/'
     | '/admin/wallet/transactions/'
@@ -1132,6 +1163,8 @@ export interface FileRouteTypes {
     | '/admin/request/influencer/$id/'
     | '/admin/users/$id/billboards/'
     | '/ads/billboard/$slug/onboard/'
+    | '/ads/billboard/learn/arcon/'
+    | '/ads/billboard/learn/creative/'
     | '/ads/influencer/$slug/onboarding/'
     | '/users/campaign/$slug/dispute-chat/'
     | '/users/campaign/influencer/$id/'
@@ -1203,6 +1236,7 @@ export interface FileRouteTypes {
     | '/vendors/influencers/settings'
     | '/vendors/influencers/wallet'
     | '/admin/payout/$id'
+    | '/admin/request/billboard'
     | '/admin/support/$id'
     | '/admin/users/$id'
     | '/admin/wallet/transactions'
@@ -1229,6 +1263,8 @@ export interface FileRouteTypes {
     | '/admin/request/influencer/$id'
     | '/admin/users/$id/billboards'
     | '/ads/billboard/$slug/onboard'
+    | '/ads/billboard/learn/arcon'
+    | '/ads/billboard/learn/creative'
     | '/ads/influencer/$slug/onboarding'
     | '/users/campaign/$slug/dispute-chat'
     | '/users/campaign/influencer/$id'
@@ -1312,6 +1348,7 @@ export interface FileRouteTypes {
     | '/vendors/influencers/settings/'
     | '/vendors/influencers/wallet/'
     | '/_admin/admin/payout/$id/'
+    | '/_admin/admin/request/billboard/'
     | '/_admin/admin/support/$id/'
     | '/_admin/admin/users/$id/'
     | '/_admin/admin/wallet/transactions/'
@@ -1338,6 +1375,8 @@ export interface FileRouteTypes {
     | '/_admin/admin/request/influencer/$id/'
     | '/_admin/admin/users/$id/billboards/'
     | '/_usersauth/ads/billboard/$slug/onboard/'
+    | '/_usersauth/ads/billboard/learn/arcon/'
+    | '/_usersauth/ads/billboard/learn/creative/'
     | '/_usersauth/ads/influencer/$slug/onboarding/'
     | '/_usersauth/users/campaign/$slug/dispute-chat/'
     | '/_usersauth/users/campaign/influencer/$id/'
@@ -1994,6 +2033,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminSupportIdIndexRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
+    '/_admin/admin/request/billboard/': {
+      id: '/_admin/admin/request/billboard/'
+      path: '/request/billboard'
+      fullPath: '/admin/request/billboard/'
+      preLoaderRoute: typeof AdminAdminRequestBillboardIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
     '/_admin/admin/payout/$id/': {
       id: '/_admin/admin/payout/$id/'
       path: '/payout/$id'
@@ -2055,6 +2101,20 @@ declare module '@tanstack/react-router' {
       path: '/influencer/$slug/onboarding'
       fullPath: '/ads/influencer/$slug/onboarding/'
       preLoaderRoute: typeof UsersauthAdsInfluencerSlugOnboardingIndexRouteImport
+      parentRoute: typeof UsersauthAdsRouteRoute
+    }
+    '/_usersauth/ads/billboard/learn/creative/': {
+      id: '/_usersauth/ads/billboard/learn/creative/'
+      path: '/billboard/learn/creative'
+      fullPath: '/ads/billboard/learn/creative/'
+      preLoaderRoute: typeof UsersauthAdsBillboardLearnCreativeIndexRouteImport
+      parentRoute: typeof UsersauthAdsRouteRoute
+    }
+    '/_usersauth/ads/billboard/learn/arcon/': {
+      id: '/_usersauth/ads/billboard/learn/arcon/'
+      path: '/billboard/learn/arcon'
+      fullPath: '/ads/billboard/learn/arcon/'
+      preLoaderRoute: typeof UsersauthAdsBillboardLearnArconIndexRouteImport
       parentRoute: typeof UsersauthAdsRouteRoute
     }
     '/_usersauth/ads/billboard/$slug/onboard/': {
@@ -2137,6 +2197,7 @@ interface AdminAdminRouteRouteChildren {
   AdminAdminVendorsIndexRoute: typeof AdminAdminVendorsIndexRoute
   AdminAdminWalletIndexRoute: typeof AdminAdminWalletIndexRoute
   AdminAdminPayoutIdIndexRoute: typeof AdminAdminPayoutIdIndexRoute
+  AdminAdminRequestBillboardIndexRoute: typeof AdminAdminRequestBillboardIndexRoute
   AdminAdminSupportIdIndexRoute: typeof AdminAdminSupportIdIndexRoute
   AdminAdminUsersIdIndexRoute: typeof AdminAdminUsersIdIndexRoute
   AdminAdminWalletTransactionsIndexRoute: typeof AdminAdminWalletTransactionsIndexRoute
@@ -2161,6 +2222,7 @@ const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
   AdminAdminVendorsIndexRoute: AdminAdminVendorsIndexRoute,
   AdminAdminWalletIndexRoute: AdminAdminWalletIndexRoute,
   AdminAdminPayoutIdIndexRoute: AdminAdminPayoutIdIndexRoute,
+  AdminAdminRequestBillboardIndexRoute: AdminAdminRequestBillboardIndexRoute,
   AdminAdminSupportIdIndexRoute: AdminAdminSupportIdIndexRoute,
   AdminAdminUsersIdIndexRoute: AdminAdminUsersIdIndexRoute,
   AdminAdminWalletTransactionsIndexRoute:
@@ -2204,6 +2266,8 @@ interface UsersauthAdsRouteRouteChildren {
   UsersauthAdsInfluencerSlugIndexRoute: typeof UsersauthAdsInfluencerSlugIndexRoute
   UsersauthAdsSmsCheckoutIndexRoute: typeof UsersauthAdsSmsCheckoutIndexRoute
   UsersauthAdsBillboardSlugOnboardIndexRoute: typeof UsersauthAdsBillboardSlugOnboardIndexRoute
+  UsersauthAdsBillboardLearnArconIndexRoute: typeof UsersauthAdsBillboardLearnArconIndexRoute
+  UsersauthAdsBillboardLearnCreativeIndexRoute: typeof UsersauthAdsBillboardLearnCreativeIndexRoute
   UsersauthAdsInfluencerSlugOnboardingIndexRoute: typeof UsersauthAdsInfluencerSlugOnboardingIndexRoute
   UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute: typeof UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute
   UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute: typeof UsersauthAdsInfluencerSlugOnboardingCheckoutIndexRoute
@@ -2222,6 +2286,10 @@ const UsersauthAdsRouteRouteChildren: UsersauthAdsRouteRouteChildren = {
   UsersauthAdsSmsCheckoutIndexRoute: UsersauthAdsSmsCheckoutIndexRoute,
   UsersauthAdsBillboardSlugOnboardIndexRoute:
     UsersauthAdsBillboardSlugOnboardIndexRoute,
+  UsersauthAdsBillboardLearnArconIndexRoute:
+    UsersauthAdsBillboardLearnArconIndexRoute,
+  UsersauthAdsBillboardLearnCreativeIndexRoute:
+    UsersauthAdsBillboardLearnCreativeIndexRoute,
   UsersauthAdsInfluencerSlugOnboardingIndexRoute:
     UsersauthAdsInfluencerSlugOnboardingIndexRoute,
   UsersauthAdsBillboardSlugOnboardCheckoutIndexRoute:

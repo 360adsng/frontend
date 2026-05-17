@@ -1,7 +1,6 @@
 const led = "/icons/led.svg";
 const duration = "/icons/duration.svg";
 const impression = "/icons/impression.svg";
-const dash = "/icons/dash.svg";
 
 import { useState } from "react";
 import { Link, createFileRoute } from "@tanstack/react-router";
@@ -14,7 +13,7 @@ import {
 } from "@components/billboard/BillboardDetailInfo";
 import { useBillboardListing } from "@endpoint/billboard/useBillboard";
 import {
-  boardTypeLabel,
+  listingTypeSummary,
   formatListingDate,
   formatRuntime,
 } from "@lib/billboardDisplay";
@@ -166,7 +165,7 @@ const Billboard = () => {
                         </span>
                         <span className="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800">
                           <img src={led} alt="" className="h-4 w-4" />
-                          {boardTypeLabel(bb.boardType)}
+                          {listingTypeSummary(bb)}
                         </span>
                       </div>
                     </div>

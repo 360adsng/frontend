@@ -3,6 +3,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAdminBillboardListingsForOwner } from "@endpoint/admin/useAdminUsers";
 import type { AdminBillboardListingSummary } from "@endpoint/admin/admin";
+import {
+  billboardTypeLabel,
+  creativeFulfillmentLabel,
+} from "@lib/billboardDisplay";
 
 function formatNaira(n: number): string {
   try {
@@ -83,7 +87,7 @@ function AdminUserBillboardsPage() {
                 <tr>
                   <th className="px-4 py-3">Listing</th>
                   <th className="px-4 py-3">Location</th>
-                  <th className="px-4 py-3">Type</th>
+                  <th className="px-4 py-3">Placement / fulfillment</th>
                   <th className="px-4 py-3">Pricing</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Created</th>
@@ -120,7 +124,13 @@ function AdminUserBillboardsPage() {
                           {row.city}, {row.state}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-stone-700">{row.boardType}</td>
+                      <td className="px-4 py-3 text-sm text-stone-700">
+                        <span className="font-medium text-stone-900">
+                          {billboardTypeLabel(row.billboardType)}
+                        </span>
+                        <span className="mx-1 text-stone-400">·</span>
+                        <span>{creativeFulfillmentLabel(row.creativeFulfillmentType)}</span>
+                      </td>
                       <td className="px-4 py-3 text-stone-800">
                         {pricingSummary(row.pricing)}
                       </td>

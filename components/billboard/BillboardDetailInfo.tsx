@@ -1,14 +1,16 @@
 import type { ReactNode } from "react";
 import type { PublicBillboardListing } from "@endpoint/billboard/billboard";
 import {
-  boardTypeLabel,
   formatActiveDaysSummary,
   formatListingDate,
   formatNaira,
   formatRuntime,
   googleMapsSearchUrl,
-  primaryPrice,
+  primaryPriceHero,
+  billboardTypeLabel,
+  creativeFulfillmentLabel,
 } from "@lib/billboardDisplay";
+import { CreativeFulfillmentType } from "@endpoint/billboard/billboardListingEnums";
 
 const locationIcon = "/icons/location.svg";
 
@@ -56,9 +58,6 @@ export function BillboardDetailMainColumn({
   if (bb.nearbyLandmarks) {
     locationChips.push({ label: "Nearby", value: bb.nearbyLandmarks });
   }
-  if (bb.trafficDescription) {
-    locationChips.push({ label: "Traffic", value: bb.trafficDescription });
-  }
 
   return (
     <div className="space-y-5">
@@ -103,119 +102,159 @@ export function BillboardDetailMainColumn({
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Board type
-          </h4>
-          <p className="mt-1 text-sm font-medium text-neutral-900">
-            {boardTypeLabel(bb.boardType)}
+      <div className="grid grid-cols-1 gap-8 border-t border-neutral-200 pt-6 md:grid-cols-2 md:items-start">
+        <div className="min-w-0 space-y-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            Placement and specs
           </p>
-        </div>
 
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Location
-          </h4>
-          <p className="mt-1 text-sm font-medium text-neutral-900">
-            {bb.address}
-          </p>
-          {locationChips.length > 0 ? (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {locationChips.map((c) => (
-                <span
-                  key={c.label}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800"
-                  title={c.value}
-                >
-                  <span className="text-neutral-600">{c.label}</span>
-                  <span className="h-1 w-1 rounded-full bg-neutral-300" />
-                  <span className="max-w-[220px] truncate">{c.value}</span>
-                </span>
-              ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                Billboard type
+              </h4>
+              <p className="mt-1 text-sm font-medium text-neutral-900">
+                {billboardTypeLabel(bb.billboardType)}
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                Creative fulfillment
+              </h4>
+              <p className="mt-1 text-sm font-medium text-neutral-900">
+                {creativeFulfillmentLabel(bb.creativeFulfillmentType)}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              Location
+            </h4>
+            <p className="mt-1 text-sm font-medium text-neutral-900">
+              {bb.address}
+            </p>
+            {locationChips.length > 0 ? (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {locationChips.map((c) => (
+                  <span
+                    key={c.label}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-800"
+                    title={c.value}
+                  >
+                    <span className="text-neutral-600">{c.label}</span>
+                    <span className="h-1 w-1 rounded-full bg-neutral-300" />
+                    <span className="max-w-[220px] truncate">{c.value}</span>
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {hasCoords ? (
+              <a
+                href={googleMapsSearchUrl(bb.latitude!, bb.longitude!)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-block text-sm font-medium text-ads360yellowBtn-100 underline"
+              >
+                Open in Google Maps
+              </a>
+            ) : null}
+          </div>
+
+          {sizeLine ? (
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                Physical size
+              </h4>
+              <p className="mt-1 text-sm text-neutral-800">{sizeLine}</p>
             </div>
           ) : null}
-          {hasCoords ? (
-            <a
-              href={googleMapsSearchUrl(bb.latitude!, bb.longitude!)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-block text-sm font-medium text-ads360yellowBtn-100 underline"
-            >
-              Open in Google Maps
-            </a>
+
+          {pixelLine ? (
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                Pixel size
+              </h4>
+              <p className="mt-1 text-sm text-neutral-800">{pixelLine}</p>
+            </div>
+          ) : null}
+
+          {bb.orientation ? (
+            <div>
+              <h4 className="text-sm font-semibold text-neutral-600">
+                Orientation
+              </h4>
+              <p className="mt-0.5">{bb.orientation}</p>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="min-w-0 space-y-5 md:border-l md:border-neutral-200 md:pl-8">
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            Audience and operations
+          </p>
+
+          {bb.illumination ? (
+            <div>
+              <h4 className="text-sm font-semibold text-neutral-600">
+                Illumination
+              </h4>
+              <p className="mt-0.5">{bb.illumination}</p>
+            </div>
+          ) : null}
+
+          {bb.facingDirection ? (
+            <div>
+              <h4 className="text-sm font-semibold text-neutral-600">
+                Facing direction
+              </h4>
+              <p className="mt-0.5">{bb.facingDirection}</p>
+            </div>
+          ) : null}
+
+          <div>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              Schedule
+            </h4>
+            <p className="mt-1 text-sm text-neutral-800">{formatRuntime(bb)}</p>
+            <p className="mt-1 text-sm text-neutral-600">
+              Active days: {formatActiveDaysSummary(bb.activeDays)}
+            </p>
+          </div>
+
+          {audience ? (
+            <div>
+              <h4 className="text-sm font-semibold text-neutral-600">Audience</h4>
+              <p className="mt-0.5">{audience}</p>
+            </div>
+          ) : null}
+
+          {bb.trafficDescription ? (
+            <div>
+              <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                USP (unique selling point)
+              </h4>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-neutral-800">
+                {bb.trafficDescription}
+              </p>
+            </div>
+          ) : null}
+
+          {bb.durationPerDisplay != null &&
+          bb.creativeFulfillmentType ===
+            CreativeFulfillmentType.DIGITAL_UPLOAD ? (
+            <div>
+              <h4 className="text-sm font-semibold text-neutral-600">
+                Spot duration
+              </h4>
+              <p className="mt-0.5">
+                About {bb.durationPerDisplay} seconds per display rotation
+              </p>
+            </div>
           ) : null}
         </div>
       </div>
-
-      {sizeLine ? (
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Physical size
-          </h4>
-          <p className="mt-1 text-sm text-neutral-800">{sizeLine}</p>
-        </div>
-      ) : null}
-
-      {pixelLine ? (
-        <div>
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-            Pixel size
-          </h4>
-          <p className="mt-1 text-sm text-neutral-800">{pixelLine}</p>
-        </div>
-      ) : null}
-
-      {bb.orientation ? (
-        <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Orientation</h4>
-          <p className="mt-0.5">{bb.orientation}</p>
-        </div>
-      ) : null}
-
-      {bb.illumination ? (
-        <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Illumination</h4>
-          <p className="mt-0.5">{bb.illumination}</p>
-        </div>
-      ) : null}
-
-      {bb.facingDirection ? (
-        <div>
-          <h4 className="text-sm font-semibold text-neutral-600">
-            Facing direction
-          </h4>
-          <p className="mt-0.5">{bb.facingDirection}</p>
-        </div>
-      ) : null}
-
-      <div>
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-          Schedule
-        </h4>
-        <p className="mt-1 text-sm text-neutral-800">{formatRuntime(bb)}</p>
-        <p className="mt-1 text-sm text-neutral-600">
-          Active days: {formatActiveDaysSummary(bb.activeDays)}
-        </p>
-      </div>
-
-      {audience ? (
-        <div>
-          <h4 className="text-sm font-semibold text-neutral-600">Audience</h4>
-          <p className="mt-0.5">{audience}</p>
-        </div>
-      ) : null}
-
-      {bb.durationPerDisplay != null ? (
-        <div>
-          <h4 className="text-sm font-semibold text-neutral-600">
-            Spot duration
-          </h4>
-          <p className="mt-0.5">
-            About {bb.durationPerDisplay} seconds per display rotation
-          </p>
-        </div>
-      ) : null}
 
       <div className="border-t border-neutral-200 pt-4 text-sm text-neutral-500">
         <p>Listing ID: {bb.id}</p>
@@ -251,17 +290,42 @@ export function BillboardDetailPricingColumn({
   if (p.monthly != null && p.monthly > 0) {
     rows.push({ label: "Monthly", value: `₦${formatNaira(p.monthly)}` });
   }
+  if (p.quarterly != null && p.quarterly > 0) {
+    rows.push({
+      label: "Quarterly (~3 mo)",
+      value: `₦${formatNaira(p.quarterly)}`,
+    });
+  }
+  if (p.semiAnnual != null && p.semiAnnual > 0) {
+    rows.push({
+      label: "Half-year (~6 mo)",
+      value: `₦${formatNaira(p.semiAnnual)}`,
+    });
+  }
+  if (p.annual != null && p.annual > 0) {
+    rows.push({
+      label: "Annual (12 mo)",
+      value: `₦${formatNaira(p.annual)}`,
+    });
+  }
+
+  const hero = primaryPriceHero(bb.pricing);
 
   return (
     <aside className="lg:sticky lg:top-24">
       <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
         <h4 className="text-sm font-semibold text-neutral-900">Pricing</h4>
-        <p className="mt-2 text-2xl font-semibold text-ads360black-100">
-          ₦{primaryPrice(bb.pricing)}
-        {p.daily != null && p.daily > 0 ? (
-          <span className="text-sm font-normal text-neutral-600"> / day</span>
-        ) : null}
-        </p>
+        {hero ? (
+          <p className="mt-2 text-2xl font-semibold text-ads360black-100">
+            <span>₦{hero.amount}</span>
+            <span className="text-sm font-normal text-neutral-600">
+              {" "}
+              {hero.periodLabel}
+            </span>
+          </p>
+        ) : (
+          <p className="mt-2 text-2xl font-semibold text-ads360black-100">—</p>
+        )}
 
         {rows.length > 0 ? (
           <ul className="mt-4 space-y-2 border-t border-neutral-200 pt-4 text-sm">
@@ -288,7 +352,8 @@ export function BillboardDetailPricingColumn({
                 Pricing is as shown unless otherwise agreed on-platform.
               </p>
             )}
-            {bb.durationPerDisplay != null ? (
+            {bb.creativeFulfillmentType === CreativeFulfillmentType.DIGITAL_UPLOAD &&
+            bb.durationPerDisplay != null ? (
               <p className="mt-2 text-sm text-neutral-600">
                 Each loop runs about {bb.durationPerDisplay} seconds on screen.
               </p>

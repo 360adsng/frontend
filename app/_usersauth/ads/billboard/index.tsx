@@ -11,7 +11,7 @@ import BillboardSorter, {
 import { useBrowseBillboardListings } from "@endpoint/billboard/useBillboard";
 import type { BillboardListQueryParams } from "@endpoint/billboard/billboard";
 import {
-  boardTypeLabel,
+  listingTypeSummary,
   formatRuntime,
   primaryPrice,
 } from "@lib/billboardDisplay";
@@ -159,7 +159,7 @@ function Billboards() {
                   <div className="my-1">
                     <p>
                       <span className="font-bold">Board-type: </span>
-                      {boardTypeLabel(billboard.boardType)}
+                      {listingTypeSummary(billboard)}
                     </p>
                   </div>
 

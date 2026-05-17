@@ -12,11 +12,12 @@ import {
   useUpdateProfile,
 } from "@endpoint/users/useUsers";
 import { COUNTRIES } from "../../../../lib/countries";
+import {
+  SettingsProfileTabs,
+  type SettingsProfileTab,
+} from "@components/settings/SettingsProfileTabs";
 
-const dash = "/icons/dash.svg";
 const avatarFallback = "/icons/user.png";
-
-type Tab = "profile" | "password";
 
 const profileSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required."),
@@ -217,37 +218,7 @@ function InfluencerSettingsPage() {
           Edit or view profile settings
         </p>
 
-        <div className="w-full flex text-sm md:text-base md:justify-start space-x-3">
-          <button
-            className="relative"
-            type="button"
-            onClick={() => setTab("profile")}
-          >
-            Edit Profile
-            {tab === "profile" && (
-              <img
-                alt="Settings tab selected"
-                src={dash}
-                className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-              />
-            )}
-          </button>
-
-          <button
-            className="relative"
-            type="button"
-            onClick={() => setTab("password")}
-          >
-            Change Password
-            {tab === "password" && (
-              <img
-                alt="Settings tab selected"
-                src={dash}
-                className="w-2/5 mx-auto absolute top-[20px] left-[17%]"
-              />
-            )}
-          </button>
-        </div>
+        <SettingsProfileTabs tab={tab} onTabChange={setTab} className="mb-0" />
       </section>
 
       <section className="min-h-screen bg-ads360-hash px-4 md:px-10 py-14">

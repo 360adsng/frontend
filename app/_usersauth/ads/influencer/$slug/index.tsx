@@ -1,130 +1,161 @@
-;
-import { Link, createFileRoute, useParams } from '@tanstack/react-router';
-import { useMemo, useState } from "react";
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Modal } from "@components/modal/modal";
 import BackBtn from "@components/buttons/BackBtn";
 import { useInfluencerDirectoryById } from "@endpoint/influencer/useInfluencer";
+import { FaUsers } from "react-icons/fa";
 
 const FALLBACK_PHOTO = "/icons/user.png";
 
+function fmtFollowers(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
+  return String(n);
+}
+
 const InfluencerDetails = () => {
-
   const [preview, setPreview] = useState(false);
-
-  const params = useParams({ from: "/_usersauth/ads/influencer/$slug/" });
-  const id = Number((params as any).slug);
-
-  const q = useInfluencerDirectoryById(id);
+  const { slug } = Route.useParams();
+  const id = Number(slug);
+  const q = useInfluencerDirectoryById(
+    Number.isFinite(id) && id > 0 ? id : 0,
+  );
   const influencer = q.data;
-
-  const fmtFollowers = (n: number) => {
-    if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-    if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
-    return String(n);
-  };
 
   return (
     <>
-      <section className="bg-[#E9E9E9] px-4 md:px-10 pt-24 pb-7">
-        <BackBtn>influencer Details</BackBtn>
+      <section className="min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12">
+        <div className="mx-auto max-w-6xl">
+          <BackBtn>Influencer details</BackBtn>
+          <p className="mt-2 text-sm text-stone-500">
+            View profile, platforms, and rates before booking a campaign.
+          </p>
 
-        <p className="text-stone-400 mb-5 mt-3">
-          View full details of influencer and proceed to checkout
-        </p>
+          {q.isLoading ? (
+            <p className="mt-10 text-center text-stone-600">Loading…</p>
+          ) : null}
 
+          {q.isError || (!q.isLoading && !influencer) ? (
+            <p className="mt-10 text-center text-red-600">
+              Could not load influencer details.
+            </p>
+          ) : null}
+
+          {!q.isLoading && influencer ? (
+            <div className="mt-8 overflow-hidden rounded-2xl border border-amber-200/40 bg-white shadow-sm">
+              <div className="flex flex-col gap-8 p-5 md:flex-row md:p-8">
+                <button
+                  type="button"
+                  onClick={() => setPreview(true)}
+                  className="mx-auto shrink-0 overflow-hidden rounded-2xl border border-stone-200 bg-stone-50 md:mx-0"
+                >
+                  <img
+                    src={influencer.photo || FALLBACK_PHOTO}
+                    alt={influencer.mediaName}
+                    className="h-56 w-56 object-cover md:h-64 md:w-64"
+                  />
+                </button>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="font-serif text-2xl font-medium text-stone-900 md:text-3xl">
+                      {influencer.mediaName}
+                    </h1>
+                    {influencer.allowNegotiation ? (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">
+                        Negotiable
+                      </span>
+                    ) : null}
+                  </div>
+
+                  <p className="mt-2 text-sm text-stone-600">
+                    {fmtFollowers(influencer.followers)} total followers ·{" "}
+                    <span className="capitalize">{influencer.influencerType}</span>
+                  </p>
+
+                  <div className="mt-5 rounded-xl border border-stone-200/80 bg-[#F7F7F5] p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                      Bio
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-stone-800">
+                      {influencer.bio?.trim()
+                        ? influencer.bio
+                        : "No bio provided."}
+                    </p>
+                  </div>
+
+                  <Link
+                    to="/ads/influencer/$slug/onboarding"
+                    params={{ slug: String(influencer.id) }}
+                    className="mt-6 inline-flex items-center justify-center rounded-xl bg-ads360yellow-100 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+                  >
+                    Select influencer
+                  </Link>
+                </div>
+              </div>
+
+              <div className="border-t border-stone-100 px-5 py-6 md:px-8">
+                <h2 className="font-serif text-xl text-stone-900">Platforms</h2>
+                {influencer.platforms.length === 0 ? (
+                  <p className="mt-3 text-sm text-stone-500">
+                    No platforms added yet.
+                  </p>
+                ) : (
+                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {influencer.platforms.map((p) => (
+                      <li
+                        key={p.id}
+                        className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm"
+                      >
+                        <p className="font-semibold capitalize text-stone-900">
+                          {p.name}
+                        </p>
+                        <p className="mt-1 truncate text-xs text-stone-500">
+                          {p.platformUrl}
+                        </p>
+                        <p className="mt-2 text-sm text-stone-600">
+                          @{p.username}
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+                          <span
+                            className="inline-flex items-center gap-1 text-stone-600"
+                            title="Followers"
+                          >
+                            <FaUsers className="h-3.5 w-3.5" aria-hidden />
+                            {fmtFollowers(p.numberOfFollowers)}
+                          </span>
+                          <span className="font-semibold text-stone-900">
+                            ₦{Number(p.amountRate || 0).toLocaleString()}
+                            <span className="font-normal text-stone-500">
+                              {" "}
+                              / post
+                            </span>
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
       </section>
 
-      
-            <section className="md:flex py-14 mx-auto w-11/12 md:w-10/12 lg:w-8/12">
-              {q.isLoading ? (
-                <div className="text-sm text-gray-600">Loading...</div>
-              ) : q.isError || !influencer ? (
-                <div className="text-sm text-red-600">
-                  Could not load influencer details.
-                </div>
-              ) : (
-                <>
-                  <div className="md:px-3 lg:px-6 basis-2/3">
-                    <img
-                      src={influencer.photo || FALLBACK_PHOTO}
-                      alt="influencer"
-                      className="rounded-10 w-96 h-96 object-cover cursor-pointer"
-                      onClick={() => setPreview(true)}
-                    />
-
-                    <div className="md:w-4/5">
-                      <h3 className="flex items-center font-bold text-lg my-3">
-                        {influencer.mediaName}
-                        {influencer.allowNegotiation ? (
-                          <span className="ml-2 text-xs rounded-full px-2 py-1 bg-ads360yellow-100 text-ads360light-100">
-                            Negotiable
-                          </span>
-                        ) : null}
-                      </h3>
-
-                      <p className="text-sm text-gray-500">
-                        {fmtFollowers(influencer.followers)} followers •{" "}
-                        {influencer.influencerType}
-                      </p>
-
-                      <p className="my-3">
-                        <b>Bio:</b>{" "}
-                        {influencer.bio?.trim()
-                          ? influencer.bio
-                          : "No bio provided."}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="basis-1/3">
-                    <h4 className="my-3 font-semibold">Platforms</h4>
-                    {influencer.platforms.length === 0 ? (
-                      <p className="text-sm text-gray-600">
-                        No platforms added yet.
-                      </p>
-                    ) : (
-                      influencer.platforms.map((p) => (
-                        <div key={p.id} className="my-3 text-sm">
-                          <p className="font-semibold capitalize">{p.name}</p>
-                          <p className="text-gray-500 truncate">{p.platformUrl}</p>
-                          <p className="text-gray-500">
-                            @{p.username} • {fmtFollowers(p.numberOfFollowers)} followers
-                          </p>
-                          <p className="mt-1">
-                            ₦{Number(p.amountRate || 0).toLocaleString()} (per post)
-                          </p>
-                        </div>
-                      ))
-                    )}
-
-                    <div className="">
-                      <button className="group my-5 rounded-10 hover:animate-changeColor hover:text-white border bg-ads360yellow-100 px-2 h-12">
-                        <Link to={`/ads/influencer/${influencer.id}/onboarding`}>
-                          Select influencer
-                        </Link>
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </section>
-
-      
-
       <Modal isOpen={preview}>
-        <div className="transition duration-500">
-          <div className="fixed w-full left-0 top-[30%]  md:left-[20%] md:top-[10%] md:w-2/3 z-[1000000000]">
-            <img
-              src={influencer?.photo || FALLBACK_PHOTO}
-              alt="influencer"
-              className="rounded-10 w-full"
-            />
-          </div>
-
-          <div
+        <div className="relative mx-auto max-w-2xl rounded-2xl bg-white p-4 shadow-xl">
+          <button
+            type="button"
             onClick={() => setPreview(false)}
-            className={`fixed w-full px-5 py-10 bg-black/20 top-0 left-0 h-full z-[100000]`}
-          ></div>
+            className="absolute right-3 top-3 rounded-full bg-stone-100 px-2 py-1 text-sm text-stone-700"
+          >
+            Close
+          </button>
+          <img
+            src={influencer?.photo || FALLBACK_PHOTO}
+            alt={influencer?.mediaName ?? "Influencer"}
+            className="w-full rounded-xl object-contain"
+          />
         </div>
       </Modal>
     </>
@@ -133,5 +164,4 @@ const InfluencerDetails = () => {
 
 export const Route = createFileRoute("/_usersauth/ads/influencer/$slug/")({
   component: InfluencerDetails,
-})
-
+});

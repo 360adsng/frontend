@@ -2,6 +2,7 @@
 
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { AdminVerifyFlutterwavePaymentButton } from "@components/admin/AdminVerifyFlutterwavePaymentButton";
 import { useAdminInfluencerBookingRequest } from "@endpoint/admin/useAdminBookingRequests";
 import type { AdminBriefUser } from "@endpoint/admin/adminBookingRequests";
 import CreativeMedia from "@components/ui/CreativeMedia";
@@ -133,6 +134,14 @@ function AdminInfluencerRequestDetailPage() {
                 </Link>
               </div>
             </header>
+
+            <AdminVerifyFlutterwavePaymentButton
+              bookingId={b.id}
+              kind="influencer"
+              booking={b}
+              onSuccess={() => void booking.refetch()}
+              className="mx-5 border-x-0 border-t-0 sm:mx-7"
+            />
 
             <div className="px-5 pt-5 sm:px-7">
               <h2 className="font-serif text-xl text-stone-900 md:text-2xl">

@@ -1,5 +1,9 @@
 import { baseFetchJson } from "../baseFetch";
 import { uploadFileToR2 } from "../storage/r2";
+import type {
+  BillboardType,
+  CreativeFulfillmentType,
+} from "./billboardListingEnums";
 
 export type CreateBillboardListingPayload = {
   name: string;
@@ -12,8 +16,12 @@ export type CreateBillboardListingPayload = {
     daily?: number;
     weekly?: number;
     monthly?: number;
+    quarterly?: number;
+    semiAnnual?: number;
+    annual?: number;
   };
-  boardType: string;
+  billboardType: BillboardType;
+  creativeFulfillmentType: CreativeFulfillmentType;
   orientation?: string;
   isNegotiable: boolean;
   trafficDescription?: string;
@@ -50,8 +58,12 @@ export type PublicBillboardListing = {
     daily?: number;
     weekly?: number;
     monthly?: number;
+    quarterly?: number;
+    semiAnnual?: number;
+    annual?: number;
   };
-  boardType: string;
+  billboardType: BillboardType;
+  creativeFulfillmentType: CreativeFulfillmentType;
   orientation: string | null;
   isNegotiable: boolean;
   trafficDescription: string | null;
@@ -70,6 +82,8 @@ export type PublicBillboardListing = {
   facingDirection: string | null;
   imageUrl: string;
   ownerCompanyName?: string | null;
+  /** Vendor print rate (₦/m²) from billboard owner profile. */
+  printingPricePerSqMeter?: number | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -123,7 +137,8 @@ export async function updateMyBillboardListing(
 export type BillboardListQueryParams = {
   page?: number;
   limit?: number;
-  boardType?: string;
+  billboardType?: BillboardType;
+  creativeFulfillmentType?: CreativeFulfillmentType;
   location?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -149,6 +164,9 @@ export type CreateBillboardBookingPayload = {
   creativeVideoUrl?: string;
   /** Set automatically after R2 upload when using image creative, or pass explicitly */
   creativeImageUrl?: string;
+  arconHasCertificate: boolean;
+  arconCertificateUrl?: string;
+  arconApplicationTurnaround?: "1d" | "3d" | "1w";
 };
 
 export type NegotiationPhase =
@@ -157,9 +175,29 @@ export type NegotiationPhase =
   | "awaiting_booker"
   | "agreed";
 
-export type BillboardBooking = {
+export type BillboardPaymentBreakdownFields = {
+  placementAmount?: number;
+  printAmount?: number;
+  arconAmount?: number;
+  vendorHoldAmount?: number;
+  payableTotal?: number;
+};
+
+export type BillboardBooking = BillboardPaymentBreakdownFields & {
   id: number;
+  quotedPlacementTotal?: number | null;
+  quotedPrintTotal?: number;
+  quotedArconTotal?: number;
   quotedTotal: number;
+  /** Placement + print held for vendor (excludes platform ARCON fee). */
+  vendorEarningsAmount?: number;
+  /** Full amount paid by booker when paid. */
+  bookerPayableTotal?: number;
+  arconHasCertificate?: boolean;
+  arconCertificateUrl?: string | null;
+  arconApplicationTurnaround?: string | null;
+  printAreaSqm?: number | null;
+  printPricePerSqMeter?: number | null;
   currency: string;
   status: string;
   paymentStatus?: string;
@@ -192,7 +230,16 @@ export type BillboardBooking = {
     city: string;
     state: string;
     imageUrl: string;
-    pricing: { daily?: number; weekly?: number; monthly?: number };
+    pricing: {
+      daily?: number;
+      weekly?: number;
+      monthly?: number;
+      quarterly?: number;
+      semiAnnual?: number;
+      annual?: number;
+    };
+    billboardType: BillboardType;
+    creativeFulfillmentType: CreativeFulfillmentType;
     isNegotiable: boolean;
   } | null;
   /** Present on advertiser booking detail only */
@@ -211,7 +258,10 @@ function billboardListQueryString(
   const usp = new URLSearchParams();
   if (params.page != null) usp.set("page", String(params.page));
   if (params.limit != null) usp.set("limit", String(params.limit));
-  if (params.boardType) usp.set("boardType", params.boardType);
+  if (params.billboardType) usp.set("billboardType", params.billboardType);
+  if (params.creativeFulfillmentType) {
+    usp.set("creativeFulfillmentType", params.creativeFulfillmentType);
+  }
   if (params.location?.trim()) usp.set("location", params.location.trim());
   if (params.minPrice != null) usp.set("minPrice", String(params.minPrice));
   if (params.maxPrice != null) usp.set("maxPrice", String(params.maxPrice));
@@ -271,17 +321,21 @@ export async function createBillboardListing(
 export async function createBillboardBooking(
   listingId: number,
   payload: CreateBillboardBookingPayload,
-  imageFile?: File,
+  files?: { imageFile?: File; arconCertificateFile?: File },
 ): Promise<BillboardBooking> {
   const base = { ...payload };
   if (payload.creativeKind === "image") {
-    if (imageFile) {
-      const { publicUrl } = await uploadFileToR2(imageFile, "booking");
+    if (files?.imageFile) {
+      const { publicUrl } = await uploadFileToR2(files.imageFile, "booking");
       base.creativeImageUrl = publicUrl;
     }
     if (!base.creativeImageUrl?.trim()) {
       throw new Error("Image creative requires an uploaded file or creativeImageUrl");
     }
+  }
+  if (payload.arconHasCertificate && files?.arconCertificateFile) {
+    const { publicUrl } = await uploadFileToR2(files.arconCertificateFile, "booking");
+    base.arconCertificateUrl = publicUrl;
   }
   return baseFetchJson<BillboardBooking>(
     `/billboard/listings/${listingId}/bookings`,
@@ -365,6 +419,8 @@ export type BillboardBookingsQueryParams = {
 export type BillboardBookingListItem = {
   id: number;
   quotedTotal: number;
+  vendorEarningsAmount?: number;
+  bookerPayableTotal?: number;
   currency: string;
   status: string;
   paymentStatus?: string;
@@ -441,7 +497,8 @@ export function getMyVendorBillboardBookings(
   );
 }
 
-export type VendorBillboardBooking = BillboardBooking & {
+export type VendorBillboardBooking = BillboardBooking &
+  BillboardPaymentBreakdownFields & {
   createdAt?: string;
   paymentStatus?: string;
   activeProofImageUrl?: string | null;

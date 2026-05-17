@@ -1,5 +1,4 @@
 const wallet = "/icons/wallet.svg";
-const bell = "/icons/bell.svg";
 const avatar = "/icons/user.png";
 import { FiMenu } from "react-icons/fi";
 const logout = "/icons/usericon/onlogout.svg";
@@ -13,22 +12,28 @@ import { Link } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
 import { useLogout } from "@endpoint/auth/useAuth";
 import { useMe } from "@endpoint/users/useUsers";
+import { NotificationListPanel } from "@components/notifications/NotificationListPanel";
+import { NotificationNavBell } from "@components/notifications/NotificationNavBell";
+import { useNotificationDrawer } from "@components/notifications/useNotificationDrawer";
+import { useUnreadNotificationCount } from "@endpoint/notifications/useNotifications";
 
 const AdminNav = () => {
   const [dropDown, setDropDown] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const {
+    isNotificationOpen,
+    toggleNotifications,
+    closeNotifications,
+  } = useNotificationDrawer();
+  const unread = useUnreadNotificationCount();
+  const unreadCount = unread.data?.count ?? 0;
   const navigate = useNavigate();
   const { mutate: logoutUser, isPending: isLoggingOut } = useLogout();
   const me = useMe();
 
   const handleToggleDrawer = () => {
     setIsDrawerOpen((o) => !o);
-  };
-
-  const handleToggleNotification = () => {
-    setIsNotificationOpen((o) => !o);
   };
 
   return (
@@ -44,12 +49,10 @@ const AdminNav = () => {
             </li>
             <li
               className="relative cursor-pointer"
-              onClick={handleToggleNotification}
+              onClick={toggleNotifications}
+              aria-label="Notifications"
             >
-              <span className="absolute -top-[5px] -left-[2px] px-1 bg-ads360yellow-100 rounded-[50%] text-xs text-center text-white">
-                0
-              </span>
-              <img src={bell} alt="bell" />
+              <NotificationNavBell count={unreadCount} />
             </li>
             <li className="relative">
               <button
@@ -213,9 +216,13 @@ const AdminNav = () => {
       </Drawer>
       <Notification
         isOpen={isNotificationOpen}
-        handleNotification={handleToggleNotification}
+        handleNotification={toggleNotifications}
       >
-        <p className="p-4 text-sm text-stone-600">No notifications yet.</p>
+        <NotificationListPanel
+          isOpen={isNotificationOpen}
+          audience="admin"
+          onAfterNavigate={closeNotifications}
+        />
       </Notification>
     </>
   );

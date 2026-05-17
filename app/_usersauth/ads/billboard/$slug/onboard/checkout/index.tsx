@@ -1,22 +1,35 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-const cancel = '/icons/usericon/modalCancelBotton.svg'
 import { Modal } from "@components/modal/modal";
-import { Link, createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
+import { Link, createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import Steps from "@components/ui/Steps";
 import BackBtn from "@components/buttons/BackBtn";
 import {
   useBillboardBooking,
   useNegotiateBillboardBooking,
 } from "@endpoint/billboard/useBillboard";
+import { formatNaira } from "@lib/billboardDisplay";
+import {
+  CampaignPaymentStatusBadge,
+  CampaignStatusBadge,
+  formatCampaignMoney,
+  formatDateRange,
+  InfoCard,
+  MediaFrame,
+  SectionLabel,
+} from "@components/campaign/CampaignDetailShared";
+import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
+import CreativeMedia from "@components/ui/CreativeMedia";
+
+const cancel = "/icons/usericon/modalCancelBotton.svg";
 
 const Checkout = () => {
   const [negotia, setNegotia] = useState(false);
   const [negotiatedAmount, setNegotiatedAmount] = useState("");
   const navigate = useNavigate();
-  const search = useSearch({
-    strict: false,
-  }) as { bookingId?: number | string };
+  const search = useSearch({ strict: false }) as {
+    bookingId?: number | string;
+  };
   const bookingId = useMemo(() => Number(search.bookingId), [search.bookingId]);
   const booking = useBillboardBooking(
     Number.isFinite(bookingId) && bookingId > 0 ? bookingId : null,
@@ -24,14 +37,17 @@ const Checkout = () => {
   const negotiate = useNegotiateBillboardBooking();
   const b = booking.data;
 
+  const placementTotal =
+    b?.quotedPlacementTotal != null
+      ? b.quotedPlacementTotal
+      : (b?.quotedTotal ?? 0) -
+        (b?.quotedPrintTotal ?? 0) -
+        (b?.quotedArconTotal ?? 0);
+
   const negotiationPayBlocked =
     Boolean(b?.listingWasNegotiable) &&
     b?.negotiatedAmount != null &&
     b?.negotiationPhase !== "agreed";
-
-  const handleNegotiate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNegotiatedAmount(e.target.value);
-  };
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,169 +74,237 @@ const Checkout = () => {
 
   return (
     <>
-      <section className="mx-4 md:mx-10 pt-32 pb-24">
-      <BackBtn>billboard Marketing</BackBtn>
+      <section className="min-h-screen bg-[#E9E9E9] px-4 py-8 md:px-8 md:py-12">
+        <div className="mx-auto max-w-3xl">
+          <BackBtn>Billboard marketing</BackBtn>
+          <Steps step={4} text="#4 - Checkout" />
 
-      <Steps step={4} text="#1 - Checkout"/>
+          {booking.isLoading ? (
+            <p className="mt-8 text-center text-stone-600">Loading booking…</p>
+          ) : null}
+          {booking.isError || (!booking.isLoading && !b) ? (
+            <p className="mt-8 text-center text-red-600">
+              Unable to load booking details.
+            </p>
+          ) : null}
 
-        <div>
-          {b?.listing?.imageUrl ? (
-            <img alt="billboard" src={b.listing.imageUrl} className="mx-auto" />
+          {!booking.isLoading && b ? (
+            <div className="mt-6 overflow-hidden rounded-2xl border border-amber-200/40 bg-white shadow-sm">
+              <header className="flex flex-col gap-3 border-b border-stone-100 px-5 pt-6 pb-4 sm:flex-row sm:items-start sm:justify-between sm:px-7">
+                <div>
+                  <h1 className="font-serif text-2xl font-medium tracking-tight text-stone-900 md:text-3xl">
+                    Review & pay
+                  </h1>
+                  <p className="mt-1.5 text-sm text-stone-500">
+                    Booking #{b.id} ·{" "}
+                    {formatDateRange(b.campaignStartDate, b.campaignEndDate)}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CampaignStatusBadge status={b.status} />
+                  <CampaignPaymentStatusBadge paymentStatus={b.paymentStatus} />
+                </div>
+              </header>
+
+              <div className="px-5 pt-5 sm:px-7">
+                <h2 className="font-serif text-xl text-stone-900 md:text-2xl">
+                  {b.listing?.name ?? "Billboard placement"}
+                </h2>
+                {b.listing ? (
+                  <p className="mt-1 text-sm text-stone-600">
+                    {b.listing.address}, {b.listing.city}, {b.listing.state}
+                  </p>
+                ) : null}
+              </div>
+
+              <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7">
+                <InfoCard
+                  label="Total due"
+                  icon={<NairaIcon />}
+                  value={formatCampaignMoney(b.quotedTotal, b.currency)}
+                  sub={
+                    b.listingWasNegotiable
+                      ? "Placement may be negotiable"
+                      : "Fixed price for this booking"
+                  }
+                />
+                <InfoCard
+                  label="Campaign duration"
+                  icon={<CalendarDays />}
+                  value={formatDateRange(
+                    b.campaignStartDate,
+                    b.campaignEndDate,
+                  )}
+                  sub={b.durationPlan ? `Plan: ${b.durationPlan}` : undefined}
+                />
+              </div>
+
+              <div className="px-5 pb-5 sm:px-7">
+                <div className="rounded-2xl border border-stone-200/80 bg-[#F7F7F5] p-5">
+                  <SectionLabel>Price breakdown</SectionLabel>
+                  <ul className="mt-2 space-y-2 text-sm text-stone-700">
+                    <li className="flex justify-between gap-4">
+                      <span>Placement (media)</span>
+                      <span className="font-semibold text-stone-900">
+                        ₦{formatNaira(placementTotal)}
+                        {b.listingWasNegotiable ? " · negotiable" : ""}
+                      </span>
+                    </li>
+                    {(b.quotedPrintTotal ?? 0) > 0 ? (
+                      <li className="flex justify-between gap-4">
+                        <span>Print material (vendor)</span>
+                        <span className="font-semibold text-stone-900">
+                          ₦{formatNaira(b.quotedPrintTotal!)}
+                        </span>
+                      </li>
+                    ) : null}
+                    {(b.quotedArconTotal ?? 0) > 0 ? (
+                      <li className="flex justify-between gap-4">
+                        <span>ARCON application (platform)</span>
+                        <span className="font-semibold text-stone-900">
+                          ₦{formatNaira(b.quotedArconTotal!)}
+                        </span>
+                      </li>
+                    ) : null}
+                  </ul>
+                  {b.listingWasNegotiable ? (
+                    <p className="mt-3 text-xs text-stone-500">
+                      Only placement can be negotiated. Print and ARCON fees are
+                      fixed.
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+
+              <div className="grid gap-4 px-5 pb-6 sm:grid-cols-2 sm:px-7">
+                <MediaFrame title="Your creative">
+                  {b.creativeImageUrl || b.creativeVideoUrl ? (
+                    <CreativeMedia
+                      creativeKind={b.creativeKind}
+                      creativeImageUrl={b.creativeImageUrl}
+                      creativeVideoUrl={b.creativeVideoUrl}
+                      hideActions
+                      className="w-full"
+                    />
+                  ) : (
+                    <p className="py-8 text-center text-sm text-stone-500">
+                      No creative attached
+                    </p>
+                  )}
+                </MediaFrame>
+                <MediaFrame title="Billboard face">
+                  {b.listing?.imageUrl ? (
+                    <img
+                      src={b.listing.imageUrl}
+                      alt={b.listing.name ?? "Billboard"}
+                      className="max-h-52 w-full rounded-lg object-contain"
+                    />
+                  ) : (
+                    <p className="py-8 text-center text-sm text-stone-500">
+                      No listing image
+                    </p>
+                  )}
+                </MediaFrame>
+              </div>
+
+              <div className="flex flex-wrap justify-end gap-3 border-t border-stone-100 px-5 py-5 sm:px-7">
+                <button
+                  type="button"
+                  disabled={
+                    !b.listingWasNegotiable ||
+                    b.minimumNegotiableAmount == null ||
+                    b.negotiatedAmount != null ||
+                    negotiate.isPending
+                  }
+                  onClick={() => setNegotia(true)}
+                  className="rounded-xl border-2 border-stone-300 bg-white px-5 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Negotiate placement
+                </button>
+
+                {!bookingId || b.status === "paid" || negotiationPayBlocked ? (
+                  <span
+                    title={
+                      negotiationPayBlocked
+                        ? "Complete negotiation before paying"
+                        : undefined
+                    }
+                    className="inline-flex cursor-not-allowed items-center justify-center rounded-xl bg-stone-300 px-6 py-2.5 text-sm font-semibold text-stone-600"
+                  >
+                    Pay now
+                  </span>
+                ) : (
+                  <Link
+                    to="/ads/$transaction_id"
+                    params={{ transaction_id: String(bookingId) }}
+                    className="inline-flex items-center justify-center rounded-xl bg-ads360yellow-100 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+                  >
+                    Pay now
+                  </Link>
+                )}
+              </div>
+
+              {negotiationPayBlocked ? (
+                <p className="border-t border-stone-100 px-5 pb-5 text-center text-xs text-amber-900 sm:px-7">
+                  Pay is available after the owner accepts your offer or you
+                  accept their counter. Check{" "}
+                  <Link
+                    to="/users/negotiations"
+                    className="font-medium underline"
+                  >
+                    Negotiations
+                  </Link>
+                  .
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
-        <div className="w-full overflow-x-auto my-5">
-          <table className="min-w-full bg-white">
-            <thead className="bg-[#D0B301]/40">
-              <tr>
-                <th className="py-2 px-2 md:px-3 border-b">Name</th>
-                <th className="py-2 px-2 md:px-3 border-b">Location</th>
-                <th className="py-2 px-2 md:px-3 border-b">Size</th>
-                <th className="py-2 px-2 md:px-3 border-b">Duration</th>
-                <th className="py-2 px-2 md:px-3 border-b">Start Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">End Date</th>
-                <th className="py-2 px-2 md:px-3 border-b">Cost/day</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b?.listing?.name ?? "-"}
-                </td>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b?.listing
-                    ? `${b.listing.address}, ${b.listing.city}, ${b.listing.state}`
-                    : "-"}
-                </td>
-                <td className="py-2 px-2 md:px-3 border-b">4m(H) by 12m(W)</td>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b?.durationPlan ?? "-"}
-                </td>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b?.campaignStartDate ? String(b.campaignStartDate).slice(0, 10) : "-"}
-                </td>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b?.campaignEndDate ? String(b.campaignEndDate).slice(0, 10) : "-"}
-                </td>
-                <td className="py-2 px-2 md:px-3 border-b">
-                  {b ? `₦${b.quotedTotal}` : "-"}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-end">
-          <div className="bg-[#D0B301]/40 flex justify-between w-full p-5 md:w-1/2 lg:w-1/3">
-            <h4>Total Amount</h4>
-            <div>
-              <div className="font-bold">{b ? `₦${b.quotedTotal}` : "—"}</div>
-              <div>{b?.durationPlan ?? ""}</div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex md:justify-end space-x-3 my-3">
-          <button
-            disabled={
-              !b?.listingWasNegotiable ||
-              b?.minimumNegotiableAmount == null ||
-              b?.negotiatedAmount != null ||
-              negotiate.isPending
-            }
-            onClick={() => setNegotia(true)}
-            className={`w-123 h-12 rounded-10 my-2 ${
-              !b?.listingWasNegotiable || b?.negotiatedAmount != null
-                ? "bg-ads360yellow-100/50 text-black/50"
-                : "hover:animate-changeColor hover:text-white bg-ads360yellow-100"
-            }`}
-          >
-            Negotiate
-          </button>
-
-          {!bookingId || b?.status === "paid" || negotiationPayBlocked ? (
-            <span
-              title={
-                negotiationPayBlocked
-                  ? "Complete negotiation (owner must accept or you accept their counter) before paying."
-                  : undefined
-              }
-              className="inline-flex w-123 cursor-not-allowed items-center justify-center rounded-10 bg-ads360yellow-100/50 px-3 py-3 text-center text-sm text-black/60 my-2"
-            >
-              Pay Now
-            </span>
-          ) : (
-            <Link
-              to="/ads/$transaction_id"
-              params={{ transaction_id: String(bookingId || "") }}
-              className="hover:animate-changeColor hover:text-white bg-ads360yellow-100 w-123 h-12 rounded-10 my-2 flex items-center justify-center"
-            >
-              Pay Now
-            </Link>
-          )}
-        </div>
-        {negotiationPayBlocked ? (
-          <p className="max-w-lg text-right text-xs text-amber-900 md:ml-auto">
-            Pay is available after the billboard owner accepts your offer or you
-            accept their counter-offer. Check{" "}
-            <Link to="/users/negotiations" className="underline font-medium">
-              Negotiations
-            </Link>
-            .
-          </p>
-        ) : null}
       </section>
 
       <Modal isOpen={negotia}>
-        <div className="bg-white p-5 w-11/12 md:w-1/3 lg:w-1/4 mx-auto rounded-10">
-          <div className="flex justify-between mb-5">
-            <h4 className="">Input Amount</h4>
-            <button onClick={() => setNegotia(false)}>
-              <img
-                src={cancel} alt="modal cancel botton"
-                className="w-5"
-              />
+        <div className="mx-auto w-11/12 max-w-md rounded-2xl bg-white p-6 shadow-xl">
+          <div className="mb-5 flex items-center justify-between">
+            <h4 className="font-semibold text-stone-900">
+              Negotiate placement fee
+            </h4>
+            <button type="button" onClick={() => setNegotia(false)}>
+              <img src={cancel} alt="Close" className="h-5 w-5" />
             </button>
           </div>
           <form onSubmit={submit}>
-            <div className="flex">
-              <div className="bg-ads360black-50/10 rounded-l text-center grid grid-cols-1 basis-1/5 content-center text-black/50">
-                {" "}
-                ₦{" "}
-              </div>
+            <div className="flex overflow-hidden rounded-xl border border-stone-200">
+              <span className="grid w-14 place-items-center bg-stone-100 text-stone-500">
+                ₦
+              </span>
               <input
                 type="number"
                 value={negotiatedAmount}
-                onChange={handleNegotiate}
-                className="p-2 focus:outline-none w-full border rounded-r"
+                onChange={(e) => setNegotiatedAmount(e.target.value)}
+                className="w-full p-3 text-stone-900 focus:outline-none"
+                placeholder="Your offer"
               />
             </div>
-            <div className="my-3">
-              <p className="text-red-700 text-xs">
-                You cannot negotiat lower than ₦
-                {b?.minimumNegotiableAmount ?? 0}
-              </p>
-              <p className="text-red-700 text-xs">You can only negotiat once</p>
-            </div>
-            <div className="flex justify-center">
-              <button
-                disabled={
-                  negotiatedAmount === "" ||
-                  (b?.minimumNegotiableAmount != null &&
-                    parseInt(negotiatedAmount) < b.minimumNegotiableAmount) ||
-                  negotiate.isPending
-                }
-                className={`${
-                  negotiatedAmount === "" ||
-                  (b?.minimumNegotiableAmount != null &&
-                    parseInt(negotiatedAmount) < b.minimumNegotiableAmount) ||
-                  negotiate.isPending
-                    ? "bg-ads360gray-100"
-                    : "bg-ads360black-100/95 hover:bg-ads360black-100"
-                } rounded mt-5  text-white  w-5/6 h-10`}
-              >
-                {negotiate.isPending ? "Sending..." : "Send Request"}
-              </button>
-            </div>
+            <p className="mt-3 text-xs text-red-700">
+              Placement only. Minimum ₦
+              {b?.minimumNegotiableAmount != null
+                ? formatNaira(b.minimumNegotiableAmount)
+                : "0"}
+              . Print and ARCON stay fixed. One negotiation per booking.
+            </p>
+            <button
+              type="submit"
+              disabled={
+                negotiatedAmount === "" ||
+                (b?.minimumNegotiableAmount != null &&
+                  parseInt(negotiatedAmount, 10) <
+                    b.minimumNegotiableAmount) ||
+                negotiate.isPending
+              }
+              className="mt-5 w-full rounded-xl bg-stone-900 py-3 text-sm font-semibold text-white disabled:bg-stone-300"
+            >
+              {negotiate.isPending ? "Sending…" : "Send request"}
+            </button>
           </form>
         </div>
       </Modal>
@@ -228,10 +312,11 @@ const Checkout = () => {
   );
 };
 
-export const Route = createFileRoute("/_usersauth/ads/billboard/$slug/onboard/checkout/")({
+export const Route = createFileRoute(
+  "/_usersauth/ads/billboard/$slug/onboard/checkout/",
+)({
   validateSearch: (search: Record<string, unknown>) => ({
     bookingId: search.bookingId,
   }),
   component: Checkout,
-})
-
+});

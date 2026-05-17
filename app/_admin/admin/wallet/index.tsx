@@ -31,6 +31,7 @@ const TYPE_LABELS: Partial<Record<TransactionType, string>> = {
 
 const STATUS_LABELS: Record<TransactionStatus, string> = {
   pending: "Pending",
+  processing: "Processing",
   completed: "Completed",
   failed: "Failed",
 };
@@ -172,8 +173,8 @@ function AdminWalletPage() {
         <div>
           <h1 className="font-serif text-2xl text-stone-900">App wallet</h1>
           <p className="mt-1 text-sm text-stone-600">
-            Platform treasury balance(s) and commission credits when paid bookings
-            complete.
+            Platform treasury: ARCON fees when payment is verified, and placement
+            commission when the booker completes the campaign.
           </p>
         </div>
 
@@ -221,13 +222,14 @@ function AdminWalletPage() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-lg font-semibold text-stone-900">
-                Platform commissions
+                Platform wallet credits
               </h2>
               <p className="mt-1 max-w-xl text-sm text-stone-600">
-                Only rows that credited the platform wallet (
+                Credits to the platform wallet (
                 <code className="rounded bg-stone-100 px-1">metadata.to</code>{" "}
-                = <span className="font-mono text-xs">app_wallet</span>). These
-                are recorded as adjustments from the vendor’s booking.
+                = <span className="font-mono text-xs">app_wallet</span>): ARCON
+                on payment verification, placement commission on campaign
+                completion. Vendor hold (placement + print) is separate.
               </p>
             </div>
             <Link

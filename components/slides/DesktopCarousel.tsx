@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 
 //swiper component and swiper css
 import { Swiper, SwiperSlide, SwiperRef } from 'swiper/react';
-import { Autoplay } from 'swiper';
+import { Autoplay } from 'swiper/modules';
 import 'swiper/css';
 
 //import from hooks and link

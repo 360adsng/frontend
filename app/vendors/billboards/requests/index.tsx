@@ -68,7 +68,12 @@ const Requests = () => {
               id: r.id,
               listing: r.listingName ?? "-",
               createdAt: r.createdAt as unknown as string,
-              amount: r.negotiatedAmount ?? r.quotedTotal,
+              amount:
+                r.vendorEarningsAmount ??
+                (r.negotiatedAmount != null
+                  ? Number(r.negotiatedAmount) + Number(r.quotedPrintTotal ?? 0)
+                  : Number(r.quotedPlacementTotal ?? 0) +
+                    Number(r.quotedPrintTotal ?? 0)),
               status: r.status as string,
               paymentStatus: r.paymentStatus ?? "unpaid",
               actionHref: `/vendors/billboards/requests/${r.id}`,

@@ -49,10 +49,11 @@ export type MeResponse =
       businessDescription?: string | null;
       address?: string | null;
       alternatePhoneNumber?: string | null;
-      businessWebsite?: string | null;
       contactPersonEmail?: string | null;
       contactPersonPosition?: string | null;
       billboardCoverage?: Array<{ state: string; lga: string[] }>;
+      /** Naira per m² for static / vinyl printing */
+      printingPricePerSqMeter?: number | null;
       profileImage?: string | null;
     }
   | {
@@ -82,10 +83,10 @@ export type UpdateProfilePayload = Partial<{
   businessName: string;
   contactName: string;
   businessDescription: string;
-  businessWebsite: string;
   contactPersonEmail: string;
   contactPersonPosition: string;
   billboardCoverage: Array<{ state: string; lga: string[] }>;
+  printingPricePerSqMeter: number;
   // influencer
   mediaName: string;
   bio: string;
@@ -97,7 +98,10 @@ export type ChangePasswordPayload = {
   newPassword: string;
 };
 
-export type SimpleMessageResponse = { message: string };
+export type SimpleMessageResponse = {
+  message: string;
+  printingPricePerSqMeter?: number | null;
+};
 
 export type BillboardCoverageRow = { state: string; lga: string[] };
 export type MyBillboardCoverageResponse = { billboardCoverage: BillboardCoverageRow[] };

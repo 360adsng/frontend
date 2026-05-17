@@ -65,9 +65,11 @@ function PaymentPill({ paymentStatus }: { paymentStatus: string }) {
       ? "bg-emerald-100 text-emerald-800 border-emerald-200"
       : s === "refunded"
         ? "bg-violet-100 text-violet-800 border-violet-200"
-        : s === "unpaid"
-          ? "bg-amber-100 text-amber-900 border-amber-200"
-          : "bg-stone-100 text-stone-700 border-stone-200";
+        : s === "processing"
+          ? "bg-sky-100 text-sky-900 border-sky-200"
+          : s === "unpaid"
+            ? "bg-amber-100 text-amber-900 border-amber-200"
+            : "bg-stone-100 text-stone-700 border-stone-200";
 
   const label =
     s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : "Unknown";

@@ -7,7 +7,6 @@ import {
   useCompleteBillboardBooking,
   useDisputeBillboardBooking,
 } from "@endpoint/billboard/useBillboard";
-import CreativeMedia from "@components/ui/CreativeMedia";
 import {
   CampaignDisputeNotice,
   CampaignPaymentStatusBadge,
@@ -17,13 +16,15 @@ import {
   formatCampaignMoney,
   formatDateRange,
   InfoCard,
-  MediaFrame,
   personDisplayName,
   resolveDisputeNoticePhase,
   SectionLabel,
 } from "@components/campaign/CampaignDetailShared";
+import { CampaignBillboardAssetsSection } from "@components/campaign/CampaignBillboardAssetsSection";
 import { CampaignDisputeModal } from "@components/campaign/CampaignDisputeModal";
 import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
+import { ArconCertificatePanel } from "@components/billboard/ArconCertificatePanel";
+import { BillboardPaymentBreakdown } from "@components/billboard/BillboardPaymentBreakdown";
 
 const CampaignDetail = () => {
   const { slug } = Route.useParams();
@@ -115,19 +116,31 @@ const CampaignDetail = () => {
 
             <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7">
               <InfoCard
-                label="Total budget"
+                label="Total paid"
                 icon={<NairaIcon />}
                 value={formatCampaignMoney(
-                  b.negotiatedAmount ?? b.quotedTotal,
+                  b.payableTotal ?? b.quotedTotal,
                   b.currency,
                 )}
-                sub="Agreed price for this placement"
               />
               <InfoCard
                 label="Campaign duration"
                 icon={<CalendarDays />}
                 value={formatDateRange(b.campaignStartDate, b.campaignEndDate)}
                 sub={b.durationPlan ? `Plan: ${b.durationPlan}` : undefined}
+              />
+            </div>
+
+            <div className="px-5 pb-5 sm:px-7">
+              <BillboardPaymentBreakdown
+                currency={b.currency}
+                placementAmount={
+                  b.placementAmount ?? Number(b.quotedPlacementTotal ?? 0)
+                }
+                printAmount={b.printAmount ?? Number(b.quotedPrintTotal ?? 0)}
+                arconAmount={b.arconAmount ?? Number(b.quotedArconTotal ?? 0)}
+                payableTotal={b.payableTotal ?? b.quotedTotal}
+                showArcon
               />
             </div>
 
@@ -156,51 +169,23 @@ const CampaignDetail = () => {
               </div>
             </div>
 
-            <div className="grid gap-4 px-5 pb-6 sm:grid-cols-3 sm:px-7">
-              <MediaFrame title="Campaign creative">
-                {b.creativeImageUrl || b.creativeVideoUrl ? (
-                  <CreativeMedia
-                    creativeKind={b.creativeKind}
-                    creativeImageUrl={b.creativeImageUrl}
-                    creativeVideoUrl={b.creativeVideoUrl}
-                    hideActions
-                    className="w-full"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    No creative uploaded yet
-                  </p>
-                )}
-              </MediaFrame>
-
-              <MediaFrame title="Billboard">
-                {b.listing?.imageUrl ? (
-                  <img
-                    src={b.listing.imageUrl}
-                    alt={b.listing.name ?? "Billboard"}
-                    className="max-h-52 w-full rounded-lg object-contain"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    No image
-                  </p>
-                )}
-              </MediaFrame>
-
-              <MediaFrame title="Active proof">
-                {b.activeProofImageUrl ? (
-                  <img
-                    src={b.activeProofImageUrl}
-                    alt="Proof of activation"
-                    className="max-h-52 w-full rounded-lg object-contain"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    The owner has not uploaded activation proof yet
-                  </p>
-                )}
-              </MediaFrame>
-            </div>
+            <CampaignBillboardAssetsSection
+              creativeKind={b.creativeKind}
+              creativeImageUrl={b.creativeImageUrl}
+              creativeVideoUrl={b.creativeVideoUrl}
+              creativeEmptyMessage="No creative uploaded yet"
+              listingImageUrl={b.listing?.imageUrl}
+              listingName={b.listing?.name}
+              activeProofImageUrl={b.activeProofImageUrl}
+              activeProofEmptyMessage="The owner has not uploaded activation proof yet"
+              arconPanel={
+                <ArconCertificatePanel
+                  booking={b}
+                  audience="advertiser"
+                  className="!px-0 !pb-0"
+                />
+              }
+            />
 
             {showDisputeBanner && disputePhase !== null ? (
               <div className="px-5 pb-4 sm:px-7">

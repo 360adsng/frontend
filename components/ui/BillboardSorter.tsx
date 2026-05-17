@@ -1,9 +1,14 @@
 import React from "react";
+import {
+  BILLBOARD_TYPE_SELECT_OPTIONS,
+  CREATIVE_FULFILLMENT_SELECT_OPTIONS,
+} from "@endpoint/billboard/billboardListingEnums";
 
 const cancel = "/icons/usericon/modalCancelBotton.svg";
 
 export type BillboardFilterForm = {
-  boardType: string;
+  billboardType: string;
+  creativeFulfillmentType: string;
   minPrice: string;
   maxPrice: string;
   location: string;
@@ -44,15 +49,32 @@ const BillboardSorter = ({
       <div className="my-2">
         <p>Billboard type</p>
         <select
-          value={value.boardType}
-          onChange={(e) => set("boardType", e.target.value)}
+          value={value.billboardType}
+          onChange={(e) => set("billboardType", e.target.value)}
           className="p-2 border focus:outline-none rounded w-full"
         >
           <option value="">Any</option>
-          <option value="digital">Digital</option>
-          <option value="led">LED</option>
-          <option value="unipole">Unipole</option>
-          <option value="billboard_bridge">Billboard bridge</option>
+          {BILLBOARD_TYPE_SELECT_OPTIONS.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="my-2">
+        <p>Creative fulfillment</p>
+        <select
+          value={value.creativeFulfillmentType}
+          onChange={(e) => set("creativeFulfillmentType", e.target.value)}
+          className="p-2 border focus:outline-none rounded w-full"
+        >
+          <option value="">Any</option>
+          {CREATIVE_FULFILLMENT_SELECT_OPTIONS.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
         </select>
       </div>
 

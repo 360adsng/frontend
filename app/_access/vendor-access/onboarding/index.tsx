@@ -247,7 +247,7 @@ const VendorAccessOnboarding = () => {
   );
 };
 
-export const Route = createFileRoute("/_access/vendor-access/onboarding/" as any)({
+export const Route = createFileRoute("/_access/vendor-access/onboarding/")({
   component: VendorAccessOnboarding,
 });
 

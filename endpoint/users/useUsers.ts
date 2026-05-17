@@ -38,7 +38,10 @@ export function useUpdateProfile() {
     mutationFn: updateProfile,
     onSuccess: async (data) => {
       toast.success(data?.message ?? "Profile updated.");
-      await qc.invalidateQueries({ queryKey: ["me"] });
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["me"] }),
+        qc.invalidateQueries({ queryKey: ["billboard"] }),
+      ]);
     },
     onError: (error) => {
       toast.error(errorMessage(error));

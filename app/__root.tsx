@@ -3,9 +3,10 @@ import {
   createRootRoute,
   HeadContent,
   Scripts,
+  ErrorComponentProps,
 } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "sonner";
 import sonnerCss from "sonner/dist/styles.css?url";
 import appCss from "../styles/global.css?url";
@@ -39,8 +40,35 @@ export const Route = createRootRoute({
     ],
   }),
   notFoundComponent: NotFoundPage,
+  errorComponent: RootError,
   component: RootLayout,
 });
+
+function RootError({ error }: ErrorComponentProps) {
+  useEffect(() => {
+    void import("@lib/sentry-browser").then((m) => {
+      if (m.isSentryEnabled()) {
+        m.Sentry.captureException(error);
+      }
+    });
+  }, [error]);
+
+  const message =
+    error instanceof Error ? error.message : "An unexpected error occurred.";
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
+      <h1 className="text-xl font-semibold text-stone-900">Something went wrong</h1>
+      <p className="mt-2 max-w-md text-sm text-stone-600">{message}</p>
+      <a
+        href="/"
+        className="mt-6 rounded-xl bg-stone-900 px-4 py-2.5 text-sm font-semibold text-white"
+      >
+        Go home
+      </a>
+    </div>
+  );
+}
 
 function RootLayout() {
   const [queryClient] = useState(
@@ -51,6 +79,10 @@ function RootLayout() {
         },
       }),
   );
+
+  useEffect(() => {
+    void import("@lib/sentry-browser").then((m) => m.initSentryClient());
+  }, []);
 
   return (
     <html lang="en">

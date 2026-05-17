@@ -16,22 +16,33 @@ import {
   type BillboardCoverageRow,
 } from "@components/vendor-settings/billboards/BillboardCoverageEditor";
 import { ContactPersonFields } from "@components/vendor-settings/billboards/ContactPersonFields";
+import {
+  SettingsProfileTabs,
+  type SettingsProfileTab,
+} from "@components/settings/SettingsProfileTabs";
 
-const dash = "/icons/dash.svg";
 const avatarFallback = "/icons/user.png";
-
-type Tab = "profile" | "password";
 
 const profileSchemaBillboardOwner = z.object({
   businessName: z.string().trim().min(1, "Business name is required."),
   contactName: z.string().trim().min(1, "Contact name is required."),
   businessDescription: z.string().trim().optional(),
-  businessWebsite: z.string().trim().optional(),
   address: z.string().trim().optional(),
   contactPersonEmail: z.string().trim().optional(),
   contactPersonPosition: z.string().trim().optional(),
   altPhoneCountryIso2: z.string().trim().optional(),
   altPhoneNationalNumber: z.string().trim().optional(),
+  printingPricePerSqMeter: z
+    .string()
+    .trim()
+    .min(1, "Printing price per m² is required.")
+    .refine(
+      (s) => {
+        const n = Number(s.replace(/,/g, ""));
+        return Number.isFinite(n) && n > 0;
+      },
+      "Enter a valid amount greater than zero (₦ per m²).",
+    ),
 });
 
 const passwordSchema = z
@@ -83,7 +94,7 @@ function toE164FromParts(
 }
 
 function BillboardOwnerSettingsPage() {
-  const [tab, setTab] = useState<Tab>("profile");
+  const [tab, setTab] = useState<SettingsProfileTab>("profile");
 
   const meQuery = useMe();
   const me = meQuery.data;
@@ -107,10 +118,10 @@ function BillboardOwnerSettingsPage() {
     businessName: "",
     contactName: "",
     businessDescription: "",
-    businessWebsite: "",
     address: "",
     contactPersonEmail: "",
     contactPersonPosition: "",
+    printingPricePerSqMeter: "",
     altPhoneCountryIso2: defaultCountryIso2,
     altPhoneNationalNumber: "",
   });
@@ -135,10 +146,14 @@ function BillboardOwnerSettingsPage() {
       businessName: me.businessName ?? "",
       contactName: me.contactName ?? "",
       businessDescription: me.businessDescription ?? "",
-      businessWebsite: me.businessWebsite ?? "",
       address: me.address ?? "",
       contactPersonEmail: me.contactPersonEmail ?? "",
       contactPersonPosition: me.contactPersonPosition ?? "",
+      printingPricePerSqMeter:
+        me.printingPricePerSqMeter != null &&
+        Number.isFinite(me.printingPricePerSqMeter)
+          ? String(me.printingPricePerSqMeter)
+          : "",
       altPhoneCountryIso2: parts?.countryIso2 || defaultCountryIso2,
       altPhoneNationalNumber: parts?.nationalNumber || "",
     });
@@ -179,11 +194,13 @@ function BillboardOwnerSettingsPage() {
       businessName: parsed.data.businessName,
       contactName: parsed.data.contactName,
       businessDescription: parsed.data.businessDescription,
-      businessWebsite: parsed.data.businessWebsite,
       address: parsed.data.address,
       contactPersonEmail: parsed.data.contactPersonEmail,
       contactPersonPosition: parsed.data.contactPersonPosition,
       alternatePhoneNumber: altE164 ?? undefined,
+      printingPricePerSqMeter: Number(
+        parsed.data.printingPricePerSqMeter.replace(/,/g, ""),
+      ),
     });
   };
 
@@ -226,29 +243,7 @@ function BillboardOwnerSettingsPage() {
         <h3 className="text-2xl">Settings</h3>
         <p className="text-[#8B8B8B] mb-5 mt-3">{accountTypeLabel} settings</p>
 
-        <div className="w-full flex text-sm md:text-base md:justify-start space-x-3">
-          <button className="relative" onClick={() => setTab("profile")}>
-            Edit Profile
-            {tab === "profile" && (
-              <img
-                alt="selected"
-                src={dash}
-                className="w-2/3 mx-auto absolute top-[20px] left-[17%]"
-              />
-            )}
-          </button>
-
-          <button className="relative" onClick={() => setTab("password")}>
-            Change Password
-            {tab === "password" && (
-              <img
-                alt="selected"
-                src={dash}
-                className="w-2/5 mx-auto absolute top-[20px] left-[17%]"
-              />
-            )}
-          </button>
-        </div>
+        <SettingsProfileTabs tab={tab} onTabChange={setTab} className="mb-0" />
       </section>
 
       <section className="min-h-screen bg-ads360-hash px-4 md:px-10 py-14">
@@ -331,16 +326,25 @@ function BillboardOwnerSettingsPage() {
                     <FieldError message={profileErrors.businessName} />
                   </div>
                   <div className="my-3">
-                    <label>Business Website:</label>
+                    <label>Printing price (₦ per m²):</label>
+                    <p className="text-xs text-neutral-500 mb-1">
+                      Rate for static vinyl printing per square metre.
+                    </p>
                     <input
-                      value={form.businessWebsite}
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      value={form.printingPricePerSqMeter}
                       onChange={(e) =>
-                        setForm((p) => ({ ...p, businessWebsite: e.target.value }))
+                        setForm((p) => ({
+                          ...p,
+                          printingPricePerSqMeter: e.target.value,
+                        }))
                       }
                       className={inputBase}
-                      placeholder="https://example.com"
+                      placeholder="e.g. 4500"
                     />
-                    <FieldError message={profileErrors.businessWebsite} />
+                    <FieldError message={profileErrors.printingPricePerSqMeter} />
                   </div>
                 </div>
 

@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import { cloudflare } from '@cloudflare/vite-plugin'
 import viteReact from '@vitejs/plugin-react'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import path from 'node:path'
 
 /** Cloudflare Workers — https://tanstack.com/start/latest/docs/framework/react/guide/hosting */
@@ -10,6 +11,13 @@ export default defineConfig(({ mode }) => {
     mode === 'cloudflare' ||
     process.env.CLOUDFLARE === 'true' ||
     process.env.CF_PAGES === 'true'
+
+  const sentryOrg = process.env.SENTRY_ORG?.trim()
+  const sentryProject = process.env.SENTRY_PROJECT?.trim()
+  const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN?.trim()
+  const useSentrySourceMaps = Boolean(
+    sentryOrg && sentryProject && sentryAuthToken,
+  )
 
   return {
   server: {
@@ -46,6 +54,19 @@ export default defineConfig(({ mode }) => {
       },
     }),
     viteReact(),
+    ...(useSentrySourceMaps
+      ? [
+          sentryVitePlugin({
+            org: sentryOrg,
+            project: sentryProject,
+            authToken: sentryAuthToken,
+            telemetry: false,
+          }),
+        ]
+      : []),
   ],
+  build: {
+    sourcemap: useSentrySourceMaps || mode === 'production',
+  },
   }
 })

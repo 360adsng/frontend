@@ -1,9 +1,9 @@
 /**
- * http://localhost:3001
+ * https://backend-934c.onrender.com
  * HTTP client for 360backend (Nest). Set `VITE_API_BASE_URL` in `.env` (e.g. http://localhost:3000).
  */
 
-const DEFAULT_BASE_URL = "https://backend-934c.onrender.com";
+const DEFAULT_BASE_URL = "http://localhost:3001";
 
 /** localStorage keys — use these after login so refresh works */
 export const ACCESS_TOKEN_STORAGE_KEY = "access_token";
@@ -412,6 +412,12 @@ export async function baseFetchJson<T>(
     if (!headers.has("Content-Type")) {
       headers.set("Content-Type", "application/json");
     }
+  } else if (
+    typeof body === "string" &&
+    body.trim().startsWith("{") &&
+    !headers.has("Content-Type")
+  ) {
+    headers.set("Content-Type", "application/json");
   }
 
   const res = await baseFetch(path, { ...init, headers, body }, options);

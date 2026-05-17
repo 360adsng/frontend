@@ -1,5 +1,3 @@
-;
-
 const Preview = ({
   previewImage,
   attachmentType,
@@ -33,107 +31,150 @@ const Preview = ({
     return null;
   })();
 
+  const hasSchedule =
+    Boolean(durationText?.trim()) ||
+    plan === "Days" ||
+    plan === "Weeks" ||
+    plan === "Months";
+
   return (
-    <div className="">
-      <h4 className="font-bold text-xl my-3">Preview</h4>
-      <div className="bg-white my-5 rounded-10 p-2 min-h-[40px]">
-        {durationText?.trim() ? <div>{durationText}</div> : null}
-        {plan === "Immediate" && (
-          <div>
-            This ad will run once, immediately after payment is confirmed.
-          </div>
-        )}
-        {plan === "Days" && (
-          <div>
-            This ad will run on selected day(s):
-            {selectedDate.map((day: valuePiece, i) => (
-              <div key={i}>{day?.toDateString()}</div>
-            ))}
-          </div>
-        )}
-        {plan === "Weeks" && !durationText?.trim() && (
-          <div>Choose a start date and number of weeks to preview.</div>
-        )}
-        {plan === "Months" && !durationText?.trim() && (
-          <div>Choose a start date and number of months to preview.</div>
-        )}
-        {plan === "" && (
-          <div className="text-gray-500 text-center">Preview Duration Plan</div>
-        )}
-      </div>
+    <aside className="sticky top-24">
+      <div className="overflow-hidden rounded-2xl border border-stone-200/80 bg-white shadow-sm">
+        <div className="border-b border-stone-100 bg-[#F7F7F5] px-4 py-3">
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-stone-500">
+            Live preview
+          </p>
+          <p className="mt-0.5 text-sm text-stone-600">
+            How your booking will look before checkout
+          </p>
+        </div>
 
-      { needPlatform &&
-      <div className="bg-white my-5 rounded-10 p-2 min-h-[40px]">
-        {platform.length > 0 && (
-          <div>
-            {platform.map((platforms: string) => (
-              <div key={platforms}>{platforms}</div>
-            ))}
+        <div className="space-y-4 p-4">
+          <div className="rounded-xl border border-stone-200/80 bg-[#F7F7F7] p-3">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+              Schedule
+            </p>
+            {durationText?.trim() ? (
+              <p className="mt-2 text-sm font-medium text-stone-900">
+                {durationText}
+              </p>
+            ) : null}
+            {plan === "Days" && selectedDate.length > 0 ? (
+              <ul className="mt-2 space-y-1 text-sm text-stone-700">
+                {selectedDate.map((day: valuePiece, i) => (
+                  <li key={i} className="rounded-md bg-white px-2 py-1">
+                    {day?.toDateString()}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            {plan === "Weeks" && !durationText?.trim() ? (
+              <p className="mt-2 text-sm text-stone-500">
+                Pick a start date and number of weeks.
+              </p>
+            ) : null}
+            {plan === "Months" && !durationText?.trim() ? (
+              <p className="mt-2 text-sm text-stone-500">
+                Pick a start date and number of months.
+              </p>
+            ) : null}
+            {!hasSchedule ? (
+              <p className="mt-2 text-sm text-stone-400 italic">
+                Select a duration plan to preview dates.
+              </p>
+            ) : null}
           </div>
-        )}
-        {platform.length === 0 && (
-          <div className="text-gray-500 text-center">Preview Platforms</div>
-        )}
-      </div>
-      }
 
-      { needMessage &&
-      <div className="prevText my-5 bg-white rounded-10 p-2 h-[200px] overflow-y-auto">
-        {writeup !== "" ? (
-          <p className="break-all">{writeup}</p>
-        ) : (
-          <div className="flex justify-center items-center h-full">
-            <p className="text-gray-500">Preview Message</p>
-          </div>
-        )}
-      </div>
-      }
-
-      <div className="rounded-10 w-full">
-        {attachmentType === "video" ? (
-          previewVideo ? (
-            <video className="rounded- h-80 w-full" controls>
-              <source className="w-full" src={previewVideo.src} type="video/mp4" />
-              <source className="w-full" src={previewVideo.src} type="video/webm" />
-              Your browser does not support the video tag.
-            </video>
-          ) : yt ? (
-            <iframe
-              className="w-full h-80 rounded-10"
-              src={yt}
-              title="Video preview"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
-          ) : externalVideoUrl?.trim() ? (
-            <div className="my-5 bg-white rounded-10 p-4">
-              <div className="text-stone-500 text-sm mb-2">Video link</div>
-              <a
-                className="text-ads360yellow-100 break-all"
-                href={externalVideoUrl}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {externalVideoUrl}
-              </a>
+          {needPlatform ? (
+            <div className="rounded-xl border border-stone-200/80 bg-[#F7F7F7] p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+                Platforms
+              </p>
+              {platform.length > 0 ? (
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {platform.map((p: string) => (
+                    <li
+                      key={p}
+                      className="rounded-full bg-white px-2.5 py-0.5 text-xs font-medium text-stone-700 ring-1 ring-stone-200"
+                    >
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-stone-400 italic">
+                  Select at least one platform.
+                </p>
+              )}
             </div>
-          ) : (
-            <div className="my-5 flex justify-center items-center bg-white rounded-10 p-2 h-[300px]">
-              <p className="text-gray-500 text-center">Paste a video link to preview</p>
+          ) : null}
+
+          {needMessage ? (
+            <div className="rounded-xl border border-stone-200/80 bg-[#F7F7F7] p-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+                Message
+              </p>
+              {writeup?.trim() ? (
+                <p className="mt-2 max-h-28 overflow-y-auto text-sm text-stone-800 whitespace-pre-wrap break-words">
+                  {writeup}
+                </p>
+              ) : (
+                <p className="mt-2 text-sm text-stone-400 italic">
+                  Your campaign brief will appear here.
+                </p>
+              )}
             </div>
-          )
-        ) : attachmentType === "image" && previewImage ? (
-          <img alt="influencer"
-            src={previewImage.src}
-            className="mx-auto w-full rounded-10 h-80"
-          />
-        ) : (
-          <div className="my-5 flex justify-center items-center bg-white rounded-10 p-2 h-[300px]">
-            <p className="text-gray-500 text-center">Preview Media</p>
+          ) : null}
+
+          <div className="overflow-hidden rounded-xl border border-stone-200 bg-stone-900/5">
+            <p className="border-b border-stone-200/80 bg-white px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-stone-500">
+              Creative
+            </p>
+            <div className="flex min-h-[220px] items-center justify-center bg-stone-100 p-2">
+              {attachmentType === "video" ? (
+                previewVideo ? (
+                  <video className="max-h-64 w-full rounded-lg" controls>
+                    <source src={previewVideo.src} type="video/mp4" />
+                    <source src={previewVideo.src} type="video/webm" />
+                  </video>
+                ) : yt ? (
+                  <iframe
+                    className="aspect-video w-full max-h-64 rounded-lg"
+                    src={yt}
+                    title="Video preview"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : externalVideoUrl?.trim() ? (
+                  <a
+                    className="break-all px-3 text-center text-sm font-medium text-amber-800 hover:underline"
+                    href={externalVideoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open video link
+                  </a>
+                ) : (
+                  <p className="px-4 text-center text-sm text-stone-500">
+                    Paste a video link to preview
+                  </p>
+                )
+              ) : attachmentType === "image" && previewImage ? (
+                <img
+                  alt="Creative preview"
+                  src={previewImage.src}
+                  className="max-h-64 w-full rounded-lg object-contain"
+                />
+              ) : (
+                <p className="px-4 text-center text-sm text-stone-500">
+                  Upload an image to preview
+                </p>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    </aside>
   );
 };
 

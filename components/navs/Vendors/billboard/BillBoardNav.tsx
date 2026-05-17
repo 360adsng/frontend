@@ -1,5 +1,4 @@
 const wallet = '/icons/wallet.svg'
-const bell = '/icons/bell.svg'
 const avatar = '/icons/user.png'
 import { FiMenu } from "react-icons/fi";
 const logout = '/icons/usericon/onlogout.svg'
@@ -7,7 +6,10 @@ import { useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import BlackLogo from "@components/logo/BlackLogo";
 import { Notification } from "@components/modal/Notification";
-import BillboardNotification from "./BillboardNotification";
+import { NotificationListPanel } from "@components/notifications/NotificationListPanel";
+import { NotificationNavBell } from "@components/notifications/NotificationNavBell";
+import { useNotificationDrawer } from "@components/notifications/useNotificationDrawer";
+import { useUnreadNotificationCount } from "@endpoint/notifications/useNotifications";
 import BillBoardDrawerContent from "./BillBoardDrawerContent";
 import Drawer from "@components/modal/Drawer";
 import { Link } from "@tanstack/react-router";
@@ -19,7 +21,13 @@ const BillBoardNav = () => {
   const [dropDown, setDropDown] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const {
+    isNotificationOpen,
+    toggleNotifications,
+    closeNotifications,
+  } = useNotificationDrawer();
+  const unread = useUnreadNotificationCount();
+  const unreadCount = unread.data?.count ?? 0;
   const navigate = useNavigate();
   const { mutate: logoutVendor, isPending: isLoggingOut } = useLogout();
   const me = useMe();
@@ -35,14 +43,6 @@ const BillBoardNav = () => {
     }
   };
 
-  const handleToggleNotification = () => {
-    if (isNotificationOpen) {
-      setIsNotificationOpen(false);
-    } else {
-      setIsNotificationOpen(true);
-    }
-  };
-
   return (
     <>
       <nav className="bg-white md:flex md:px-14 py-3 justify-between items-center hidden">
@@ -55,11 +55,12 @@ const BillBoardNav = () => {
                 <img src={wallet} alt="wallet" />
               </Link>
             </li>
-            <li className="relative cursor-pointer" onClick={handleToggleNotification}>
-              <span className="absolute -top-[5px] -left-[2px] px-1 bg-ads360yellow-100 rounded-[50%] text-xs text-center text-white">
-                0
-              </span>
-              <img src={bell} alt="bell" />
+            <li
+              className="relative cursor-pointer"
+              onClick={toggleNotifications}
+              aria-label="Notifications"
+            >
+              <NotificationNavBell count={unreadCount} />
             </li>
             <li className="relative">
               <button
@@ -174,11 +175,11 @@ const BillBoardNav = () => {
                       <span className="px-3">Wallet</span>
                     </Link>
                   </li>
-                  <li className="flex items-center my-3 relative cursor-pointer" onClick={handleToggleNotification}>
-                    <span className="absolute -top-[5px] -left-[2px] px-1 bg-ads360yellow-100 rounded-[50%] text-xs text-center text-white">
-                      0
-                    </span>
-                    <img src={bell} alt="bell" />
+                  <li
+                    className="flex items-center my-3 relative cursor-pointer"
+                    onClick={toggleNotifications}
+                  >
+                    <NotificationNavBell count={unreadCount} />
                     <span className="px-3">Notification</span>
                   </li>
                   <hr />
@@ -211,8 +212,15 @@ const BillBoardNav = () => {
       <Drawer isOpen={isDrawerOpen} toggleDrawer={handleToggleDrawer}>
         <BillBoardDrawerContent toggleDrawer={handleToggleDrawer} />
       </Drawer>
-      <Notification isOpen={isNotificationOpen} handleNotification={handleToggleNotification}>
-        <BillboardNotification/>
+      <Notification
+        isOpen={isNotificationOpen}
+        handleNotification={toggleNotifications}
+      >
+        <NotificationListPanel
+          isOpen={isNotificationOpen}
+          audience="billboard_vendor"
+          onAfterNavigate={closeNotifications}
+        />
       </Notification>
 
     </>

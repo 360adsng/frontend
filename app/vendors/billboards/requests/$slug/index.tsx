@@ -5,7 +5,6 @@ import {
   useRejectVendorBillboardBooking,
   useVendorBillboardBooking,
 } from "@endpoint/billboard/useBillboard";
-import CreativeMedia from "@components/ui/CreativeMedia";
 import { toast } from "sonner";
 import FilesInput from "@components/inputs/FilesInput";
 import { Modal } from "@components/modal/modal";
@@ -19,12 +18,14 @@ import {
   formatCampaignMoney,
   formatDateRange,
   InfoCard,
-  MediaFrame,
   personDisplayName,
   resolveDisputeNoticePhase,
   SectionLabel,
 } from "@components/campaign/CampaignDetailShared";
+import { CampaignBillboardAssetsSection } from "@components/campaign/CampaignBillboardAssetsSection";
 import { CalendarDays, NairaIcon } from "@components/campaign/CampaignIcons";
+import { ArconCertificatePanel } from "@components/billboard/ArconCertificatePanel";
+import { BillboardPaymentBreakdown } from "@components/billboard/BillboardPaymentBreakdown";
 
 const Request = () => {
   const { slug } = Route.useParams();
@@ -145,15 +146,6 @@ const Request = () => {
 
             <div className="grid gap-4 px-5 py-5 sm:grid-cols-2 sm:px-7">
               <InfoCard
-                label="Total budget"
-                icon={<NairaIcon />}
-                value={formatCampaignMoney(
-                  b.negotiatedAmount ?? b.quotedTotal,
-                  b.currency,
-                )}
-                sub="Booker’s agreed price"
-              />
-              <InfoCard
                 label="Campaign duration"
                 icon={<CalendarDays />}
                 value={formatDateRange(
@@ -161,6 +153,28 @@ const Request = () => {
                   b.campaignEndDate,
                 )}
                 sub={b.durationPlan ? `Plan: ${b.durationPlan}` : undefined}
+              />
+              <InfoCard
+                label="Your earnings (held)"
+                icon={<NairaIcon />}
+                value={formatCampaignMoney(
+                  b.vendorEarningsAmount ?? b.vendorHoldAmount ?? 0,
+                  b.currency,
+                )}
+              />
+            </div>
+
+            <div className="px-5 pb-5 sm:px-7">
+              <BillboardPaymentBreakdown
+                currency={b.currency}
+                placementAmount={
+                  b.placementAmount ?? Number(b.quotedPlacementTotal ?? 0)
+                }
+                printAmount={b.printAmount ?? Number(b.quotedPrintTotal ?? 0)}
+                payableTotal={
+                  b.vendorEarningsAmount ?? b.vendorHoldAmount ?? undefined
+                }
+                showArcon={false}
               />
             </div>
 
@@ -185,55 +199,46 @@ const Request = () => {
               </div>
             </div>
 
-            <div className="grid gap-4 px-5 pb-6 sm:grid-cols-3 sm:px-7">
-              <MediaFrame title="Campaign creative">
-                {isRejected ? (
-                  <p className="py-8 text-center text-sm text-stone-600">
-                    Creative assets are not available for rejected bookings.
-                  </p>
-                ) : b.creativeImageUrl || b.creativeVideoUrl ? (
-                  <CreativeMedia
-                    creativeKind={b.creativeKind}
-                    creativeImageUrl={b.creativeImageUrl}
-                    creativeVideoUrl={b.creativeVideoUrl}
-                    hideActions
-                    className="w-full"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    No creative uploaded
-                  </p>
-                )}
-              </MediaFrame>
-
-              <MediaFrame title="Billboard">
-                {b.listing?.imageUrl ? (
-                  <img
-                    src={b.listing.imageUrl}
-                    alt={b.listing.name ?? "Billboard"}
-                    className="max-h-52 w-full rounded-lg object-contain"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    No image
-                  </p>
-                )}
-              </MediaFrame>
-
-              <MediaFrame title="Active proof">
-                {b.activeProofImageUrl ? (
-                  <img
-                    src={b.activeProofImageUrl}
-                    alt="Activation proof"
-                    className="max-h-52 w-full rounded-lg object-contain"
-                  />
-                ) : (
-                  <p className="py-8 text-center text-sm text-stone-500">
-                    Upload proof when you accept the campaign
-                  </p>
-                )}
-              </MediaFrame>
-            </div>
+            <CampaignBillboardAssetsSection
+              creativeKind={b.creativeKind}
+              creativeImageUrl={b.creativeImageUrl}
+              creativeVideoUrl={b.creativeVideoUrl}
+              creativeEmptyMessage="No creative uploaded"
+              creativeUnavailable={isRejected}
+              listingImageUrl={b.listing?.imageUrl}
+              listingName={b.listing?.name}
+              activeProofImageUrl={b.activeProofImageUrl}
+              activeProofEmptyMessage="Upload proof when you accept the campaign"
+              arconPanel={
+                <ArconCertificatePanel
+                  booking={b}
+                  audience="vendor"
+                  className="!px-0 !pb-0"
+                />
+              }
+              underCreativeActions={
+                !isRejected && creativeUrl ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => void copyCreative()}
+                      className="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50"
+                    >
+                      Copy creative URL
+                    </button>
+                    <a
+                      className="inline-flex items-center justify-center rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50"
+                      href={creativeUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      download={canDownload ? "" : undefined}
+                    >
+                      {canDownload ? "Download" : "Open creative"}
+                    </a>
+                  </>
+                ) : null
+              }
+            />
 
             {showDisputeBanner && disputePhase !== null ? (
               <div className="px-5 pb-4 sm:px-7">
@@ -259,27 +264,6 @@ const Request = () => {
             ) : null}
 
             <div className="flex flex-col gap-3 border-t border-stone-100 px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:px-7">
-              {!isRejected && creativeUrl ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => void copyCreative()}
-                    className="rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50"
-                  >
-                    Copy creative URL
-                  </button>
-                  <a
-                    className="inline-flex items-center justify-center rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50"
-                    href={creativeUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    download={canDownload ? "" : undefined}
-                  >
-                    {canDownload ? "Download" : "Open creative"}
-                  </a>
-                </>
-              ) : null}
-
               {canAct ? (
                 <button
                   type="button"

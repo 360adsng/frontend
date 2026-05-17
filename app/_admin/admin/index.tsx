@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useAdminDashboard } from "@endpoint/admin/useAdminDashboard";
 import { CampaignPaymentStatusBadge, CampaignStatusBadge, formatCampaignMoney, formatDateShort } from "@components/campaign/CampaignDetailShared";
+import { arconTurnaroundLabel } from "@lib/billboardArcon";
 
 function StatCard({
   label,
@@ -49,6 +50,11 @@ function AdminHome() {
               href="/admin/request"
             />
             <StatCard
+              label="ARCON applications"
+              value={d.counts.arconApplicationsPending ?? 0}
+              href="/admin/request"
+            />
+            <StatCard
               label="Pending payouts"
               value={d.counts.payoutsPending}
               href="/admin/payout"
@@ -80,12 +86,44 @@ function AdminHome() {
               </div>
 
               <div className="mt-5 space-y-3">
-                {d.queues.disputes.length === 0 ? (
+                {(d.queues.arconApplications ?? []).map((x) => (
+                  <div
+                    key={`arcon-${x.id}`}
+                    className="rounded-xl border border-amber-300 bg-amber-50/80 p-4"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-amber-900">
+                          ARCON · billboard · NG#{x.id}
+                        </p>
+                        <p className="mt-1 truncate text-sm font-semibold text-stone-900">
+                          {x.listingName ?? "—"}
+                        </p>
+                        <p className="mt-1 text-xs text-stone-600">
+                          {arconTurnaroundLabel(x.turnaround)}
+                        </p>
+                      </div>
+                      <CampaignPaymentStatusBadge
+                        paymentStatus={x.paymentStatus}
+                      />
+                    </div>
+                    <Link
+                      to={`/admin/request/billboard/${x.id}`}
+                      className="mt-3 inline-block text-sm font-semibold text-stone-900 underline-offset-2 hover:underline"
+                    >
+                      Upload certificate
+                    </Link>
+                  </div>
+                ))}
+
+                {d.queues.disputes.length === 0 &&
+                (d.queues.arconApplications ?? []).length === 0 ? (
                   <p className="text-sm text-stone-600">
-                    No open disputes in the current queue.
+                    No disputes or ARCON applications need attention.
                   </p>
-                ) : (
-                  d.queues.disputes.map((x) => {
+                ) : null}
+
+                {d.queues.disputes.map((x) => {
                     const href =
                       x.kind === "billboard"
                         ? `/admin/request/billboard/${x.id}`
@@ -135,8 +173,7 @@ function AdminHome() {
                         </div>
                       </div>
                     );
-                  })
-                )}
+                  })}
               </div>
             </div>
 

@@ -76,9 +76,10 @@ export type PublicBillboardBusiness = {
   businessName: string;
   businessAddress: string;
   cac: string;
-  businessWebsite: string | null;
   businessLogo: string | null;
   billboardCoverage: BillboardCoverageDto[];
+  /** Naira per m² for static / vinyl printing */
+  printingPricePerSqMeter: number | null;
   contactPersonName: string;
   contactPersonPhone: string | null;
   contactPersonEmail: string | null;
@@ -195,11 +196,9 @@ export type BillboardOwnerSignupPayload =
       businessName: string;
       address: string;
       billboardCoverage: BillboardCoverageDto[];
-      website?: string;
+      printingPricePerSqMeter: number;
       cacUrl?: string;
-      cacDataUrl?: string;
       logoUrl?: string;
-      logoDataUrl?: string;
     }
   | {
       inviteToken: string;
@@ -217,4 +216,7 @@ export type BillboardOwnerSignupResponse = {
   user?: VendorOnboardingUser;
   business?: PublicBillboardBusiness | null;
   status?: "submitted";
+  /** Returned after step 1 for optional authenticated requests */
+  accessToken?: string;
+  refreshToken?: string;
 };

@@ -62,6 +62,22 @@ export type AdminListingSummary = {
   owner: AdminBriefUser | null;
 };
 
+export type AdminFlutterwaveReconcileMeta = {
+  flutterwaveReconcileAvailable: boolean;
+  pendingFlutterwaveTxRef: string | null;
+  pendingTransactionId: number | null;
+  pendingTransactionStatus: string | null;
+};
+
+export type AdminBillboardPaymentBreakdown = {
+  placementAmount: number;
+  printAmount: number;
+  arconAmount: number;
+  vendorHoldAmount: number;
+  payableTotal: number;
+  arconFeeRefunded: boolean;
+};
+
 export type AdminBillboardRequestDetail = {
   id: number;
   billboardListingId: number;
@@ -80,6 +96,11 @@ export type AdminBillboardRequestDetail = {
   creativeVideoUrl: string | null;
   activeProofImageUrl: string | null;
   activeAt: string | null;
+  arconHasCertificate: boolean;
+  arconCertificateUrl: string | null;
+  arconApplicationTurnaround: string | null;
+  quotedArconTotal: number | null;
+  arconApplicationPending: boolean;
   currency: string;
   quotedTotal: number;
   listingWasNegotiable: boolean;
@@ -97,7 +118,7 @@ export type AdminBillboardRequestDetail = {
   disputeChatHasThread: boolean;
   createdAt: string;
   updatedAt: string;
-};
+} & AdminFlutterwaveReconcileMeta & AdminBillboardPaymentBreakdown;
 
 /** Influencer bookings list row */
 export type AdminInfluencerRequestRow = {
@@ -186,6 +207,30 @@ export type AdminInfluencerRequestDetail = {
   disputeChatHasThread: boolean;
   createdAt: string;
   updatedAt: string;
+} & AdminFlutterwaveReconcileMeta;
+
+export type AdminBillboardRefundResult = {
+  bookingId: number;
+  status: string;
+  paymentStatus: string;
+  refund: {
+    scope: string;
+    amount: number;
+    method: string;
+    transactionId: number;
+  };
+};
+
+export type AdminReconcileFlutterwavePaymentResult = {
+  ok: boolean;
+  bookingId: number;
+  kind: string;
+  flutterwaveStatus: string;
+  txRef: string;
+  received?: boolean;
+  duplicate?: boolean;
+  skipped?: boolean;
+  status?: string;
 };
 
 export function buildAdminBillboardRequestsQueryString(
@@ -245,5 +290,78 @@ export async function getAdminInfluencerBookingRequestDetail(
 ): Promise<AdminInfluencerRequestDetail> {
   return baseFetchJson<AdminInfluencerRequestDetail>(
     `/admin/requests/influencers/${id}`,
+  );
+}
+
+export async function attachAdminBillboardArconCertificate(
+  bookingId: number,
+  arconCertificateUrl: string,
+): Promise<{ id: number; arconCertificateUrl: string | null }> {
+  return baseFetchJson(`/admin/requests/billboards/${bookingId}/arcon-certificate`, {
+    method: "PATCH",
+    body: { arconCertificateUrl },
+  });
+}
+
+export async function reconcileAdminBillboardFlutterwavePayment(
+  bookingId: number,
+): Promise<AdminReconcileFlutterwavePaymentResult> {
+  return baseFetchJson<AdminReconcileFlutterwavePaymentResult>(
+    `/admin/requests/billboards/${bookingId}/reconcile-flutterwave-payment`,
+    { method: "POST" },
+  );
+}
+
+export type AdminRepairBillboardPaymentLedgerResult = {
+  ok: boolean;
+  bookingId: number;
+  placementAmount: number;
+  printAmount: number;
+  arconAmount: number;
+  vendorHoldAmount: number;
+  payableTotal: number;
+};
+
+export async function repairAdminBillboardPaymentLedger(
+  bookingId: number,
+): Promise<AdminRepairBillboardPaymentLedgerResult> {
+  return baseFetchJson<AdminRepairBillboardPaymentLedgerResult>(
+    `/admin/requests/billboards/${bookingId}/repair-payment-ledger`,
+    { method: "POST" },
+  );
+}
+
+export async function reconcileAdminInfluencerFlutterwavePayment(
+  bookingId: number,
+): Promise<AdminReconcileFlutterwavePaymentResult> {
+  return baseFetchJson<AdminReconcileFlutterwavePaymentResult>(
+    `/admin/requests/influencers/${bookingId}/reconcile-flutterwave-payment`,
+    { method: "POST" },
+  );
+}
+
+export async function cancelAdminBillboardBookingPayment(
+  bookingId: number,
+  reason?: string,
+): Promise<AdminBillboardRefundResult> {
+  return baseFetchJson<AdminBillboardRefundResult>(
+    `/admin/requests/billboards/${bookingId}/cancel-payment`,
+    {
+      method: "POST",
+      body: JSON.stringify(reason?.trim() ? { reason: reason.trim() } : {}),
+    },
+  );
+}
+
+export async function refundAdminBillboardArconFee(
+  bookingId: number,
+  reason?: string,
+): Promise<AdminBillboardRefundResult> {
+  return baseFetchJson<AdminBillboardRefundResult>(
+    `/admin/requests/billboards/${bookingId}/refund-arcon-fee`,
+    {
+      method: "POST",
+      body: JSON.stringify(reason?.trim() ? { reason: reason.trim() } : {}),
+    },
   );
 }

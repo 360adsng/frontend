@@ -28,6 +28,7 @@ const TYPE_LABELS: Partial<Record<TransactionType, string>> = {
 
 const STATUS_LABELS: Record<TransactionStatus, string> = {
   pending: "Pending",
+  processing: "Processing",
   completed: "Completed",
   failed: "Failed",
 };
